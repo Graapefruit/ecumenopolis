@@ -1,0 +1,13 @@
+fileFormatVersion: 2
+guid: e27435bfd2c75c143896c44afc0d9b05
+MonoImporter:
+  externalObjects: {}
+  serializedVersion: 2
+  defaultReferences:
+  - caltrops: {fileID: 2276571768285789531, guid: a0520eb13a3ee2047a631c4ef3b2661d,
+      type: 3}
+  executionOrder: 0
+  icon: {instanceID: 0}
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
