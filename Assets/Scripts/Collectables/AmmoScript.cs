@@ -7,7 +7,7 @@ public class AmmoScript : Collectable
     private int ammoCount;
 
     void Start() {
-        ammoCount = Random.Range(1, 4);
+        this.ammoCount = 8 + Random.Range(0, 8);
     }
 
     protected override bool validPickupCandidate(GameObject gameObject) {

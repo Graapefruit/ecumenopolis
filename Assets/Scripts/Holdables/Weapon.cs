@@ -5,30 +5,32 @@ using UnityEngine;
 public abstract class Weapon : Holdable {
     protected readonly float fireCooldown;
     protected readonly int damage;
-    protected readonly int baseAmmo;
+    protected readonly int maxAmmo;
     protected float timeLastShot;
     protected int ammoRemaining;
     protected float bulletSpread;
     protected float stoppingPower;
 
-    public Weapon(float fc, int d, int ba, float bs, float sp) {
+    public Weapon(float fc, int d, int maxAmmo, float bs, float sp) {
         this.fireCooldown = fc;
         this.damage = d;
-        this.baseAmmo = ba;
+        this.maxAmmo = maxAmmo;
         this.timeLastShot = this.fireCooldown * -1;
-        this.ammoRemaining = this.baseAmmo;
+        this.ammoRemaining = this.maxAmmo;
         this.bulletSpread = bs;
     }
 
     public override void primaryUsed(Vector3 source, Vector3 destination) {
         Vector3 direction = this.getFireDirection(source, destination);
         if (this.gunIsReady()) {
-            this.fireGun(source, direction);
+            timeLastShot = Time.time;
+            this.fireWeapon(source, direction);
+            this.ammoRemaining--;
         }
     }
 
     public virtual void refillAmmo(int amount) {
-        this.ammoRemaining = Mathf.Min(baseAmmo, amount + this.ammoRemaining);
+        this.ammoRemaining = Mathf.Min(maxAmmo, amount + this.ammoRemaining);
     }
 
     public virtual int getRemainingAmmo() {
@@ -39,35 +41,38 @@ public abstract class Weapon : Holdable {
         return Time.time - timeLastShot >= fireCooldown && ammoRemaining > 0;
     }
 
-    private void fireGun(Vector3 source, Vector3 direction) {
-        // this.ammoRemaining--;
-        RaycastHit hit;
-        // TODO: Tracer if the bullet goes off the map too
-        if (Physics.Raycast(source, direction, out hit, Mathf.Infinity)) {
-            GameObject objectHit = hit.collider.gameObject;
-            if (isMover(objectHit)) {
-                Mover mover = objectHit.GetComponents(typeof(Mover))[0] as Mover;
-                mover.dealDamage(damage);
-            }
-            TracerManager.createTracer(source, hit.point);
-        }
-        timeLastShot = Time.time;
-    }
+    protected abstract void fireWeapon(Vector3 source, Vector3 direction);
+
+    // protected virtual void fireGun(Vector3 source, Vector3 direction) {
+    //     RaycastHit hit;
+    //     Vector3 tracerEnd;
+    //     // TODO: Tracer if the bullet goes off the map too
+    //     if (Physics.Raycast(source, direction, out hit, Mathf.Infinity)) {
+    //         GameObject objectHit = hit.collider.gameObject;
+    //         if (isMover(objectHit)) {
+    //             Mover mover = objectHit.GetComponents(typeof(Mover))[0] as Mover;
+    //             mover.dealDamage(damage);
+    //         }
+    //         tracerEnd = hit.point;
+    //     } else {
+    //         tracerEnd = source + (direction * 15.0f);//??
+    //     }
+    //     TracerManager.createTracer(source, tracerEnd);
+    // }
 
     // TODO: Normal Distribution
     // TODO: Check for 0
-    private Vector3 getFireDirection(Vector3 source, Vector3 destination) {
+    protected Vector3 getFireDirection(Vector3 source, Vector3 destination) {
         Vector3 initialDirection = (destination - source).normalized;
         float angle = Mathf.Atan(initialDirection.z / initialDirection.x);
         angle += Random.Range(-this.bulletSpread, this.bulletSpread);
-        Debug.Log(angle);
         float newX = Mathf.Cos(angle) * (source.x < destination.x ? 1 : -1);
         float newZ = Mathf.Sin(angle) * (source.x < destination.x ? 1 : -1);
         Vector3 newDirection = new Vector3(newX, 0.0f, newZ);
         return newDirection.normalized;
     }
 
-    private bool isMover(GameObject gameObject) {
+    protected bool isMover(GameObject gameObject) {
         return gameObject.GetComponents(typeof(Mover)).Length > 0;
     }
 }

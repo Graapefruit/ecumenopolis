@@ -10,7 +10,6 @@ public class PlayerCharacter : Mover
     public Light light;
     private List<Holdable> inventory;
     private Holdable held;
-    private int scrapCount;
     
     void Start()
     {
@@ -19,7 +18,6 @@ public class PlayerCharacter : Mover
         this.inventory = new List<Holdable>();
         this.inventory.Add(newRifle);
         this.inventory.Add(newBuilder);
-        this.scrapCount = 0;
         this.held = newRifle;
         this.updateHud();
     }
@@ -54,7 +52,7 @@ public class PlayerCharacter : Mover
     }
 
     public void pickupScrap(int amount) {
-        this.scrapCount = amount;
+        ((Weapon) this.inventory[1]).refillAmmo(amount);
         this.updateHud();
     }
 
@@ -101,12 +99,7 @@ public class PlayerCharacter : Mover
     }
 
     private void updateHud() {
-        int remainingAmmo = 0;
         HudManager.updateCurrentHeld(this.held.getName());
-        if (this.held is Weapon) {
-            remainingAmmo = ((Weapon) this.held).getRemainingAmmo();
-        }
-        HudManager.updateAmmo(remainingAmmo);
-        HudManager.updateScrap(this.scrapCount);
+        HudManager.updateAmmo(((Weapon) this.held).getRemainingAmmo());
     }
 }
