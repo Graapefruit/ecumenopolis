@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 
 public abstract class Weapon : Holdable {
+    protected const int GUN_IGNORE_LAYER = ~(1 << 8);
     protected readonly string name;
     protected readonly float fireCooldown;
     protected readonly int damage;
@@ -58,7 +59,7 @@ public abstract class Weapon : Holdable {
     protected void shootBullet(Vector3 source, Vector3 direction) {
         RaycastHit hit;
         Vector3 tracerEnd;
-        if (Physics.Raycast(source, direction, out hit, Mathf.Infinity)) {
+        if (Physics.Raycast(source, direction, out hit, Mathf.Infinity, GUN_IGNORE_LAYER)) {
             GameObject objectHit = hit.collider.gameObject;
             if (isMover(objectHit)) {
                 Mover mover = objectHit.GetComponents(typeof(Mover))[0] as Mover;

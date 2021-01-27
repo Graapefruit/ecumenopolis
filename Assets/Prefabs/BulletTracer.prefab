@@ -10,7 +10,7 @@ GameObject:
   m_Component:
   - component: {fileID: 7530678543858403903}
   - component: {fileID: 7530678543858403888}
-  m_Layer: 0
+  m_Layer: 8
   m_Name: BulletTracer
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -46,6 +46,7 @@ LineRenderer:
   m_LightProbeUsage: 0
   m_ReflectionProbeUsage: 0
   m_RayTracingMode: 0
+  m_RayTraceProcedural: 0
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:

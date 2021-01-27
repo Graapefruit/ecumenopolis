@@ -11,8 +11,7 @@ public class PlayerCharacter : Mover
 
     public PlayerCharacter() : base(1, 4.5f) {}
     
-    void Start()
-    {
+    void Start() {
         Holdable newRifle = new Rifle();
         Holdable newBuilder = new Builder();
         this.inventory = new List<Holdable>();
@@ -22,9 +21,7 @@ public class PlayerCharacter : Mover
         this.updateHud();
     }
 
-    // Update is called once per frame
-    void Update()
-    {
+    void Update() {
         bool anythingChanged = true;
         this.turnCharacterToMouse();
         this.moveCharacter();
@@ -65,12 +62,12 @@ public class PlayerCharacter : Mover
     }
 
     private void moveCharacter() {
-        float horizontalMagnitude = 0;
-        float verticalMagnitude = 0;
-        verticalMagnitude += (Input.GetKey("w") ? 1.0f : 0.0f);
-        horizontalMagnitude += (Input.GetKey("a") ? -1.0f : 0.0f);
-        verticalMagnitude += (Input.GetKey("s") ? -1.0f : 0.0f);
+        float horizontalMagnitude = 0.0f;
+        float verticalMagnitude = 0.0f;
         horizontalMagnitude += (Input.GetKey("d") ? 1.0f : 0.0f);
+        horizontalMagnitude += (Input.GetKey("a") ? -1.0f : 0.0f);
+        verticalMagnitude += (Input.GetKey("w") ? 1.0f : 0.0f);
+        verticalMagnitude += (Input.GetKey("s") ? -1.0f : 0.0f);
         if (horizontalMagnitude != 0 && verticalMagnitude != 0) {
             horizontalMagnitude *= 0.70710678118f;
             verticalMagnitude *= 0.70710678118f;
@@ -99,7 +96,7 @@ public class PlayerCharacter : Mover
     private void updateHud() {
         string weaponName = this.held.getName();
         int ammoAmount = ((Weapon) this.held).getRemainingAmmo();
-
+        
         HudManager.updateCurrentHeld(this.held.getName());
         HudManager.updateAmmo(ammoAmount);
     }

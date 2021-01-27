@@ -13,7 +13,7 @@ GameObject:
   - component: {fileID: 3763333456912917670}
   - component: {fileID: 7757224281529409148}
   - component: {fileID: 941761499720072871}
-  m_Layer: 0
+  m_Layer: 8
   m_Name: Caltrops
   m_TagString: Untagged
   m_Icon: {fileID: 0}
