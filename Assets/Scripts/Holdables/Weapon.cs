@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 
 public abstract class Weapon : Holdable {
+    protected readonly string name;
     protected readonly float fireCooldown;
     protected readonly int damage;
     protected readonly int maxAmmo;
@@ -11,11 +12,13 @@ public abstract class Weapon : Holdable {
     protected float bulletSpread;
     protected float stoppingPower;
 
-    public Weapon(float fireCooldown, 
+    public Weapon(string name,
+                    float fireCooldown, 
                     int damage, 
                     int maxAmmo, 
                     float bulletSpread, 
                     float stoppingPower) {
+        this.name = name;
         this.fireCooldown = fireCooldown;
         this.damage = damage;
         this.maxAmmo = maxAmmo;
@@ -23,6 +26,10 @@ public abstract class Weapon : Holdable {
         this.ammoRemaining = this.maxAmmo;
         this.bulletSpread = bulletSpread;
         this.stoppingPower = stoppingPower;
+    }
+
+    public override string getName() {
+        return this.name;
     }
 
     public override void primaryUsed(Vector3 source, Vector3 destination) {
@@ -48,22 +55,21 @@ public abstract class Weapon : Holdable {
 
     protected abstract void fireWeapon(Vector3 source, Vector3 direction);
 
-    // protected virtual void fireGun(Vector3 source, Vector3 direction) {
-    //     RaycastHit hit;
-    //     Vector3 tracerEnd;
-    //     // TODO: Tracer if the bullet goes off the map too
-    //     if (Physics.Raycast(source, direction, out hit, Mathf.Infinity)) {
-    //         GameObject objectHit = hit.collider.gameObject;
-    //         if (isMover(objectHit)) {
-    //             Mover mover = objectHit.GetComponents(typeof(Mover))[0] as Mover;
-    //             mover.dealDamage(damage);
-    //         }
-    //         tracerEnd = hit.point;
-    //     } else {
-    //         tracerEnd = source + (direction * 15.0f);//??
-    //     }
-    //     TracerManager.createTracer(source, tracerEnd);
-    // }
+    protected void shootBullet(Vector3 source, Vector3 direction) {
+        RaycastHit hit;
+        Vector3 tracerEnd;
+        if (Physics.Raycast(source, direction, out hit, Mathf.Infinity)) {
+            GameObject objectHit = hit.collider.gameObject;
+            if (isMover(objectHit)) {
+                Mover mover = objectHit.GetComponents(typeof(Mover))[0] as Mover;
+                mover.dealDamage(this.damage, this.stoppingPower);
+            }
+            tracerEnd = hit.point;
+        } else {
+            tracerEnd = source + (direction * 15.0f);
+        }
+        TracerManager.createTracer(source, tracerEnd);
+    }
 
     // TODO: Normal Distribution
     // TODO: Check for 0

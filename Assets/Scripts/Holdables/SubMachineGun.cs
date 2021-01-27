@@ -1,9 +1,10 @@
-﻿using System.Collections;
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class Rifle : Weapon {
-    public Rifle() : base("Rifle", 0.125f, 7, 30, Mathf.PI / 20, 1.2f) {}
+public class SubMachineGun : Weapon {
+    public SubMachineGun() : base("SMG", 0.085f, 5, 45, Mathf.PI / 35, 0.5f) {}
+    
     protected override void fireWeapon(Vector3 source, Vector3 direction) {
         this.shootBullet(source, direction);
     }

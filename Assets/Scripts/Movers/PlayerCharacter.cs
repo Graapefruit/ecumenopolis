@@ -67,10 +67,10 @@ public class PlayerCharacter : Mover
     private void moveCharacter() {
         float horizontalMagnitude = 0;
         float verticalMagnitude = 0;
-        horizontalMagnitude += (Input.GetKey("d") ? 1.0f : 0.0f);
-        horizontalMagnitude += (Input.GetKey("a") ? -1.0f : 0.0f);
         verticalMagnitude += (Input.GetKey("w") ? 1.0f : 0.0f);
+        horizontalMagnitude += (Input.GetKey("a") ? -1.0f : 0.0f);
         verticalMagnitude += (Input.GetKey("s") ? -1.0f : 0.0f);
+        horizontalMagnitude += (Input.GetKey("d") ? 1.0f : 0.0f);
         if (horizontalMagnitude != 0 && verticalMagnitude != 0) {
             horizontalMagnitude *= 0.70710678118f;
             verticalMagnitude *= 0.70710678118f;
@@ -92,14 +92,15 @@ public class PlayerCharacter : Mover
 
     private Vector3 getMouseLocationAtZeroHeight() {
         Ray ray = this.playerCamera.ScreenPointToRay(Input.mousePosition);
-
-        // The below line is derrived from: origin.y + n*direction.y = 0
         float distance = -1 * ray.origin.y / ray.direction.y;
         return ray.GetPoint(distance);
     }
 
     private void updateHud() {
+        string weaponName = this.held.getName();
+        int ammoAmount = ((Weapon) this.held).getRemainingAmmo();
+
         HudManager.updateCurrentHeld(this.held.getName());
-        HudManager.updateAmmo(((Weapon) this.held).getRemainingAmmo());
+        HudManager.updateAmmo(ammoAmount);
     }
 }

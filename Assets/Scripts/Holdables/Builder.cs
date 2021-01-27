@@ -4,12 +4,7 @@ using UnityEngine;
 
 public class Builder : Weapon {
     private const float maxPlacementDistance = 3.25f;
-    protected const string name = "Builder";
-    public Builder() : base(1.05f, 0, 10, 0.0f, 0.0f) {}
-
-    public override string getName() {
-        return name;
-    }
+    public Builder() : base("Builder", 1.05f, 0, 10, 0.0f, 0.0f) {}
 
     protected override void fireWeapon(Vector3 source, Vector3 direction) {
         float placementDistance = direction.magnitude;
