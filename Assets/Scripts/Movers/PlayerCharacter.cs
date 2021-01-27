@@ -67,10 +67,10 @@ public class PlayerCharacter : Mover
     private void moveCharacter() {
         float horizontalMagnitude = 0;
         float verticalMagnitude = 0;
-        horizontalMagnitude += (Input.GetKey("right") ? 1.0f : 0.0f);
-        horizontalMagnitude += (Input.GetKey("left") ? -1.0f : 0.0f);
-        verticalMagnitude += (Input.GetKey("up") ? 1.0f : 0.0f);
-        verticalMagnitude += (Input.GetKey("down") ? -1.0f : 0.0f);
+        horizontalMagnitude += (Input.GetKey("d") ? 1.0f : 0.0f);
+        horizontalMagnitude += (Input.GetKey("a") ? -1.0f : 0.0f);
+        verticalMagnitude += (Input.GetKey("w") ? 1.0f : 0.0f);
+        verticalMagnitude += (Input.GetKey("s") ? -1.0f : 0.0f);
         if (horizontalMagnitude !=0 && verticalMagnitude != 0) {
             horizontalMagnitude *= 0.70710678118f;
             verticalMagnitude *= 0.70710678118f;
