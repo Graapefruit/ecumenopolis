@@ -14,6 +14,7 @@ public class Portal : MonoBehaviour
             Vector3 spawnLocation = transform.position;
             spawnLocation.y = 0.5f;
             GameObject newEnemy = (GameObject) Instantiate(enemy, spawnLocation, Quaternion.identity);
+            newEnemy.GetComponent<Enemy>().giveTarget(Game.getPlayer());
             EnemyManager.addNewEnemy(newEnemy);
             EnemyManager.removeEnemy(gameObject);
             Destroy(gameObject);

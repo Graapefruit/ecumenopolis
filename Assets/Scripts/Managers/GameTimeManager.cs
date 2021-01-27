@@ -11,7 +11,7 @@ public class GameTimeManager : MonoBehaviour
     private static readonly int dayLightIntensity = 1;
     private static readonly int nightLightIntensity = 5;
     private static readonly float dayDurationSeconds = 15.0f;
-    private static readonly float nightDurationSeconds = 5.0f;
+    private static readonly float nightDurationSeconds = 15.0f;
     private bool isDay = false;
     private float timeLeftInCycle = 0.0f;
     public Light overheadLight;

@@ -4,7 +4,7 @@ using UnityEngine;
 
 public class Rifle : Weapon {
     protected const string name = "Rifle";
-    public Rifle() : base(0.125f, 4, 30, Mathf.PI / 20, 2.0f) {}
+    public Rifle() : base(0.125f, 4, 30, Mathf.PI / 20, 1.0f) {}
     public override string getName() {
         return name;
     }
@@ -16,7 +16,7 @@ public class Rifle : Weapon {
             GameObject objectHit = hit.collider.gameObject;
             if (isMover(objectHit)) {
                 Mover mover = objectHit.GetComponents(typeof(Mover))[0] as Mover;
-                mover.dealDamage(damage);
+                mover.dealDamage(this.damage, this.stoppingPower);
             }
             tracerEnd = hit.point;
         } else {

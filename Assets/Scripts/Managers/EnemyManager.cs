@@ -24,8 +24,7 @@ public class EnemyManager : MonoBehaviour
     }
 
     // Update is called once per frame
-    void Update()
-    {
+    void Update() {
         remainingPortalCooldown -= Time.deltaTime;
         if (remainingPortalCooldown <= 0.0f && !(GameTimeManager.isCurrentlyDay())) {
             Vector3 spawnLocation = BoardManager.getRandomLocation(portalSpawnHeight);

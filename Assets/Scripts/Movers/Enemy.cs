@@ -9,26 +9,22 @@ public class Enemy : Mover
     private const float detectionRange = 7.0f;
     private List<Vector3> path;
     private Vector3 currentWaypoint;
-    protected readonly float baseSpeed = 5.0f;
-    // protected readonly float baseSpeed = 1.0f;
-    protected readonly int baseHealth = 30;
 
-    // Start is called before the first frame update
-    void Start() {
-        currentHealth = baseHealth;
-        isChasingPlayer = false;
-        target = Game.getPlayer();
+    public Enemy() : base(30, 5.0f) {}
+
+    public void giveTarget(PlayerCharacter target) {
+        this.target = target;
     }
 
     // Update is called once per frame
-    void Update()
-    {
+    void Update() {
         if (target) {
             path = BoardManager.getPath(transform.position, target.transform.position);
             currentWaypoint = path[1];
-            transform.position = Vector3.MoveTowards(transform.position, currentWaypoint, baseSpeed * Time.deltaTime);
+            this.moveTowardsLocation(currentWaypoint);
+            // transform.position = Vector3.MoveTowards(transform.position, currentWaypoint, baseSpeed * Time.deltaTime);
             if ((target.transform.position - transform.position).magnitude <= 0.5f) {
-                target.dealDamage(1);
+                target.dealDamage(1, 2.0f);
             }
         }
     }

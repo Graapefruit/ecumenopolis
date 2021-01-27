@@ -4,12 +4,12 @@ using UnityEngine;
 
 public class PlayerCharacter : Mover
 {
-    private readonly float baseSpeed = 4.5f;
-    private readonly int baseHealth = 1;
-    public Camera camera;
-    public Light light;
+    public Camera playerCamera;
+    public Light playerCamerLight;
     private List<Holdable> inventory;
     private Holdable held;
+
+    public PlayerCharacter() : base(1, 4.5f) {}
     
     void Start()
     {
@@ -71,7 +71,7 @@ public class PlayerCharacter : Mover
         horizontalMagnitude += (Input.GetKey("a") ? -1.0f : 0.0f);
         verticalMagnitude += (Input.GetKey("w") ? 1.0f : 0.0f);
         verticalMagnitude += (Input.GetKey("s") ? -1.0f : 0.0f);
-        if (horizontalMagnitude !=0 && verticalMagnitude != 0) {
+        if (horizontalMagnitude != 0 && verticalMagnitude != 0) {
             horizontalMagnitude *= 0.70710678118f;
             verticalMagnitude *= 0.70710678118f;
         }
@@ -85,13 +85,13 @@ public class PlayerCharacter : Mover
             Vector3 newLightLocation = new Vector3(newX, 5.0f, newZ);
             Vector3 newCameraLocation = new Vector3(newX, 18.0f, newZ);
             transform.position = newPlayerLocation;
-            light.transform.position = newLightLocation;
-            camera.transform.position = newCameraLocation;
+            this.playerCamerLight.transform.position = newLightLocation;
+            this.playerCamera.transform.position = newCameraLocation;
         }
     }
 
     private Vector3 getMouseLocationAtZeroHeight() {
-        Ray ray = camera.ScreenPointToRay(Input.mousePosition);
+        Ray ray = this.playerCamera.ScreenPointToRay(Input.mousePosition);
 
         // The below line is derrived from: origin.y + n*direction.y = 0
         float distance = -1 * ray.origin.y / ray.direction.y;

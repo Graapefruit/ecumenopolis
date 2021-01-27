@@ -4,29 +4,44 @@ using UnityEngine;
 
 public abstract class Mover : MonoBehaviour
 {
+    protected const float stoppingPowerRecoveryRatePerSecond = 1.5f;
+    protected const float minimumPossibleSpeed = 0.1f;
     protected readonly float baseSpeed;
     protected readonly int baseHealth;
+    protected float stoppingPowerApplied;
+    protected float stoppingPowerLastUpdate;
     protected int currentHealth;
-    // Start is called before the first frame update
-    void Start() {
-        currentHealth = baseHealth;
+
+    public Mover(int baseHealth, float baseSpeed) {
+        this.baseHealth = baseHealth;
+        this.baseSpeed = baseSpeed;
+        this.stoppingPowerApplied = 0;
+        this.currentHealth = this.baseHealth;
     }
 
-    public void dealDamage(int damageDealt) {
+    public void dealDamage(int damageDealt, float stoppingPower) {
         this.currentHealth -= damageDealt;
-        if (currentHealth <= 0) {
+        if (this.currentHealth <= 0) {
             Destroy(gameObject);
         }
+        this.stoppingPowerApplied = stoppingPower;
+        this.stoppingPowerLastUpdate = Time.time;
     }
 
-    protected void moveInDirection(Vector3 directionVector) {
-        float newX = transform.position.x + (directionVector.x * Time.deltaTime);
-        float newY = transform.position.y;
-        float newZ = transform.position.z + (directionVector.z * Time.deltaTime);
-        transform.position = new Vector3(newX, newY, newZ);
+    protected void moveTowardsLocation(Vector3 destination) {
+        this.updateStoppingPowerApplied();
+        float speedWithStoppingPower = this.baseSpeed - stoppingPowerApplied;
+        float speed = (speedWithStoppingPower > minimumPossibleSpeed ? speedWithStoppingPower : minimumPossibleSpeed);
+        transform.position = Vector3.MoveTowards(transform.position, destination, speed * Time.deltaTime);
+        this.stoppingPowerLastUpdate = Time.time;
     }
 
-    protected void moveTowardsLocation(Vector3 locationVector) {
-        transform.position = Vector3.MoveTowards(transform.position, locationVector, baseSpeed * Time.deltaTime);
+    private void updateStoppingPowerApplied() {
+        float stoppingPowerReduction = (Time.time - this.stoppingPowerLastUpdate) * stoppingPowerRecoveryRatePerSecond;
+        if (stoppingPowerReduction < this.stoppingPowerApplied) {
+            this.stoppingPowerApplied -= stoppingPowerReduction;
+        } else {
+            this.stoppingPowerApplied = 0;
+        }
     }
 }

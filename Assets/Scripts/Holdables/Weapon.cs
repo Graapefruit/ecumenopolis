@@ -11,13 +11,18 @@ public abstract class Weapon : Holdable {
     protected float bulletSpread;
     protected float stoppingPower;
 
-    public Weapon(float fc, int d, int maxAmmo, float bs, float sp) {
-        this.fireCooldown = fc;
-        this.damage = d;
+    public Weapon(float fireCooldown, 
+                    int damage, 
+                    int maxAmmo, 
+                    float bulletSpread, 
+                    float stoppingPower) {
+        this.fireCooldown = fireCooldown;
+        this.damage = damage;
         this.maxAmmo = maxAmmo;
         this.timeLastShot = this.fireCooldown * -1;
         this.ammoRemaining = this.maxAmmo;
-        this.bulletSpread = bs;
+        this.bulletSpread = bulletSpread;
+        this.stoppingPower = stoppingPower;
     }
 
     public override void primaryUsed(Vector3 source, Vector3 destination) {
