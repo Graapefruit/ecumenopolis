@@ -6,6 +6,7 @@ public class BuildingManager : MonoBehaviour
 {
     public GameObject caltrops; 
     private static BuildingManager bm;
+    private List<GameObject> caltropsList;
     
     void Awake() {
         if (bm != null) {
@@ -13,9 +14,11 @@ public class BuildingManager : MonoBehaviour
             GameObject.Destroy(bm);
         }
         bm = this;
+        this.caltropsList = new List<GameObject>();
     }
 
     public static void createCaltrops(Vector3 location, Quaternion rotation) {
-        Instantiate(bm.caltrops, location, rotation);
+        GameObject newCaltrops = Instantiate(bm.caltrops, location, rotation);
+        bm.caltropsList.Add(newCaltrops);
     }
 }
