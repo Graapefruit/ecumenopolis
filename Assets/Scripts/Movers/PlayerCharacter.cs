@@ -70,7 +70,7 @@ public class PlayerCharacter : Mover
         verticalMagnitude += (Input.GetKey("s") ? -1.0f : 0.0f);
         Vector3 movementDirection = new Vector3(horizontalMagnitude, 0.0f, verticalMagnitude).normalized;
         if (horizontalMagnitude != 0.0f || verticalMagnitude != 0.0f) {
-            this.moveInDirection(movementDirection, Mathf.Infinity);
+            this.moveInDirection(movementDirection);
 
             float newX = transform.position.x;
             float newZ = transform.position.z;

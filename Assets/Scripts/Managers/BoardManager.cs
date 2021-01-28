@@ -2,6 +2,11 @@
 using System.Collections.Generic;
 using UnityEngine;
 
+//TODOS:
+// 1: Separate the source/dest from the graphs
+// 2: Keep copies of the graphs in memory
+// 3: Terminate Dijkstra's early if shortest path found
+
 public class BoardManager : MonoBehaviour
 {
     public GameObject floor;
