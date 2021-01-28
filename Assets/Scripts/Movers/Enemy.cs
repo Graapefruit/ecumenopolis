@@ -10,9 +10,11 @@ public class Enemy : Mover
     private List<Vector3> path;
     private Vector3 currentWaypoint;
     private float pathRefreshCooldown;
+    private Weapon bite;
 
     public Enemy() : base(30, 3.0f) {
         this.pathRefreshCooldown = 0.0f;
+        this.bite = new DretchBite();
     }
 
     public void giveTarget(PlayerCharacter target) {
@@ -34,8 +36,8 @@ public class Enemy : Mover
             }
         }
 
-        if ((target.transform.position - transform.position).magnitude <= 0.5f) {
-            target.dealDamage(1, 2.0f);
+        if ((target.transform.position - transform.position).magnitude <= 1.1f) {
+            this.bite.primaryUsed(transform.position, target.transform.position);
         }
         this.pathRefreshCooldown -= Time.deltaTime;
     }

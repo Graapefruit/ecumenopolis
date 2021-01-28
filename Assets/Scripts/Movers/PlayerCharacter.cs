@@ -9,7 +9,12 @@ public class PlayerCharacter : Mover
     private List<Holdable> inventory;
     private Holdable held;
 
-    public PlayerCharacter() : base(1, 8.5f) {}
+    public PlayerCharacter() : base(50, 8.5f) {}
+
+    public override void dealDamage(int damageDealt, float stoppingPower) {
+        base.dealDamage(damageDealt, stoppingPower);
+        this.updateHud();
+    }
     
     void Start() {
         Holdable newRifle = new Rifle();
@@ -89,6 +94,7 @@ public class PlayerCharacter : Mover
         string weaponName = this.held.getName();
         int ammoAmount = ((Weapon) this.held).getRemainingAmmo();
         
+        HudManager.updateHealth(this.currentHealth);
         HudManager.updateCurrentHeld(this.held.getName());
         HudManager.updateAmmo(ammoAmount);
     }

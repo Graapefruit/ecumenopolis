@@ -14,6 +14,11 @@ public class HudManager : MonoBehaviour
         hud = this;
     }
 
+    public static void updateHealth(int newAmount) {
+        Text healthDisplay = hud.transform.Find("HealthDisplay").GetComponent<Text>();
+        healthDisplay.text = string.Format("Health: {0}", newAmount);
+    }
+
     public static void updateAmmo(int newAmount) {
         Text ammoDisplay = hud.transform.Find("AmmoDisplay").GetComponent<Text>();
         ammoDisplay.text = string.Format("Ammo: {0}", newAmount);

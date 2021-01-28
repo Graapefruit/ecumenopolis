@@ -20,7 +20,7 @@ public abstract class Mover : MonoBehaviour
         this.currentHealth = this.baseHealth;
     }
 
-    public void dealDamage(int damageDealt, float stoppingPower) {
+    public virtual void dealDamage(int damageDealt, float stoppingPower) {
         this.currentHealth -= damageDealt;
         if (this.currentHealth <= 0) {
             Destroy(gameObject);
@@ -36,8 +36,8 @@ public abstract class Mover : MonoBehaviour
         Vector3 direction = (destination - transform.position).normalized;
         float distance = (destination - transform.position).magnitude;
         RaycastHit hit;
-        if (Physics.SphereCast(transform.position, 0.5f, direction, out hit, speed, COLLISION_LAYERS)) {
-            transform.position = hit.point + (hit.normal * 0.51f);
+        if (Physics.SphereCast(transform.position, 0.4f, direction, out hit, speed, COLLISION_LAYERS)) {
+            transform.position = hit.point + (hit.normal * 0.5f);
         } else {
             if (distance < speed) {
                 transform.position = destination;

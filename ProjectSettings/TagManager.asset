@@ -13,9 +13,9 @@ TagManager:
   - UI
   - 
   - 
-  - GunIgnore
-  - Terrain
-  - 
+  - Intangible
+  - Wall
+  - Mover
   - 
   - 
   - 
