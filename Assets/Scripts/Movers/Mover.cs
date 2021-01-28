@@ -4,6 +4,7 @@ using UnityEngine;
 
 public abstract class Mover : MonoBehaviour
 {
+    protected const int IGNORE_LAYER = ~(1 << 8);
     protected const float stoppingPowerRecoveryRatePerSecond = 1.5f;
     protected const float minimumPossibleSpeed = 0.1f;
     protected readonly float baseSpeed;
@@ -28,17 +29,15 @@ public abstract class Mover : MonoBehaviour
         this.stoppingPowerLastUpdate = Time.time;
     }
 
-    protected void moveTowardsLocation(Vector3 destination) {
+    protected void moveInDirection(Vector3 direction, float maxDistance) {
         this.updateStoppingPowerApplied();
-        float speed = this.getSpeed();
-        transform.position = Vector3.MoveTowards(transform.position, destination, speed * Time.deltaTime);
-    }
-
-    protected void moveInDirection(Vector3 direction) {
-        this.updateStoppingPowerApplied();
-        float speed = this.getSpeed();
-        Debug.LogFormat("speed: {0}, base speed: {1}", speed, this.baseSpeed);
-        transform.position += direction.normalized * speed * Time.deltaTime;
+        float speed = Mathf.Min(this.getSpeed(), maxDistance);
+        RaycastHit hit;
+        if (Physics.SphereCast(transform.position, 0.5f, direction, out hit, speed * Time.deltaTime, IGNORE_LAYER)) {
+            transform.position = hit.point + (hit.normal * 0.51f);
+        } else {
+            transform.position += direction.normalized * speed * Time.deltaTime;
+        }
     }
 
     private void updateStoppingPowerApplied() {

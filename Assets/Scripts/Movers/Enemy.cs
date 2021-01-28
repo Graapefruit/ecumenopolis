@@ -10,7 +10,7 @@ public class Enemy : Mover
     private List<Vector3> path;
     private Vector3 currentWaypoint;
 
-    public Enemy() : base(30, 5.0f) {}
+    public Enemy() : base(30, 3.0f) {}
 
     public void giveTarget(PlayerCharacter target) {
         this.target = target;
@@ -21,8 +21,9 @@ public class Enemy : Mover
         if (target) {
             path = BoardManager.getPath(transform.position, target.transform.position);
             currentWaypoint = path[1];
-            this.moveTowardsLocation(currentWaypoint);
-            // transform.position = Vector3.MoveTowards(transform.position, currentWaypoint, baseSpeed * Time.deltaTime);
+            Vector3 direction = (currentWaypoint - transform.position).normalized;
+            float distance = (currentWaypoint - transform.position).magnitude;
+            this.moveInDirection(direction, distance);
             if ((target.transform.position - transform.position).magnitude <= 0.5f) {
                 target.dealDamage(1, 2.0f);
             }

@@ -9,7 +9,7 @@ public class PlayerCharacter : Mover
     private List<Holdable> inventory;
     private Holdable held;
 
-    public PlayerCharacter() : base(1, 4.5f) {}
+    public PlayerCharacter() : base(1, 8.5f) {}
     
     void Start() {
         Holdable newRifle = new Rifle();
@@ -70,7 +70,7 @@ public class PlayerCharacter : Mover
         verticalMagnitude += (Input.GetKey("s") ? -1.0f : 0.0f);
         Vector3 movementDirection = new Vector3(horizontalMagnitude, 0.0f, verticalMagnitude).normalized;
         if (horizontalMagnitude != 0.0f || verticalMagnitude != 0.0f) {
-            this.moveInDirection(movementDirection);
+            this.moveInDirection(movementDirection, Mathf.Infinity);
 
             float newX = transform.position.x;
             float newZ = transform.position.z;

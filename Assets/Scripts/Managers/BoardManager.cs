@@ -49,11 +49,12 @@ public class BoardManager : MonoBehaviour
             float zpos = blocker.transform.position.z;
             float xscale = blocker.transform.localScale.x;
             float zscale = blocker.transform.localScale.z;
+            float size = 0.51f;
             // TODO: Accomodate Size? Instead of Static +/- 0.5f
-            bm.visibilityVerticies.Add(new Vector3(xpos - (xscale / 2.0f) - 0.5f, 0.5f, zpos + (zscale / 2.0f) + 0.5f));
-            bm.visibilityVerticies.Add(new Vector3(xpos + (xscale / 2.0f) + 0.5f, 0.5f, zpos + (zscale / 2.0f) + 0.5f));
-            bm.visibilityVerticies.Add(new Vector3(xpos - (xscale / 2.0f) - 0.5f, 0.5f, zpos - (zscale / 2.0f) - 0.5f));
-            bm.visibilityVerticies.Add(new Vector3(xpos + (xscale / 2.0f) + 0.5f, 0.5f, zpos - (zscale / 2.0f) - 0.5f));
+            bm.visibilityVerticies.Add(new Vector3(xpos - (xscale / 2.0f) - size, 0.5f, zpos + (zscale / 2.0f) + size));
+            bm.visibilityVerticies.Add(new Vector3(xpos + (xscale / 2.0f) + size, 0.5f, zpos + (zscale / 2.0f) + size));
+            bm.visibilityVerticies.Add(new Vector3(xpos - (xscale / 2.0f) - size, 0.5f, zpos - (zscale / 2.0f) - size));
+            bm.visibilityVerticies.Add(new Vector3(xpos + (xscale / 2.0f) + size, 0.5f, zpos - (zscale / 2.0f) - size));
         } 
         bm.visibilityVerticies.Add(dest);
     }
@@ -79,8 +80,11 @@ public class BoardManager : MonoBehaviour
         }
     }
 
-    private bool somethingBetweenTwoPoints(Vector3 a, Vector3 b) {
-        return Physics.Raycast(a, b - a, (b - a).magnitude, TERRAIN_LAYER_MASK);
+    private bool somethingBetweenTwoPoints(Vector3 source, Vector3 destination) {
+        Vector3 direction = (destination-source).normalized;
+        float distance = (destination-source).magnitude;
+        RaycastHit r;
+        return Physics.SphereCast(source, 0.5f, direction, out r, distance, TERRAIN_LAYER_MASK);
     }
 
     // TODO: Make path subscribable(observer pattern) in case of updates
