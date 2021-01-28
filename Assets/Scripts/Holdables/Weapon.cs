@@ -7,6 +7,7 @@ public abstract class Weapon : Holdable {
     protected readonly string name;
     protected readonly float fireCooldown;
     protected readonly int damage;
+    protected readonly float range;
     protected readonly int maxAmmo;
     protected float timeLastShot;
     protected int ammoRemaining;
@@ -16,12 +17,14 @@ public abstract class Weapon : Holdable {
     public Weapon(string name,
                     float fireCooldown, 
                     int damage, 
+                    float range,
                     int maxAmmo, 
                     float bulletSpread, 
                     float stoppingPower) {
         this.name = name;
         this.fireCooldown = fireCooldown;
         this.damage = damage;
+        this.range = range;
         this.maxAmmo = maxAmmo;
         this.timeLastShot = this.fireCooldown * -1;
         this.ammoRemaining = this.maxAmmo;
@@ -61,13 +64,17 @@ public abstract class Weapon : Holdable {
         Vector3 tracerEnd;
         if (Physics.Raycast(source, direction, out hit, Mathf.Infinity, GUN_IGNORE_LAYER)) {
             GameObject objectHit = hit.collider.gameObject;
-            if (isMover(objectHit)) {
-                Mover mover = objectHit.GetComponents(typeof(Mover))[0] as Mover;
-                mover.dealDamage(this.damage, this.stoppingPower);
+            if (this.range >= hit.distance) {
+                if (isMover(objectHit)) {
+                    Mover mover = objectHit.GetComponents(typeof(Mover))[0] as Mover;
+                    mover.dealDamage(this.damage, this.stoppingPower);
+                }
+                tracerEnd = hit.point;
+            } else {
+                tracerEnd = source + ((hit.point - source).normalized * this.range);
             }
-            tracerEnd = hit.point;
         } else {
-            tracerEnd = source + (direction * 15.0f);
+            tracerEnd = source + (direction * this.range);
         }
         TracerManager.createTracer(source, tracerEnd);
     }
