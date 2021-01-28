@@ -30,10 +30,15 @@ public abstract class Mover : MonoBehaviour
 
     protected void moveTowardsLocation(Vector3 destination) {
         this.updateStoppingPowerApplied();
-        float speedWithStoppingPower = this.baseSpeed - stoppingPowerApplied;
-        float speed = (speedWithStoppingPower > minimumPossibleSpeed ? speedWithStoppingPower : minimumPossibleSpeed);
+        float speed = this.getSpeed();
         transform.position = Vector3.MoveTowards(transform.position, destination, speed * Time.deltaTime);
-        this.stoppingPowerLastUpdate = Time.time;
+    }
+
+    protected void moveInDirection(Vector3 direction) {
+        this.updateStoppingPowerApplied();
+        float speed = this.getSpeed();
+        Debug.LogFormat("speed: {0}, base speed: {1}", speed, this.baseSpeed);
+        transform.position += direction.normalized * speed * Time.deltaTime;
     }
 
     private void updateStoppingPowerApplied() {
@@ -43,5 +48,11 @@ public abstract class Mover : MonoBehaviour
         } else {
             this.stoppingPowerApplied = 0;
         }
+        this.stoppingPowerLastUpdate = Time.time;
+    }
+
+    private float getSpeed() {
+        float speedWithStoppingPower = this.baseSpeed - this.stoppingPowerApplied;
+        return (speedWithStoppingPower > minimumPossibleSpeed ? speedWithStoppingPower : minimumPossibleSpeed);
     }
 }

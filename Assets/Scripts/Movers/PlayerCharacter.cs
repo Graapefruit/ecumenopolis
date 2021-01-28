@@ -68,22 +68,14 @@ public class PlayerCharacter : Mover
         horizontalMagnitude += (Input.GetKey("a") ? -1.0f : 0.0f);
         verticalMagnitude += (Input.GetKey("w") ? 1.0f : 0.0f);
         verticalMagnitude += (Input.GetKey("s") ? -1.0f : 0.0f);
-        if (horizontalMagnitude != 0 && verticalMagnitude != 0) {
-            horizontalMagnitude *= 0.70710678118f;
-            verticalMagnitude *= 0.70710678118f;
-        }
-        if (horizontalMagnitude != 0 || verticalMagnitude != 0) {
-            Vector3 direction = new Vector3(horizontalMagnitude, 0.0f, verticalMagnitude);
-            float distance = Time.deltaTime * baseSpeed;
-            Vector3 newPos = BoardManager.move(0.5f, transform.position, direction, distance);
-            float newX = newPos.x;
-            float newZ = newPos.z;
-            Vector3 newPlayerLocation = new Vector3(newX, 0.5f, newZ);
-            Vector3 newLightLocation = new Vector3(newX, 5.0f, newZ);
-            Vector3 newCameraLocation = new Vector3(newX, 18.0f, newZ);
-            transform.position = newPlayerLocation;
-            this.playerCamerLight.transform.position = newLightLocation;
-            this.playerCamera.transform.position = newCameraLocation;
+        Vector3 movementDirection = new Vector3(horizontalMagnitude, 0.0f, verticalMagnitude).normalized;
+        if (horizontalMagnitude != 0.0f || verticalMagnitude != 0.0f) {
+            this.moveInDirection(movementDirection);
+
+            float newX = transform.position.x;
+            float newZ = transform.position.z;
+            this.playerCamerLight.transform.position = new Vector3(newX, 5.0f, newZ);
+            this.playerCamera.transform.position = new Vector3(newX, 18.0f, newZ);
         }
     }
 
