@@ -10,12 +10,4 @@ public class Builder : Weapon {
         Vector3 placementLocation = source + (direction * this.range);
         BuildingManager.createCaltrops(placementLocation, Quaternion.Euler(0.0f, Mathf.Atan(direction.x / direction.z) * Mathf.Rad2Deg, 0.0f));
     }
-
-    // public override void primaryUsed(Vector3 source, Vector3 destination) {
-    //     Vector3 direction = (destination - source).normalized;
-    //     float placementDistance = (destination - source).magnitude;
-    //     Vector3 maxDistancePlacement = source + (direction * maxPlacementDistance);
-    //     Vector3 placementLocation = (placementDistance <= maxPlacementDistance ? destination : maxDistancePlacement);
-    //     BuildingManager.createCaltrops(placementLocation, Quaternion.Euler(0.0f, Mathf.Atan(direction.x / direction.z) * Mathf.Rad2Deg, 0.0f));
-    // }
 }

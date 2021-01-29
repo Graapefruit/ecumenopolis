@@ -8,6 +8,7 @@ public class PlayerCharacter : Mover
     public Light playerCamerLight;
     private List<Holdable> inventory;
     private Holdable held;
+    private float xRotationClamp;
 
     public PlayerCharacter() : base(50, 8.5f) {}
 
@@ -17,6 +18,7 @@ public class PlayerCharacter : Mover
     }
     
     void Start() {
+        this.xRotationClamp = 0.0f;
         Holdable newRifle = new Rifle();
         Holdable newBuilder = new Builder();
         this.inventory = new List<Holdable>();
@@ -27,9 +29,14 @@ public class PlayerCharacter : Mover
     }
 
     void Update() {
-        bool anythingChanged = true;
-        this.turnCharacterToMouse();
+        if (Input.GetKeyDown(KeyCode.Space)) {
+            Cursor.lockState = (Cursor.lockState == CursorLockMode.Locked ? CursorLockMode.None : CursorLockMode.Locked);
+        }
+        if (Cursor.lockState == CursorLockMode.Locked) {
+            this.changePlayerRotation();
+        }
         this.moveCharacter();
+        bool anythingChanged = true;
         if (Input.GetKeyDown(KeyCode.Alpha1)) {
             this.held = this.inventory[0];
         } else if (Input.GetKeyDown(KeyCode.Alpha2)) {
@@ -58,29 +65,35 @@ public class PlayerCharacter : Mover
         this.updateHud();
     }
 
-    private void turnCharacterToMouse() {
-        Vector3 lookLocation = getMouseLocationAtZeroHeight();
-        Vector3 currentLocation = transform.position;
-        currentLocation.y = 0;
-        Vector3 lookDirection = currentLocation - lookLocation;
-        transform.rotation = Quaternion.LookRotation(lookDirection);
+    private void changePlayerRotation() {
+        float mouseDeltaX = Input.GetAxis("Mouse X");
+        float mouseDeltaY = Input.GetAxis("Mouse Y");
+        Vector3 playerRotation = transform.rotation.eulerAngles;
+        float newClamp = xRotationClamp - mouseDeltaY;
+        if (newClamp < 90.0f && newClamp > -90.0f) {
+            playerRotation.x -= mouseDeltaY;
+            xRotationClamp -= mouseDeltaY;
+        }
+        playerRotation.y += mouseDeltaX;
+        playerRotation.z = 0;
+        transform.rotation = Quaternion.Euler(playerRotation);
     }
 
     private void moveCharacter() {
-        float horizontalMagnitude = 0.0f;
-        float verticalMagnitude = 0.0f;
-        horizontalMagnitude += (Input.GetKey("d") ? 1.0f : 0.0f);
-        horizontalMagnitude += (Input.GetKey("a") ? -1.0f : 0.0f);
-        verticalMagnitude += (Input.GetKey("w") ? 1.0f : 0.0f);
-        verticalMagnitude += (Input.GetKey("s") ? -1.0f : 0.0f);
-        Vector3 movementDirection = new Vector3(horizontalMagnitude, 0.0f, verticalMagnitude).normalized;
-        if (horizontalMagnitude != 0.0f || verticalMagnitude != 0.0f) {
+        float xMagnitude = 0.0f;
+        float zMagnitude = 0.0f;
+        xMagnitude += (Input.GetKey("d") ? 1.0f : 0.0f);
+        xMagnitude += (Input.GetKey("a") ? -1.0f : 0.0f);
+        zMagnitude += (Input.GetKey("w") ? 1.0f : 0.0f);
+        zMagnitude += (Input.GetKey("s") ? -1.0f : 0.0f);
+        Vector3 movementDirection = new Vector3(xMagnitude, 0.0f, zMagnitude).normalized;
+        // Apply the current heading to the movement
+        movementDirection = transform.rotation * movementDirection;
+        // Ignore any elevation in the current heading
+        movementDirection.y = 0;
+        movementDirection = movementDirection.normalized;
+        if (xMagnitude != 0.0f || zMagnitude != 0.0f) {
             this.moveInDirection(movementDirection);
-
-            float newX = transform.position.x;
-            float newZ = transform.position.z;
-            this.playerCamerLight.transform.position = new Vector3(newX, 5.0f, newZ);
-            this.playerCamera.transform.position = new Vector3(newX, 18.0f, newZ);
         }
     }
 
