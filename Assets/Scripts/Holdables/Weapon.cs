@@ -36,11 +36,11 @@ public abstract class Weapon : Holdable {
         return this.name;
     }
 
-    public override void primaryUsed(Vector3 source, Vector3 destination) {
-        Vector3 direction = this.getFireDirection(source, destination);
+    public override void primaryUsed(Vector3 source, Vector3 direction) {
+        Vector3 directionWithSpray = this.addSpray(source, direction);
         if (this.gunIsReady()) {
             timeLastShot = Time.time;
-            this.fireWeapon(source, direction);
+            this.fireWeapon(source, directionWithSpray);
             this.ammoRemaining--;
         }
     }
@@ -80,14 +80,13 @@ public abstract class Weapon : Holdable {
     }
 
     // TODO: Normal Distribution
-    // TODO: Check for 0
-    protected Vector3 getFireDirection(Vector3 source, Vector3 destination) {
-        Vector3 initialDirection = (destination - source).normalized;
-        float angle = Mathf.Atan(initialDirection.z / initialDirection.x);
+    // TODO: Vertical Spray
+    protected Vector3 addSpray(Vector3 source, Vector3 direction) {
+        float angle = Mathf.Atan2(direction.z, direction.x);
         angle += Random.Range(-this.bulletSpread, this.bulletSpread);
-        float newX = Mathf.Cos(angle) * (source.x < destination.x ? 1 : -1);
-        float newZ = Mathf.Sin(angle) * (source.x < destination.x ? 1 : -1);
-        Vector3 newDirection = new Vector3(newX, 0.0f, newZ);
+        float newX = Mathf.Cos(angle);
+        float newZ = Mathf.Sin(angle);
+        Vector3 newDirection = new Vector3(newX, direction.y, newZ);
         return newDirection.normalized;
     }
 

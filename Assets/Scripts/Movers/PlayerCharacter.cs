@@ -43,9 +43,8 @@ public class PlayerCharacter : Mover
             this.held = this.inventory[1];
         } else if (Input.GetMouseButton(0)) {
             Vector3 source = transform.position;
-            Vector3 destination = getMouseLocationAtZeroHeight();
-            destination.y = 0.5f;
-            this.held.primaryUsed(source, destination);
+            Vector3 direction = (transform.rotation * Vector3.forward).normalized;
+            this.held.primaryUsed(source, direction);
         } else {
             anythingChanged = false;
         }
