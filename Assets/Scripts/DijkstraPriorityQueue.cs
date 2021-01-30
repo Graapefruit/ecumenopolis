@@ -35,7 +35,7 @@ public class DijkstraPriorityQueue{
         }
     }
 
-    public int getAndRemoveSmallest() {
+    public int popSmallest() {
         int currentIndex = 0;
         int smallest = minHeap[currentIndex].first;
         minHeap[currentIndex] = new Tuple<int, float>(minHeap[currentIndex].first, Mathf.Infinity);

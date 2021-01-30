@@ -4,6 +4,7 @@ using UnityEngine;
 
 public class Enemy : Mover
 {
+    private const int IGNORE_INTANGIBLE = ~(1 << 8);
     private bool isChasingPlayer;
     private PlayerCharacter target;
     private const float detectionRange = 7.0f;
@@ -30,7 +31,9 @@ public class Enemy : Mover
                     Vector3 direction = (transform.position - this.target.transform.position).normalized;
                     this.bite.primaryUsed(transform.position, this.target.transform.position);
                 }
+                this.pathRefreshCooldown = 0.0f;
             } else {
+                Debug.Log(this.pathRefreshCooldown);
                 if (this.pathRefreshCooldown <= 0.0f) {
                     this.generateNewPath();
                 }
@@ -53,7 +56,7 @@ public class Enemy : Mover
         Vector3 direction = (this.target.transform.position - source).normalized;
         float distance = (this.target.transform.position - source).magnitude;
         RaycastHit hit;
-        if (Physics.Raycast(transform.position, direction, out hit, distance)) {
+        if (Physics.Raycast(transform.position, direction, out hit, distance, IGNORE_INTANGIBLE)) {
             return hit.collider.gameObject.GetComponent<PlayerCharacter>() == this.target;
         }
         return false;
@@ -66,7 +69,6 @@ public class Enemy : Mover
 
     private void generateNewPath() {
         this.path = BoardManager.getPath(transform.position, target.transform.position);
-        this.path.RemoveAt(0);
         this.getNextWaypoint();
         float distanceToTarget = (target.transform.position - transform.position).magnitude;
         distanceToTarget = distanceToTarget / 4;

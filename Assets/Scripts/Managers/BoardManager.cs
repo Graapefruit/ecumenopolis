@@ -9,6 +9,48 @@ using UnityEngine;
 
 public class BoardManager : MonoBehaviour
 {
+    public class Vector3Path {
+        // TODO: Better Encapsulation
+        public List<Vector3> _path;
+        public float _dist;
+
+        public Vector3Path(Vector3 firstWaypoint, float distToSource) {
+            _path = new List<Vector3>();
+            _path.Add(firstWaypoint);
+            _dist = distToSource;
+        }
+
+        public Vector3Path(Vector3Path source) {
+            _path = new List<Vector3>();
+            foreach(Vector3 vector in source.getPath()) {
+                _path.Add(vector);
+            }
+            _dist = source.getDistance();
+        }
+
+        public void addWaypoint(Vector3 waypoint) {
+            _dist += (waypoint - _path[_path.Count-1]).magnitude;
+            _path.Add(waypoint);
+        }
+
+        public List<Vector3> getPath() {
+            return _path;
+        }
+
+        public float getDistance() {
+            return _dist;
+        }
+
+        public string printPath() {
+            string r = "";
+            for(int i = 0; i < _path.Count-1; i++) {
+                r += string.Format("({0}, {1}) => ", _path[i].x, _path[i].z);
+            }
+            r += string.Format("({0}, {1})", _path[_path.Count-1].x, _path[_path.Count-1].z);
+            return r;
+        }
+    }
+
     public GameObject floor;
     private const int TERRAIN_LAYER_MASK = 1 << 9;
     private List<GameObject> blockers;
@@ -27,26 +69,22 @@ public class BoardManager : MonoBehaviour
     }
 
     private void loadMap() {
-        initializeVisibilityGraph();
         blockers = new List<GameObject>();
         for (int i = 0; i < transform.childCount; i++) {
             blockers.Add(transform.GetChild(i).gameObject);
         }
+        initializeVisibilityGraph();
     }
 
     private void initializeVisibilityGraph() {
         bm.visibilityVerticies = new List<Vector3>();
         bm.visibilityGraph = new List<List<float>>();
-    }
-
-    private void generateVisibilityGraph(Vector3 source, Vector3 dest) {
-        generateVisibilityEdges(source, dest);
+        generateVisibilityEdges();
         removeUnreachableEdges();
         generateVisibilityAdjacencyList();
     }
 
-    private void generateVisibilityEdges(Vector3 source, Vector3 dest) {
-        bm.visibilityVerticies.Add(source);
+    private void generateVisibilityEdges() {
         foreach(GameObject blocker in blockers) {
             // TODO: Handle Multiple Shapes
             // TODO: Handle Redundant/Unreachable Edges
@@ -61,7 +99,6 @@ public class BoardManager : MonoBehaviour
             bm.visibilityVerticies.Add(new Vector3(xpos - (xscale / 2.0f) - size, 0.5f, zpos - (zscale / 2.0f) - size));
             bm.visibilityVerticies.Add(new Vector3(xpos + (xscale / 2.0f) + size, 0.5f, zpos - (zscale / 2.0f) - size));
         } 
-        bm.visibilityVerticies.Add(dest);
     }
 
     private void removeUnreachableEdges() {
@@ -95,63 +132,23 @@ public class BoardManager : MonoBehaviour
     // TODO: Make path subscribable(observer pattern) in case of updates
     // TODO: Dijkstra's!
 
-    public class Vector3Path {
-        // TODO: Better Encapsulation
-        public List<Vector3> _path;
-        public float _dist;
-
-        public Vector3Path(Vector3 source) {
-            _path = new List<Vector3>();
-            _path.Add(source);
-            _dist = 0.0f;
-        }
-
-        public Vector3Path(Vector3Path source) {
-            _path = new List<Vector3>();
-            foreach(Vector3 vector in source.getPath()) {
-                _path.Add(vector);
-            }
-            _dist = source.getDistance();
-        }
-
-        public void addWaypoint(Vector3 waypoint) {
-            _dist += (waypoint - _path[_path.Count-1]).magnitude;
-            _path.Add(waypoint);
-        }
-
-        public List<Vector3> getPath() {
-            return _path;
-        }
-
-        public bool noPath() {
-            return _path.Count == 0;
-        }
-
-        public float getDistance() {
-            return _dist;
-        }
-
-        public string printPath() {
-            string r = "";
-            for(int i = 0; i < _path.Count-1; i++) {
-                r += string.Format("({0}, {1}) => ", _path[i].x, _path[i].z);
-            }
-            r += string.Format("({0}, {1})", _path[_path.Count-1].x, _path[_path.Count-1].z);
-            return r;
-        }
-    }
-
     public static List<Vector3> getPath(Vector3 source, Vector3 dest) {
-        bm.generateVisibilityGraph(source, dest);
         int verticies = bm.visibilityVerticies.Count;
         Vector3Path[] pathsToI = new Vector3Path[verticies];
-        DijkstraPriorityQueue pq = new DijkstraPriorityQueue(verticies);
+        DijkstraPriorityQueue shortestPaths = new DijkstraPriorityQueue(verticies);
+        float shortestEndingPathLength = Mathf.Infinity;
+        int shortestEndingPathIndex = -1;
 
-        pq.decreaseValue(0, 0.0f);
-        pathsToI[0] = new Vector3Path(source);
-        int iterations;
-        for(iterations = 0; iterations < verticies; iterations++) {
-            int i = pq.getAndRemoveSmallest();
+        for(int i = 0; i < verticies; i++) {
+            if (!bm.somethingBetweenTwoPoints(source, bm.visibilityVerticies[i])) {
+                float distToI = (bm.visibilityVerticies[i] - source).magnitude;
+                pathsToI[i] = new Vector3Path(bm.visibilityVerticies[i], distToI);
+                shortestPaths.decreaseValue(i, distToI);
+            }
+        }
+
+        for(int iterations = 0; iterations < verticies; iterations++) {
+            int i = shortestPaths.popSmallest();
             if (i == Mathf.Infinity) {
                 break;
             }
@@ -159,19 +156,26 @@ public class BoardManager : MonoBehaviour
                 float IToJDistance = bm.visibilityGraph[i][j];
                 if(bm.connectionExists(IToJDistance)) {
                     float newPossibleDistance = pathsToI[i].getDistance() + IToJDistance;
-                    if (pathsToI[j] == null || newPossibleDistance < pathsToI[j].getDistance()) {
-                        // Debug.Log(string.Format("Updating Node {0}", j));
-                        pq.decreaseValue(j, newPossibleDistance);
+                    bool waypointPreviouslyUnreachable = (pathsToI[j] == null);
+                    if (waypointPreviouslyUnreachable || newPossibleDistance < pathsToI[j].getDistance()) {
                         pathsToI[j] = new Vector3Path(pathsToI[i]);
                         pathsToI[j].addWaypoint(bm.visibilityVerticies[j]);
+                        shortestPaths.decreaseValue(j, newPossibleDistance);
                     }
                 }
             }
         }
 
-        bm.initializeVisibilityGraph();
-
-        return pathsToI[iterations-1].getPath();
+        for(int i = 0; i < verticies; i++) {
+            if (!bm.somethingBetweenTwoPoints(bm.visibilityVerticies[i], dest)) {
+                float newPossibleSmallestDistance = pathsToI[i].getDistance() + (dest - bm.visibilityVerticies[i]).magnitude;
+                if (newPossibleSmallestDistance < shortestEndingPathLength) {
+                    shortestEndingPathLength = newPossibleSmallestDistance;
+                    shortestEndingPathIndex = i;
+                }
+            } 
+        }
+        return pathsToI[shortestEndingPathIndex].getPath();
     }
 
     private bool connectionExists(float i) {
