@@ -182,22 +182,6 @@ public class BoardManager : MonoBehaviour
         return i > 0.0f && i != Mathf.Infinity;
     }
 
-    public static Vector3 move(float radius, Vector3 source, Vector3 direction, float distance) {
-        RaycastHit hit;
-        Vector3 endingPoint;
-        // TODO: Switch to Spherecast. Beware: if the spherecast starts inside the wall even a smidge, it will ignore the wall
-        if (Physics.Raycast(source, direction, out hit, distance, TERRAIN_LAYER_MASK)) {
-            endingPoint = new Vector3(hit.point.x + (hit.normal.x * radius), hit.point.y, hit.point.z + (hit.normal.z * radius));
-        } else {
-            // TODO: Better direction vector
-            endingPoint = new Vector3(source.x + (direction.x * distance), 0.5f, source.z + (direction.z * distance));
-        }
-        if (bm.isOverEdge(endingPoint, radius)) {
-            endingPoint = source;
-        }
-        return endingPoint;
-    }
-
     public static Vector3 getRandomLocation(float height) {
         float randX = Random.Range(bm.floor.transform.position.x - (bm.floor.transform.localScale.x * 5), bm.floor.transform.position.x + (bm.floor.transform.localScale.x * 5));
         float randZ = Random.Range(bm.floor.transform.position.z - (bm.floor.transform.localScale.z * 5), bm.floor.transform.position.z + (bm.floor.transform.localScale.z * 5));

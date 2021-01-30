@@ -13,7 +13,9 @@ public class Enemy : Mover
     private float pathRefreshCooldown;
     private Weapon bite;
 
-    public Enemy() : base(30, 3.0f) {
+    public override void Awake() {
+        base.Awake();
+        base.setup(30, 3.0f);
         this.pathRefreshCooldown = 0.0f;
         this.bite = new DretchBite();
     }
@@ -33,7 +35,6 @@ public class Enemy : Mover
                 }
                 this.pathRefreshCooldown = 0.0f;
             } else {
-                Debug.Log(this.pathRefreshCooldown);
                 if (this.pathRefreshCooldown <= 0.0f) {
                     this.generateNewPath();
                 }

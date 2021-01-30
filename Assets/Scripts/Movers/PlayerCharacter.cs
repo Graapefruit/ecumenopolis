@@ -10,14 +10,14 @@ public class PlayerCharacter : Mover
     private Holdable held;
     private float xRotationClamp;
 
-    public PlayerCharacter() : base(50, 8.5f) {}
-
     public override void dealDamage(int damageDealt, float stoppingPower) {
         base.dealDamage(damageDealt, stoppingPower);
         this.updateHud();
     }
     
-    void Start() {
+    public override void Awake() {
+        base.Awake();
+        base.setup(50, 8.5f);
         this.xRotationClamp = 0.0f;
         Holdable newRifle = new Rifle();
         Holdable newBuilder = new Builder();
@@ -25,6 +25,9 @@ public class PlayerCharacter : Mover
         this.inventory.Add(newRifle);
         this.inventory.Add(newBuilder);
         this.held = newRifle;
+    }
+
+    public void Start() {
         this.updateHud();
     }
 

@@ -7,13 +7,18 @@ public abstract class Mover : MonoBehaviour
     protected const int COLLISION_LAYERS = (1 << 9) + (1 << 10);
     protected const float stoppingPowerRecoveryRatePerSecond = 1.5f;
     protected const float minimumPossibleSpeed = 0.1f;
-    protected readonly float baseSpeed;
-    protected readonly int baseHealth;
+    protected float baseSpeed;
+    protected int baseHealth;
     protected float stoppingPowerApplied;
     protected float stoppingPowerLastUpdate;
     protected int currentHealth;
+    private Rigidbody rigidBody;
 
-    public Mover(int baseHealth, float baseSpeed) {
+    public virtual void Awake() {
+        this.rigidBody = this.GetComponent<Rigidbody>();
+    }
+
+    public virtual void setup(int baseHealth, float baseSpeed) {
         this.baseHealth = baseHealth;
         this.baseSpeed = baseSpeed;
         this.stoppingPowerApplied = 0;
@@ -50,6 +55,7 @@ public abstract class Mover : MonoBehaviour
     }
 
     protected void moveInDirection(Vector3 direction) {
+        Debug.Log(this.rigidBody);
         this.updateStoppingPowerApplied();
         float speed = this.getSpeed();
         RaycastHit hit;
