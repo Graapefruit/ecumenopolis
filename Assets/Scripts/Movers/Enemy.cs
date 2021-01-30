@@ -23,23 +23,40 @@ public class Enemy : Mover
 
     // Update is called once per frame
     void Update() {
-        if (target && this.pathRefreshCooldown <= 0.0f) {
-            this.generateNewPath();
-        }
-        
-        bool arrivedAtWaypoint = this.moveTowardsDestination(currentWaypoint);
-        if (arrivedAtWaypoint) {
-            if (this.path.Count > 0) {
-                this.getNextWaypoint();
+        if (target) {
+            if (this.canSeeTarget()) {
+                this.moveTowardsDestination(this.target.transform.position);
+                if ((target.transform.position - transform.position).magnitude <= 1.1f) {
+                    Vector3 direction = (transform.position - this.target.transform.position).normalized;
+                    this.bite.primaryUsed(transform.position, this.target.transform.position);
+                }
             } else {
-                this.generateNewPath();
+                if (this.pathRefreshCooldown <= 0.0f) {
+                    this.generateNewPath();
+                }
+                
+                bool arrivedAtWaypoint = this.moveTowardsDestination(currentWaypoint);
+                if (arrivedAtWaypoint) {
+                    if (this.path.Count > 0) {
+                        this.getNextWaypoint();
+                    } else {
+                        this.generateNewPath();
+                    }
+                }
+                this.pathRefreshCooldown -= Time.deltaTime;
             }
         }
+    }
 
-        if ((target.transform.position - transform.position).magnitude <= 1.1f) {
-            this.bite.primaryUsed(transform.position, target.transform.position);
+    private bool canSeeTarget() {
+        Vector3 source = transform.position;
+        Vector3 direction = (this.target.transform.position - source).normalized;
+        float distance = (this.target.transform.position - source).magnitude;
+        RaycastHit hit;
+        if (Physics.Raycast(transform.position, direction, out hit, distance)) {
+            return hit.collider.gameObject.GetComponent<PlayerCharacter>() == this.target;
         }
-        this.pathRefreshCooldown -= Time.deltaTime;
+        return false;
     }
 
     private void getNextWaypoint() {

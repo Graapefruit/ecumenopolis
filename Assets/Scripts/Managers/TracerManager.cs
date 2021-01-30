@@ -6,7 +6,7 @@ public class TracerManager : MonoBehaviour
 {
     public GameObject tracer;
     private PriorityQueueAscending<GameObject> tracers;
-    private const float tracerDuration = 0.8f;
+    private const float tracerDuration = 0.15f;
     private static TracerManager tm;
     
     void Awake() {
