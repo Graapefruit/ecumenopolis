@@ -39,13 +39,14 @@ public class Enemy : Mover
                     this.generateNewPath();
                 }
                 
-                bool arrivedAtWaypoint = this.moveTowardsDestination(currentWaypoint);
-                if (arrivedAtWaypoint) {
+                if (this.arrivedAtWaypoint()) {
                     if (this.path.Count > 0) {
                         this.getNextWaypoint();
                     } else {
                         this.generateNewPath();
                     }
+                } else {
+                    this.moveTowardsDestination(currentWaypoint);
                 }
                 this.pathRefreshCooldown -= Time.deltaTime;
             }
@@ -76,4 +77,8 @@ public class Enemy : Mover
         // TODO: Exponential function: closer = faster refrshes, further = longer ones
         this.pathRefreshCooldown = distanceToTarget * 0.15f;
     } 
+
+    private bool arrivedAtWaypoint() {
+        return (transform.position - this.currentWaypoint).magnitude < 0.05f;
+    }
 }

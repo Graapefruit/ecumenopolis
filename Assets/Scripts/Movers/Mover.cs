@@ -13,9 +13,30 @@ public abstract class Mover : MonoBehaviour
     protected float stoppingPowerLastUpdate;
     protected int currentHealth;
     private Rigidbody rigidBody;
+    private Vector3 movementDirection;
+    private bool movingTowardsWaypoint;
+    private Vector3 currentWaypoint;
 
     public virtual void Awake() {
         this.rigidBody = this.GetComponent<Rigidbody>();
+        this.movementDirection = Vector3.zero;
+        this.movingTowardsWaypoint = false;
+    }
+
+    private void FixedUpdate() {
+        if (movingTowardsWaypoint) {
+            Vector3 waypointDirection = currentWaypoint - transform.position;
+            float speedThisTick = this.getSpeed() * Time.fixedDeltaTime;
+            if (speedThisTick >= waypointDirection.magnitude) {
+                rigidBody.MovePosition(currentWaypoint);
+                movingTowardsWaypoint = false;
+            } else {
+                rigidBody.MovePosition(transform.position + (waypointDirection.normalized * speedThisTick));
+            }
+        } else {
+            rigidBody.MovePosition(transform.position + (movementDirection * this.getSpeed() * Time.fixedDeltaTime));
+            this.movementDirection = Vector3.zero;
+        }
     }
 
     public virtual void setup(int baseHealth, float baseSpeed) {
@@ -34,36 +55,14 @@ public abstract class Mover : MonoBehaviour
         this.stoppingPowerLastUpdate = Time.time;
     }
 
-    // TODO; Remove boilerplate in two functions below: both are similar
-    protected bool moveTowardsDestination(Vector3 destination) {
+    protected void moveInDirection(Vector3 direction) {
         this.updateStoppingPowerApplied();
-        float speed = this.getSpeed();
-        Vector3 direction = (destination - transform.position).normalized;
-        float distance = (destination - transform.position).magnitude;
-        RaycastHit hit;
-        if (Physics.SphereCast(transform.position, 0.4f, direction, out hit, speed, COLLISION_LAYERS)) {
-            transform.position = hit.point + (hit.normal * 0.5f);
-        } else {
-            if (distance < speed) {
-                transform.position = destination;
-                return true;
-            } else {
-                transform.position += direction.normalized * speed;
-            }
-        }
-        return false;
+        this.movementDirection = direction;
     }
 
-    protected void moveInDirection(Vector3 direction) {
-        Debug.Log(this.rigidBody);
-        this.updateStoppingPowerApplied();
-        float speed = this.getSpeed();
-        RaycastHit hit;
-        if (Physics.SphereCast(transform.position, 0.5f, direction, out hit, speed, COLLISION_LAYERS)) {
-            transform.position = hit.point + (hit.normal * 0.51f);
-        } else {
-            transform.position += direction.normalized * speed;
-        }
+    protected void moveTowardsDestination(Vector3 destination) {
+        this.moveInDirection((destination - transform.position).normalized);
+        this.currentWaypoint = destination;
     }
 
     private void updateStoppingPowerApplied() {
@@ -78,6 +77,6 @@ public abstract class Mover : MonoBehaviour
 
     private float getSpeed() {
         float speedWithStoppingPower = this.baseSpeed - this.stoppingPowerApplied;
-        return (speedWithStoppingPower > minimumPossibleSpeed ? speedWithStoppingPower : minimumPossibleSpeed) * Time.deltaTime;
+        return (speedWithStoppingPower > minimumPossibleSpeed ? speedWithStoppingPower : minimumPossibleSpeed);
     }
 }
