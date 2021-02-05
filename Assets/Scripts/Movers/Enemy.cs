@@ -9,14 +9,16 @@ public class Enemy : Mover
     private PlayerCharacter target;
     private const float detectionRange = 7.0f;
     private Vector3 currentWaypoint;
-    private float pathRefreshCooldown;
     private Weapon bite;
 
     public override void Awake() {
         base.Awake();
         base.setup(30, 3.0f);
-        this.pathRefreshCooldown = 0.0f;
         this.bite = new DretchBite();
+    }
+
+    public void Start() {
+        this.currentWaypoint = this.getNextWaypoint(target.transform.position);
     }
 
     public void giveTarget(PlayerCharacter target) {
@@ -26,23 +28,19 @@ public class Enemy : Mover
     // Update is called once per frame
     void Update() {
         if (target) {
+            bool getNewWaypoint = false;
             if (this.canSeeTarget()) {
                 this.moveTowardsDestination(this.target.transform.position);
                 if ((target.transform.position - transform.position).magnitude <= 1.1f) {
                     Vector3 direction = (this.target.transform.position - transform.position).normalized;
                     this.bite.primaryUsed(transform.position, this.target.transform.position);
                 }
-                this.pathRefreshCooldown = 0.0f;
+                getNewWaypoint = true;
             } else {
-                if (this.pathRefreshCooldown <= 0.0f) {
-                    this.getNextWaypoint();
-                }
-                
-                if (this.arrivedAtWaypoint()) {
-                    this.getNextWaypoint();
+                if (getNewWaypoint || this.arrivedAtWaypoint()) {
+                    this.currentWaypoint = this.getNextWaypoint(target.transform.position);
                 }
                 this.moveTowardsDestination(currentWaypoint);
-                this.pathRefreshCooldown -= Time.deltaTime;
             }
         }
     }
@@ -57,14 +55,6 @@ public class Enemy : Mover
         }
         return false;
     }
-
-    private void getNextWaypoint() {
-        this.currentWaypoint = this.getNextWaypoint(target.transform.position);
-        float distanceToTarget = (target.transform.position - transform.position).magnitude;
-        distanceToTarget = distanceToTarget / 4;
-        // TODO: Exponential function: closer = faster refrshes, further = longer ones
-        this.pathRefreshCooldown = distanceToTarget * 0.15f;
-    } 
 
     private bool arrivedAtWaypoint() {
         return (transform.position - this.currentWaypoint).magnitude < 0.05f;

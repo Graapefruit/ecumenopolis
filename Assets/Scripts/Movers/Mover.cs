@@ -68,14 +68,17 @@ public abstract class Mover : MonoBehaviour
 
     protected Vector3 getNextWaypoint(Vector3 destination) {
         RaycastHit hit;
+        Vector3 originalDestination = destination;
         Vector3 direction = (destination - transform.position).normalized;
         float distance = (destination - transform.position).magnitude;
         while (Physics.SphereCast(transform.position, 0.45f, direction, out hit, distance, TERRAIN_LAYER_MASK)) {
             Vector3 leftEdge, rightEdge;
             Vector3 newDestination;
             this.getWallEdges(hit.collider.gameObject, out leftEdge, out rightEdge);
-            // TODO: Randomize so monsters spread out
-            if ((destination - leftEdge).magnitude <= (destination - rightEdge).magnitude) {
+            float leftDist = (leftEdge - transform.position).magnitude + (originalDestination - leftEdge).magnitude;
+            float rightDist = (rightEdge - transform.position).magnitude + (originalDestination - rightEdge).magnitude;
+            // TODO: Somehow, dont re-randomize a path if we're going around the same object. Keep track of the object we're moving around in memory?
+            if (GrapeMath.goLeftAroundEdge(leftDist, rightDist)) {
                 newDestination = leftEdge;
             } else {
                 newDestination = rightEdge;
@@ -97,7 +100,7 @@ public abstract class Mover : MonoBehaviour
         float zpos = wall.transform.position.z;
         float xscale = wall.transform.localScale.x;
         float zscale = wall.transform.localScale.z;
-        float size = 0.485f;
+        float size = 0.45f;
         float top = zpos + (zscale / 2.0f);
         float leftSide = xpos - (xscale / 2.0f);
         float rightSide = xpos + (xscale / 2.0f);
