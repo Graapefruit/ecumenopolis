@@ -8,7 +8,6 @@ public class Enemy : Mover
     private bool isChasingPlayer;
     private PlayerCharacter target;
     private const float detectionRange = 7.0f;
-    private List<Vector3> path;
     private Vector3 currentWaypoint;
     private float pathRefreshCooldown;
     private Weapon bite;
@@ -30,24 +29,19 @@ public class Enemy : Mover
             if (this.canSeeTarget()) {
                 this.moveTowardsDestination(this.target.transform.position);
                 if ((target.transform.position - transform.position).magnitude <= 1.1f) {
-                    Vector3 direction = (transform.position - this.target.transform.position).normalized;
+                    Vector3 direction = (this.target.transform.position - transform.position).normalized;
                     this.bite.primaryUsed(transform.position, this.target.transform.position);
                 }
                 this.pathRefreshCooldown = 0.0f;
             } else {
                 if (this.pathRefreshCooldown <= 0.0f) {
-                    this.generateNewPath();
+                    this.getNextWaypoint();
                 }
                 
                 if (this.arrivedAtWaypoint()) {
-                    if (this.path.Count > 0) {
-                        this.getNextWaypoint();
-                    } else {
-                        this.generateNewPath();
-                    }
-                } else {
-                    this.moveTowardsDestination(currentWaypoint);
+                    this.getNextWaypoint();
                 }
+                this.moveTowardsDestination(currentWaypoint);
                 this.pathRefreshCooldown -= Time.deltaTime;
             }
         }
@@ -58,20 +52,14 @@ public class Enemy : Mover
         Vector3 direction = (this.target.transform.position - source).normalized;
         float distance = (this.target.transform.position - source).magnitude;
         RaycastHit hit;
-        if (Physics.Raycast(transform.position, direction, out hit, distance, IGNORE_INTANGIBLE)) {
+        if (Physics.Raycast(source, direction, out hit, distance, IGNORE_INTANGIBLE)) {
             return hit.collider.gameObject.GetComponent<PlayerCharacter>() == this.target;
         }
         return false;
     }
 
     private void getNextWaypoint() {
-        this.currentWaypoint = path[0];
-        this.path.RemoveAt(0);
-    }
-
-    private void generateNewPath() {
-        this.path = BoardManager.getPath(transform.position, target.transform.position);
-        this.getNextWaypoint();
+        this.currentWaypoint = this.getNextWaypoint(target.transform.position);
         float distanceToTarget = (target.transform.position - transform.position).magnitude;
         distanceToTarget = distanceToTarget / 4;
         // TODO: Exponential function: closer = faster refrshes, further = longer ones
