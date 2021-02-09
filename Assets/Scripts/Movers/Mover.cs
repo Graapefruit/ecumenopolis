@@ -55,7 +55,7 @@ public abstract class Mover : MonoBehaviour
         this.stoppingPowerLastUpdate = Time.time;
     }
 
-    protected void moveInDirection(Vector3 direction) {
+    public void moveInDirection(Vector3 direction) {
         this.updateStoppingPowerApplied();
         this.movementDirection = direction;
     }

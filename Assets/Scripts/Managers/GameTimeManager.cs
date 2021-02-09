@@ -5,11 +5,9 @@ using UnityEngine;
 public class GameTimeManager : MonoBehaviour
 {   
     private static readonly Color dayLightColour = new Color(0.851f, 0.698f, 0.433f, 1.0f);
-    private static readonly Color nightLightColour = new Color(0.573f, 0.573f, 1.0f, 1.0f);
-    private static readonly LightType dayLightType = LightType.Directional;
-    private static readonly LightType nightLightType = LightType.Point;
-    private static readonly int dayLightIntensity = 1;
-    private static readonly int nightLightIntensity = 5;
+    private static readonly Color nightLightColour = new Color(0.694f, 0.914f, 1.0f, 1.0f);
+    private static readonly float dayLightIntensity = 1.0f;
+    private static readonly float nightLightIntensity = 0.2f;
     private static readonly float dayDurationSeconds = 15.0f;
     private static readonly float nightDurationSeconds = 60.0f;
     private bool isDay = false;
@@ -49,13 +47,11 @@ public class GameTimeManager : MonoBehaviour
 
     private void switchToDayLight() {
         overheadLight.color = dayLightColour;
-        overheadLight.type = dayLightType;
         overheadLight.intensity = dayLightIntensity;
     }
 
     private void switchToNightLight() {
         overheadLight.color = nightLightColour;
-        overheadLight.type = nightLightType;
         overheadLight.intensity = nightLightIntensity;
     }
 }

@@ -4,11 +4,13 @@ using UnityEngine;
 
 public class Game : MonoBehaviour
 {
-    public GameObject player;
-    public GameObject ammo;
+    public GameObject ammoPrefab;
+    public GameObject pmObject;
+    private PlayerCharacter player;
     private const float ammoSpawnHeight = 0.5f;
     private const float ammoBaseCooldown = 3.5f;
     private float remainingAmmoCooldown = 3.5f;
+    private PlayerManager playerManager;
     public static Game game;
     
     // Start is called before the first frame update
@@ -19,12 +21,14 @@ public class Game : MonoBehaviour
             GameObject.Destroy(game);
         }
         game = this;
+        game.playerManager = pmObject.GetComponent<PlayerManager>();
+        game.player = game.playerManager.getPlayer();
     }
 
     // Update is called once per frame
     void Update()
     {
-        remainingAmmoCooldown = manageSpawnCooldown(ammo, ammoBaseCooldown, remainingAmmoCooldown);
+        remainingAmmoCooldown = manageSpawnCooldown(ammoPrefab, ammoBaseCooldown, remainingAmmoCooldown);
     }
 
     private static float manageSpawnCooldown(GameObject gameObject, float baseCooldown, float remainingCooldown) {
@@ -43,6 +47,5 @@ public class Game : MonoBehaviour
         } else {
             return null;
         }
-        
     }
 }
