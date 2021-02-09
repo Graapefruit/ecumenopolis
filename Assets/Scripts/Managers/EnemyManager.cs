@@ -6,7 +6,6 @@ public class EnemyManager : MonoBehaviour
 {
     public GameObject portal;
     private static EnemyManager em;
-    private const float portalSpawnHeight = 2.0f;
     private const float portalBaseCooldown = 2.5f;
     private float remainingPortalCooldown = 2.5f;
     private List<GameObject> enemies;
@@ -27,7 +26,7 @@ public class EnemyManager : MonoBehaviour
     void Update() {
         remainingPortalCooldown -= Time.deltaTime;
         if (remainingPortalCooldown <= 0.0f && !(GameTimeManager.isCurrentlyDay())) {
-            Vector3 spawnLocation = BoardManager.getRandomLocation(portalSpawnHeight);
+            Vector3 spawnLocation = BoardManager.getRandomLocation();
             enemies.Add((GameObject) Instantiate(portal, spawnLocation, Quaternion.identity));
             remainingPortalCooldown = portalBaseCooldown;
         }

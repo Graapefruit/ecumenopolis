@@ -10,15 +10,17 @@ public class Enemy : Mover
     private const float detectionRange = 7.0f;
     private Vector3 currentWaypoint;
     private Weapon bite;
+    private PathingHelper pathingHelper;
 
     public override void Awake() {
         base.Awake();
         base.setup(30, 3.0f);
+        this.pathingHelper = new GremlinPathingHelper(0.5f);
         this.bite = new DretchBite();
     }
 
     public void Start() {
-        this.currentWaypoint = this.getNextWaypoint(target.transform.position);
+        this.currentWaypoint = pathingHelper.getNextWaypoint(transform.position, target.transform.position);
     }
 
     public void giveTarget(PlayerCharacter target) {
@@ -26,6 +28,7 @@ public class Enemy : Mover
     }
 
     // Update is called once per frame
+    // TODO: If colliding with another enemy, re-do our path? Maybe enable spherecasts to collide with enemies?
     void Update() {
         if (target) {
             bool getNewWaypoint = false;
@@ -38,7 +41,7 @@ public class Enemy : Mover
                 getNewWaypoint = true;
             } else {
                 if (getNewWaypoint || this.arrivedAtWaypoint()) {
-                    this.currentWaypoint = this.getNextWaypoint(target.transform.position);
+                    this.currentWaypoint = pathingHelper.getNextWaypoint(transform.position, target.transform.position);
                 }
                 this.moveTowardsDestination(currentWaypoint);
             }

@@ -53,6 +53,7 @@ public class BoardManager : MonoBehaviour
 
     public GameObject floor;
     private const int TERRAIN_LAYER_MASK = 1 << 9;
+    private const int GROUND_LAYER_MASK = 1 << 0;
     private List<GameObject> blockers;
     private List<Vector3> visibilityVerticies;
     // Implements an adjacency list
@@ -182,10 +183,14 @@ public class BoardManager : MonoBehaviour
         return i > 0.0f && i != Mathf.Infinity;
     }
 
-    public static Vector3 getRandomLocation(float height) {
+    public static Vector3 getRandomLocation() {
         float randX = Random.Range(bm.floor.transform.position.x - (bm.floor.transform.localScale.x * 5), bm.floor.transform.position.x + (bm.floor.transform.localScale.x * 5));
         float randZ = Random.Range(bm.floor.transform.position.z - (bm.floor.transform.localScale.z * 5), bm.floor.transform.position.z + (bm.floor.transform.localScale.z * 5));
-        return new Vector3(randX, height, randZ);
+        Vector3 randomLocation = new Vector3(randX, 10.0f, randZ);
+        RaycastHit hit;
+        Physics.Raycast(randomLocation, new Vector3(0.0f, -1.0f, 0.0f), out hit, Mathf.Infinity, GROUND_LAYER_MASK);
+        randomLocation.y = hit.point.y;
+        return randomLocation;
     }
 
     private bool isOverEdge(Vector3 location, float radius) {

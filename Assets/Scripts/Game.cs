@@ -24,13 +24,13 @@ public class Game : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        remainingAmmoCooldown = manageSpawnCooldown(ammo, ammoSpawnHeight, ammoBaseCooldown, remainingAmmoCooldown);
+        remainingAmmoCooldown = manageSpawnCooldown(ammo, ammoBaseCooldown, remainingAmmoCooldown);
     }
 
-    private static float manageSpawnCooldown(GameObject gameObject, float spawnHeight, float baseCooldown, float remainingCooldown) {
+    private static float manageSpawnCooldown(GameObject gameObject, float baseCooldown, float remainingCooldown) {
         float returnedCooldown = remainingCooldown - Time.deltaTime;
         if (returnedCooldown <= 0.0f) {
-            Vector3 spawnLocation = BoardManager.getRandomLocation(spawnHeight);
+            Vector3 spawnLocation = BoardManager.getRandomLocation();
             Instantiate(gameObject, spawnLocation, Quaternion.identity);
             returnedCooldown += baseCooldown;
         }
