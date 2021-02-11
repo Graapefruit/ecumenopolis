@@ -60,7 +60,7 @@ public abstract class Mover : MonoBehaviour
         this.movementDirection = direction;
     }
 
-    protected void moveTowardsDestination(Vector3 destination) {
+    protected virtual void moveTowardsDestination(Vector3 destination) {
         this.moveInDirection((destination - transform.position).normalized);
         this.positionOnFixedUpdate = destination;
     }

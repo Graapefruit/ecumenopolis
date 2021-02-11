@@ -7,16 +7,17 @@ public class Enemy : Mover
     private const int IGNORE_INTANGIBLE = ~(1 << 8);
     private bool isChasingPlayer;
     private PlayerCharacter target;
-    private const float detectionRange = 7.0f;
     private Vector3 currentWaypoint;
     private Weapon bite;
     private PathingHelper pathingHelper;
+    private Animator animator;
 
     public override void Awake() {
         base.Awake();
         base.setup(30, 3.0f);
         this.pathingHelper = new GremlinPathingHelper(0.5f);
         this.bite = new DretchBite();
+        this.animator = this.GetComponent<Animator>();
     }
 
     public void Start() {
@@ -31,6 +32,7 @@ public class Enemy : Mover
     // TODO: If colliding with another enemy, re-do our path? Maybe enable spherecasts to collide with enemies?
     void Update() {
         if (target) {
+            this.animator.SetBool("isMoving", true);
             bool getNewWaypoint = false;
             if (this.canSeeTarget()) {
                 this.moveTowardsDestination(this.target.transform.position);
@@ -45,7 +47,16 @@ public class Enemy : Mover
                 }
                 this.moveTowardsDestination(currentWaypoint);
             }
+        } else {
+            this.animator.SetBool("isMoving", false);
         }
+    }
+
+    protected override void moveTowardsDestination(Vector3 destination) {
+        base.moveTowardsDestination(destination);
+        destination.y = transform.position.y;
+        Debug.Log((destination - transform.position).normalized);
+        transform.rotation = Quaternion.LookRotation((destination - transform.position).normalized);
     }
 
     private bool canSeeTarget() {
