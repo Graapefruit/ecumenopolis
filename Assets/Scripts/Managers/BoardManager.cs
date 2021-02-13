@@ -1,6 +1,7 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.AI;
 
 //TODOS:
 // 1: Separate the source/dest from the graphs
@@ -186,11 +187,12 @@ public class BoardManager : MonoBehaviour
     public static Vector3 getRandomLocation() {
         float randX = Random.Range(bm.floor.transform.position.x - (bm.floor.transform.localScale.x * 5), bm.floor.transform.position.x + (bm.floor.transform.localScale.x * 5));
         float randZ = Random.Range(bm.floor.transform.position.z - (bm.floor.transform.localScale.z * 5), bm.floor.transform.position.z + (bm.floor.transform.localScale.z * 5));
-        Vector3 randomLocation = new Vector3(randX, 10.0f, randZ);
-        RaycastHit hit;
-        Physics.Raycast(randomLocation, new Vector3(0.0f, -1.0f, 0.0f), out hit, Mathf.Infinity, GROUND_LAYER_MASK);
-        randomLocation.y = hit.point.y;
-        return randomLocation;
+        Vector3 randomSkyLocation = new Vector3(randX, 10.0f, randZ);
+        RaycastHit raycastHit;
+        Physics.Raycast(randomSkyLocation, new Vector3(0.0f, -1.0f, 0.0f), out raycastHit, Mathf.Infinity, TERRAIN_LAYER_MASK);
+        NavMeshHit navMeshHit;
+        NavMesh.SamplePosition(raycastHit.point, out navMeshHit, 3.0f, NavMesh.AllAreas);
+        return navMeshHit.position;
     }
 
     private bool isOverEdge(Vector3 location, float radius) {

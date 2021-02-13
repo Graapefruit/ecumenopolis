@@ -4,7 +4,6 @@ using UnityEngine;
 
 public abstract class Mover : MonoBehaviour
 {
-    protected const int COLLISION_LAYERS = (1 << 9) + (1 << 10);
     protected const float stoppingPowerRecoveryRatePerSecond = 1.5f;
     protected const float minimumPossibleSpeed = 0.1f;
     protected float baseSpeed;
@@ -14,29 +13,16 @@ public abstract class Mover : MonoBehaviour
     protected int currentHealth;
     private Rigidbody rigidBody;
     private Vector3 movementDirection;
-    private bool movingTowardsWaypoint;
     private Vector3 positionOnFixedUpdate;
 
     public virtual void Awake() {
         this.rigidBody = this.GetComponent<Rigidbody>();
         this.movementDirection = Vector3.zero;
-        this.movingTowardsWaypoint = false;
     }
 
     private void FixedUpdate() {
-        if (movingTowardsWaypoint) {
-            Vector3 waypointDirection = positionOnFixedUpdate - transform.position;
-            float speedThisTick = this.getSpeed() * Time.fixedDeltaTime;
-            if (speedThisTick >= waypointDirection.magnitude) {
-                rigidBody.MovePosition(positionOnFixedUpdate);
-                movingTowardsWaypoint = false;
-            } else {
-                rigidBody.MovePosition(transform.position + (waypointDirection.normalized * speedThisTick));
-            }
-        } else {
-            rigidBody.MovePosition(transform.position + (movementDirection * this.getSpeed() * Time.fixedDeltaTime));
-            this.movementDirection = Vector3.zero;
-        }
+        rigidBody.MovePosition(transform.position + (movementDirection * this.getSpeed() * Time.fixedDeltaTime));
+        this.movementDirection = Vector3.zero;
     }
 
     public virtual void setup(int baseHealth, float baseSpeed) {
@@ -58,11 +44,6 @@ public abstract class Mover : MonoBehaviour
     public void moveInDirection(Vector3 direction) {
         this.updateStoppingPowerApplied();
         this.movementDirection = direction;
-    }
-
-    protected virtual void moveTowardsDestination(Vector3 destination) {
-        this.moveInDirection((destination - transform.position).normalized);
-        this.positionOnFixedUpdate = destination;
     }
 
     private void updateStoppingPowerApplied() {

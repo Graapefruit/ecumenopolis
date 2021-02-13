@@ -21,22 +21,18 @@ public class GameTimeManager : MonoBehaviour
             GameObject.Destroy(gtm);
         }
         gtm = this;
-        switchToNightLight();
-        timeLeftInCycle = nightDurationSeconds;
+        this.switchToNight();
     }
 
     void Update()
     {
         timeLeftInCycle -= Time.deltaTime;
         if (timeLeftInCycle <= 0.0f) {
-            isDay = !isDay;
             if (isDay) {
-                timeLeftInCycle = dayDurationSeconds;
-                switchToDayLight();
+                this.switchToDay();
                 EnemyManager.removeAllEnemies();
             } else {
-                timeLeftInCycle = nightDurationSeconds;
-                switchToNightLight();
+                this.switchToNight();
             }
         }
     }
@@ -45,13 +41,17 @@ public class GameTimeManager : MonoBehaviour
         return gtm.isDay;
     }
 
-    private void switchToDayLight() {
-        overheadLight.color = dayLightColour;
-        overheadLight.intensity = dayLightIntensity;
+    private void switchToDay() {
+        this.overheadLight.color = dayLightColour;
+        this.overheadLight.intensity = dayLightIntensity;
+        this.timeLeftInCycle = dayDurationSeconds;
+        this.isDay = true;
     }
 
-    private void switchToNightLight() {
-        overheadLight.color = nightLightColour;
-        overheadLight.intensity = nightLightIntensity;
+    private void switchToNight() {
+        this.overheadLight.color = nightLightColour;
+        this.overheadLight.intensity = nightLightIntensity;
+        this.timeLeftInCycle = nightDurationSeconds;
+        this.isDay = false;
     }
 }

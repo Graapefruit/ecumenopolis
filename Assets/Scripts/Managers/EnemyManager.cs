@@ -27,7 +27,6 @@ public class EnemyManager : MonoBehaviour
         remainingPortalCooldown -= Time.deltaTime;
         if (remainingPortalCooldown <= 0.0f && !(GameTimeManager.isCurrentlyDay())) {
             Vector3 spawnLocation = BoardManager.getRandomLocation();
-            spawnLocation.y = 2.0f;
             enemies.Add((GameObject) Instantiate(portal, spawnLocation, Quaternion.identity));
             remainingPortalCooldown = portalBaseCooldown;
         }

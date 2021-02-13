@@ -1,62 +1,42 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.AI;
 
 public class Enemy : Mover
 {
     private const int IGNORE_INTANGIBLE = ~(1 << 8);
     private bool isChasingPlayer;
     private PlayerCharacter target;
-    private Vector3 currentWaypoint;
     private Weapon bite;
-    private PathingHelper pathingHelper;
     private Animator animator;
+    private NavMeshAgent navMeshAgent;
 
     public override void Awake() {
         base.Awake();
         base.setup(30, 3.0f);
-        this.pathingHelper = new GremlinPathingHelper(0.5f);
         this.bite = new DretchBite();
         this.animator = this.GetComponent<Animator>();
-    }
-
-    public void Start() {
-        this.currentWaypoint = pathingHelper.getNextWaypoint(transform.position, target.transform.position);
+        this.navMeshAgent = this.GetComponent<NavMeshAgent>();
     }
 
     public void giveTarget(PlayerCharacter target) {
         this.target = target;
     }
 
-    // Update is called once per frame
-    // TODO: If colliding with another enemy, re-do our path? Maybe enable spherecasts to collide with enemies?
     void Update() {
         if (target) {
             this.animator.SetBool("isMoving", true);
-            bool getNewWaypoint = false;
-            if (this.canSeeTarget()) {
-                this.moveTowardsDestination(this.target.transform.position);
-                if ((target.transform.position - transform.position).magnitude <= 1.1f) {
-                    Vector3 direction = (this.target.transform.position - transform.position).normalized;
-                    this.bite.primaryUsed(transform.position, this.target.transform.position);
-                }
-                getNewWaypoint = true;
+            if ((target.transform.position - transform.position).magnitude <= 1.1f) {
+                Vector3 direction = (this.target.transform.position - transform.position).normalized;
+                this.bite.primaryUsed(transform.position, this.target.transform.position);
             } else {
-                if (getNewWaypoint || this.arrivedAtWaypoint()) {
-                    this.currentWaypoint = pathingHelper.getNextWaypoint(transform.position, target.transform.position);
-                }
-                this.moveTowardsDestination(currentWaypoint);
+                this.navMeshAgent.destination = this.target.transform.position;
             }
         } else {
             this.animator.SetBool("isMoving", false);
+            // this.navMeshAgent.ResetPath(this.target.transform.position);
         }
-    }
-
-    protected override void moveTowardsDestination(Vector3 destination) {
-        base.moveTowardsDestination(destination);
-        destination.y = transform.position.y;
-        Debug.Log((destination - transform.position).normalized);
-        transform.rotation = Quaternion.LookRotation((destination - transform.position).normalized);
     }
 
     private bool canSeeTarget() {
@@ -68,9 +48,5 @@ public class Enemy : Mover
             return hit.collider.gameObject.GetComponent<PlayerCharacter>() == this.target;
         }
         return false;
-    }
-
-    private bool arrivedAtWaypoint() {
-        return (transform.position - this.currentWaypoint).magnitude < 0.05f;
     }
 }
