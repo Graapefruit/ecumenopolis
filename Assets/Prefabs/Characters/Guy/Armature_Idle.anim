@@ -10,7 +10,7 @@ AnimationClip:
   serializedVersion: 6
   m_Legacy: 0
   m_Compressed: 0
-  m_UseHighQualityCurve: 1
+  m_UseHighQualityCurve: 0
   m_RotationCurves:
   - curve:
       serializedVersion: 2
@@ -1562,7 +1562,7 @@ AnimationClip:
       m_Curve:
       - serializedVersion: 3
         time: 0
-        value: {x: 0.025673557, y: 0.9978719, z: -0.059919123, w: -0.0015277398}
+        value: {x: 0.025673565, y: 0.9978719, z: -0.059919126, w: -0.001527607}
         inSlope: {x: 0, y: 0, z: 0, w: 0}
         outSlope: {x: 0, y: 0, z: 0, w: 0}
         tangentMode: 0
@@ -1571,7 +1571,7 @@ AnimationClip:
         outWeight: {x: 0.33333334, y: 0.33333334, z: 0.33333334, w: 0.33333334}
       - serializedVersion: 3
         time: 4.166667
-        value: {x: 0.025673557, y: 0.9978719, z: -0.059919123, w: -0.0015277398}
+        value: {x: 0.025673565, y: 0.9978719, z: -0.059919126, w: -0.001527607}
         inSlope: {x: 0, y: 0, z: 0, w: 0}
         outSlope: {x: 0, y: 0, z: 0, w: 0}
         tangentMode: 0

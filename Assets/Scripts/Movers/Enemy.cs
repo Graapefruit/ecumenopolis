@@ -9,14 +9,12 @@ public class Enemy : Mover, Shooter
     private bool isChasingPlayer;
     private PlayerCharacter target;
     private Weapon bite;
-    private Animator animator;
     private NavMeshAgent navMeshAgent;
 
     public override void Awake() {
         base.Awake();
         base.setup(30, 3.0f);
         this.bite = new DretchBite();
-        this.animator = this.GetComponent<Animator>();
         this.navMeshAgent = this.GetComponent<NavMeshAgent>();
     }
 
@@ -34,7 +32,6 @@ public class Enemy : Mover, Shooter
 
     void Update() {
         if (target) {
-            this.animator.SetBool("isMoving", true);
             if ((target.transform.position - transform.position).magnitude <= 1.1f) {
                 Vector3 direction = (this.target.transform.position - transform.position).normalized;
                 this.bite.primaryUsed(this as Shooter, transform.position, this.target.transform.position);
@@ -42,7 +39,6 @@ public class Enemy : Mover, Shooter
                 this.navMeshAgent.destination = this.target.transform.position;
             }
         } else {
-            this.animator.SetBool("isMoving", false);
             // this.navMeshAgent.ResetPath(this.target.transform.position);
         }
     }

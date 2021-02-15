@@ -11,7 +11,7 @@ public class PlayerCharacter : Mover, Shooter
     
     public override void Awake() {
         base.Awake();
-        base.setup(50, 6.25f);
+        base.setup(50, 3.5f);
         this.xRotation = 0.0f;
         Holdable newRifle = new Rifle();
         Holdable newBuilder = new Builder();

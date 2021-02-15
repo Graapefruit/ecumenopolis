@@ -14,15 +14,26 @@ public abstract class Mover : MonoBehaviour
     private Rigidbody rigidBody;
     private Vector3 movementDirection;
     private Vector3 positionOnFixedUpdate;
+    protected Animator animator;
 
     public virtual void Awake() {
         this.rigidBody = this.GetComponent<Rigidbody>();
         this.movementDirection = Vector3.zero;
+        this.animator = this.GetComponent<Animator>();
     }
 
     private void FixedUpdate() {
+        this.updateMovingAnimation();
         rigidBody.MovePosition(transform.position + (movementDirection * this.getSpeed() * Time.fixedDeltaTime));
         this.movementDirection = Vector3.zero;
+    }
+
+    protected virtual void updateMovingAnimation() {
+        if (this.movementDirection == Vector3.zero) {
+            this.animator.SetBool("isWalking", false);
+        } else {
+            this.animator.SetBool("isWalking", true);
+        }
     }
 
     public virtual void setup(int baseHealth, float baseSpeed) {
