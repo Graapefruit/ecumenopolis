@@ -36,11 +36,11 @@ public abstract class Weapon : Holdable {
         return this.name;
     }
 
-    public override void primaryUsed(Vector3 source, Vector3 direction) {
-        Vector3 directionWithSpray = this.addSpray(source, direction);
+    public override void primaryUsed(Vector3 objectSource, Vector3 mathSource, Vector3 direction) {
+        Vector3 directionWithSpray = this.addSpray(mathSource, direction);
         if (this.gunIsReady()) {
             timeLastShot = Time.time;
-            this.fireWeapon(source, directionWithSpray);
+            this.fireWeapon(objectSource, mathSource, directionWithSpray);
             this.ammoRemaining--;
         }
     }
@@ -57,12 +57,12 @@ public abstract class Weapon : Holdable {
         return Time.time - timeLastShot >= fireCooldown && ammoRemaining > 0;
     }
 
-    protected abstract void fireWeapon(Vector3 source, Vector3 direction);
+    protected abstract void fireWeapon(Vector3 objectSource, Vector3 mathSource, Vector3 direction);
 
-    protected void shootBullet(Vector3 source, Vector3 direction) {
+    protected void shootBullet(Vector3 objectSource, Vector3 mathSource, Vector3 direction) {
         RaycastHit hit;
         Vector3 tracerEnd;
-        if (Physics.Raycast(source, direction, out hit, Mathf.Infinity, GUN_IGNORE_LAYER)) {
+        if (Physics.Raycast(mathSource, direction, out hit, Mathf.Infinity, GUN_IGNORE_LAYER)) {
             GameObject objectHit = hit.collider.gameObject;
             if (this.range >= hit.distance) {
                 if (isMover(objectHit)) {
@@ -71,12 +71,12 @@ public abstract class Weapon : Holdable {
                 }
                 tracerEnd = hit.point;
             } else {
-                tracerEnd = source + ((hit.point - source).normalized * this.range);
+                tracerEnd = objectSource + ((hit.point - objectSource).normalized * this.range);
             }
         } else {
-            tracerEnd = source + (direction * this.range);
+            tracerEnd = objectSource + (direction * this.range);
         }
-        TracerManager.createTracer(source, tracerEnd);
+        TracerManager.createTracer(objectSource, tracerEnd);
     }
 
     // TODO: Normal Distribution

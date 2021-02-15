@@ -4,22 +4,22 @@ using UnityEngine;
 
 public class PlayerCharacter : Mover
 {
-    public Camera playerCamera;
-    public Light playerCamerLight;
     private List<Holdable> inventory;
     private Holdable held;
-    private float xRotationClamp;
+    private float xRotation;
+    private Transform thirdPersonCamera;
     
     public override void Awake() {
         base.Awake();
         base.setup(50, 6.25f);
-        this.xRotationClamp = 0.0f;
+        this.xRotation = 0.0f;
         Holdable newRifle = new Rifle();
         Holdable newBuilder = new Builder();
         this.inventory = new List<Holdable>();
         this.inventory.Add(newRifle);
         this.inventory.Add(newBuilder);
         this.held = newRifle;
+        this.thirdPersonCamera = this.transform.GetChild(1);
     }
 
     public void changeHeld(int index) {
@@ -27,9 +27,10 @@ public class PlayerCharacter : Mover
     }
 
     public void useHeld() {
-        Vector3 source = transform.position;
-        Vector3 direction = (transform.rotation * Vector3.forward).normalized;
-        this.held.primaryUsed(source, direction);
+        Vector3 tracerSource = this.getTracerSource();
+        Vector3 source = this.thirdPersonCamera.position;
+        Vector3 direction = (this.thirdPersonCamera.rotation * Vector3.forward).normalized;
+        this.held.primaryUsed(tracerSource, source, direction);
     }
 
     public void pickupAmmo(int amount) {
@@ -41,14 +42,32 @@ public class PlayerCharacter : Mover
     }
 
     public void changeLookDirection(float mouseDeltaX, float mouseDeltaY) {
-        Vector3 playerRotation = transform.rotation.eulerAngles;
-        float newClamp = xRotationClamp - mouseDeltaY;
+        Vector3 playerRotation = this.transform.rotation.eulerAngles;
+        float newClamp = xRotation - mouseDeltaY;
         if (newClamp < 90.0f && newClamp > -90.0f) {
-            playerRotation.x -= mouseDeltaY;
-            xRotationClamp -= mouseDeltaY;
+            xRotation -= mouseDeltaY;
+            Debug.Log(playerRotation);
+            this.thirdPersonCamera.RotateAround(this.transform.position, this.getCameraPivotAngle(), mouseDeltaY);
+            
         }
         playerRotation.y += mouseDeltaX;
         playerRotation.z = 0;
         transform.rotation = Quaternion.Euler(playerRotation);
+    }
+
+    private Vector3 getTracerSource() {
+        Vector3 source = this.transform.position;
+        source.y += 1.0f;
+        return source;
+    }
+
+    private Vector3 getCameraPivotPoint() {
+        Vector3 pivotPoint = this.transform.position + this.thirdPersonCamera.position;
+        pivotPoint.z += 1.0f;
+        return pivotPoint;
+    }
+
+    private Vector3 getCameraPivotAngle() {
+        return new Vector3(transform.forward.z, 0.0f, -transform.forward.x);
     }
 }

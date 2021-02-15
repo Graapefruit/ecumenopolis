@@ -29,7 +29,7 @@ public class Enemy : Mover
             this.animator.SetBool("isMoving", true);
             if ((target.transform.position - transform.position).magnitude <= 1.1f) {
                 Vector3 direction = (this.target.transform.position - transform.position).normalized;
-                this.bite.primaryUsed(transform.position, this.target.transform.position);
+                this.bite.primaryUsed(transform.position, transform.position, this.target.transform.position);
             } else {
                 this.navMeshAgent.destination = this.target.transform.position;
             }
