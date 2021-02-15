@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public class PlayerCharacter : Mover
+public class PlayerCharacter : Mover, Shooter
 {
     private List<Holdable> inventory;
     private Holdable held;
@@ -27,10 +27,9 @@ public class PlayerCharacter : Mover
     }
 
     public void useHeld() {
-        Vector3 tracerSource = this.getTracerSource();
         Vector3 source = this.thirdPersonCamera.position;
         Vector3 direction = (this.thirdPersonCamera.rotation * Vector3.forward).normalized;
-        this.held.primaryUsed(tracerSource, source, direction);
+        this.held.primaryUsed(this as Shooter, source, direction);
     }
 
     public void pickupAmmo(int amount) {
@@ -46,7 +45,6 @@ public class PlayerCharacter : Mover
         float newClamp = xRotation - mouseDeltaY;
         if (newClamp < 90.0f && newClamp > -90.0f) {
             xRotation -= mouseDeltaY;
-            Debug.Log(playerRotation);
             this.thirdPersonCamera.RotateAround(this.transform.position, this.getCameraPivotAngle(), mouseDeltaY);
             
         }
@@ -55,7 +53,11 @@ public class PlayerCharacter : Mover
         transform.rotation = Quaternion.Euler(playerRotation);
     }
 
-    private Vector3 getTracerSource() {
+    public bool isSelf(GameObject gameObject) {
+        return gameObject == this.gameObject;
+    }
+
+    public Vector3 getTracerSource() {
         Vector3 source = this.transform.position;
         source.y += 1.0f;
         return source;

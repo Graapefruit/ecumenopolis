@@ -5,9 +5,9 @@ using UnityEngine;
 public class Builder : Weapon {
     public Builder() : base("Builder", 1.05f, 0, 3.25f, 10, 0.0f, 0.0f) {}
 
-    protected override void fireWeapon(Vector3 objectSource, Vector3 mathSource, Vector3 direction) {
+    protected override void fireWeapon(Shooter shooter, Vector3 source, Vector3 direction) {
         float placementDistance = direction.magnitude;
-        Vector3 placementLocation = mathSource + (direction * this.range);
+        Vector3 placementLocation = source + (direction * this.range);
         BuildingManager.createCaltrops(placementLocation, Quaternion.Euler(0.0f, Mathf.Atan(direction.x / direction.z) * Mathf.Rad2Deg, 0.0f));
     }
 }

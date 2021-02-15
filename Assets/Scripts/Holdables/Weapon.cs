@@ -1,4 +1,5 @@
-﻿using System.Collections;
+﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
@@ -36,11 +37,11 @@ public abstract class Weapon : Holdable {
         return this.name;
     }
 
-    public override void primaryUsed(Vector3 objectSource, Vector3 mathSource, Vector3 direction) {
-        Vector3 directionWithSpray = this.addSpray(mathSource, direction);
+    public override void primaryUsed(Shooter shooter, Vector3 source, Vector3 direction) {
+        Vector3 directionWithSpray = this.addSpray(source, direction);
         if (this.gunIsReady()) {
             timeLastShot = Time.time;
-            this.fireWeapon(objectSource, mathSource, directionWithSpray);
+            this.fireWeapon(shooter, source, directionWithSpray);
             this.ammoRemaining--;
         }
     }
@@ -57,33 +58,45 @@ public abstract class Weapon : Holdable {
         return Time.time - timeLastShot >= fireCooldown && ammoRemaining > 0;
     }
 
-    protected abstract void fireWeapon(Vector3 objectSource, Vector3 mathSource, Vector3 direction);
+    protected abstract void fireWeapon(Shooter shooter, Vector3 source, Vector3 direction);
 
-    protected void shootBullet(Vector3 objectSource, Vector3 mathSource, Vector3 direction) {
+    protected void shootBullet(Shooter shooter, Vector3 source, Vector3 direction) {
+        Vector3 tracerStart = shooter.getTracerSource();
+        Vector3 tracerEnd = tracerStart + (direction * this.range);
+        RaycastHit[] objectsHit = Physics.RaycastAll(new Ray(source, direction), this.range, GUN_IGNORE_LAYER);
+        Array.Sort<RaycastHit>(objectsHit, new Comparison<RaycastHit>((i1, i2) => i2.distance.CompareTo(i1.distance)));
+        // Because RaycastHit is not nullable and has no public constructor, modularizing the code without making a container class is difficult
         RaycastHit hit;
-        Vector3 tracerEnd;
-        if (Physics.Raycast(mathSource, direction, out hit, Mathf.Infinity, GUN_IGNORE_LAYER)) {
-            GameObject objectHit = hit.collider.gameObject;
-            if (this.range >= hit.distance) {
-                if (isMover(objectHit)) {
-                    Mover mover = objectHit.GetComponents(typeof(Mover))[0] as Mover;
-                    mover.dealDamage(this.damage, this.stoppingPower);
+        if (objectsHit.Length > 0) {
+            hit = objectsHit[0];
+            Debug.Log(hit);
+            if (shooter.isSelf(hit.collider.gameObject)) {
+                if (objectsHit.Length > 1) {
+                    tracerEnd = hit.point;
+                    this.applyBulletEffects(hit);
                 }
-                tracerEnd = hit.point;
             } else {
-                tracerEnd = objectSource + ((hit.point - objectSource).normalized * this.range);
+                tracerEnd = hit.point;
+                this.applyBulletEffects(hit);
             }
-        } else {
-            tracerEnd = objectSource + (direction * this.range);
         }
-        TracerManager.createTracer(objectSource, tracerEnd);
+
+        TracerManager.createTracer(tracerStart, tracerEnd);
+    }
+
+    private void applyBulletEffects(RaycastHit hit) {
+        GameObject gameObjectHit = hit.collider.gameObject;
+        if (isMover(gameObjectHit)) {
+            Mover mover = gameObjectHit.GetComponents(typeof(Mover))[0] as Mover;
+            mover.dealDamage(this.damage, this.stoppingPower);
+        }
     }
 
     // TODO: Normal Distribution
     // TODO: Vertical Spray
     protected Vector3 addSpray(Vector3 source, Vector3 direction) {
         float angle = Mathf.Atan2(direction.z, direction.x);
-        angle += Random.Range(-this.bulletSpread, this.bulletSpread);
+        angle += UnityEngine.Random.Range(-this.bulletSpread, this.bulletSpread);
         float newX = Mathf.Cos(angle);
         float newZ = Mathf.Sin(angle);
         Vector3 newDirection = new Vector3(newX, direction.y, newZ);

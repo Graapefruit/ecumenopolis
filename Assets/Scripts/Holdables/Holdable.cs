@@ -10,6 +10,6 @@ public abstract class Holdable
     // TODO: Item parent class to this?
     // TODO: Change to source/destinatio
     public abstract string getName();
-    public abstract void primaryUsed(Vector3 objectSource, Vector3 mathSource, Vector3 direction);
+    public abstract void primaryUsed(Shooter shooter, Vector3 source, Vector3 direction);
     //private abstract void secondaryUsed();
 }

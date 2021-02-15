@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.AI;
 
-public class Enemy : Mover
+public class Enemy : Mover, Shooter
 {
     private const int IGNORE_INTANGIBLE = ~(1 << 8);
     private bool isChasingPlayer;
@@ -24,12 +24,20 @@ public class Enemy : Mover
         this.target = target;
     }
 
+    public bool isSelf(GameObject gameObject) {
+        return gameObject == this.gameObject;
+    }
+
+    public Vector3 getTracerSource() {
+        return this.transform.position;
+    }
+
     void Update() {
         if (target) {
             this.animator.SetBool("isMoving", true);
             if ((target.transform.position - transform.position).magnitude <= 1.1f) {
                 Vector3 direction = (this.target.transform.position - transform.position).normalized;
-                this.bite.primaryUsed(transform.position, transform.position, this.target.transform.position);
+                this.bite.primaryUsed(this as Shooter, transform.position, this.target.transform.position);
             } else {
                 this.navMeshAgent.destination = this.target.transform.position;
             }
