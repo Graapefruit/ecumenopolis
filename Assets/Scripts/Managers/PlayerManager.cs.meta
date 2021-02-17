@@ -6,6 +6,8 @@ MonoImporter:
   defaultReferences:
   - pcPrefab: {fileID: 891549560684360584, guid: 41ee383ba7469b047b50ee3d38dab115,
       type: 3}
+  - hudPrefab: {fileID: 7324557115130655737, guid: a9a5bd09af0abbe438841a21e807f797,
+      type: 3}
   executionOrder: 0
   icon: {instanceID: 0}
   userData: 

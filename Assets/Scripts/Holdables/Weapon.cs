@@ -69,7 +69,6 @@ public abstract class Weapon : Holdable {
         RaycastHit hit;
         if (objectsHit.Length > 0) {
             hit = objectsHit[0];
-            Debug.Log(hit);
             if (shooter.isSelf(hit.collider.gameObject)) {
                 if (objectsHit.Length > 1) {
                     tracerEnd = hit.point;

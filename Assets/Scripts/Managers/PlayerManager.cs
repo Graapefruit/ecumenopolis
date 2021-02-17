@@ -4,11 +4,13 @@ using UnityEngine;
 
 public class PlayerManager : MonoBehaviour {
     public GameObject pcPrefab;
+    public GameObject hudPrefab;
+    private HudManager hud;
     private PlayerCharacter playerCharacter;
 
     void Awake() {
-        GameObject newPc = (GameObject) Instantiate(pcPrefab, new Vector3 (0.0f, 0.5f, 0.0f), Quaternion.identity);
-        this.playerCharacter = newPc.GetComponent<PlayerCharacter>();
+        this.playerCharacter = ((GameObject) Instantiate(pcPrefab, new Vector3 (34.0f, 11.5f, 3.0f), Quaternion.identity)).GetComponent<PlayerCharacter>();
+        this.hud = new HudManager((GameObject) Instantiate(hudPrefab, Vector3.zero, Quaternion.identity));
     }
 
     // Update is called once per frame
@@ -21,6 +23,7 @@ public class PlayerManager : MonoBehaviour {
             manageInventory();
             manageGunShooting();
         }
+        this.hud.updateHud(this.playerCharacter.getHp(), this.playerCharacter.getCurrentWeaponAmmo(), this.playerCharacter.getCurrentWeaponName());
     }
 
     public PlayerCharacter getPlayer() {

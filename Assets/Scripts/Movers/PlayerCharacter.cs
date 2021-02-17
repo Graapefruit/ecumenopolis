@@ -11,7 +11,7 @@ public class PlayerCharacter : Mover, Shooter
     
     public override void Awake() {
         base.Awake();
-        base.setup(50, 3.5f);
+        base.setup(100, 3.0f);
         this.xRotation = 0.0f;
         Holdable newRifle = new Rifle();
         Holdable newBuilder = new Builder();
@@ -61,6 +61,18 @@ public class PlayerCharacter : Mover, Shooter
         Vector3 source = this.transform.position;
         source.y += 1.0f;
         return source;
+    }
+
+    public int getHp() {
+        return this.currentHealth;
+    }
+
+    public int getCurrentWeaponAmmo() {
+        return ((Weapon) this.held).getRemainingAmmo();
+    }
+
+    public string getCurrentWeaponName() {
+        return ((Weapon) this.held).getName();
     }
 
     private Vector3 getCameraPivotPoint() {

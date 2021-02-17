@@ -46,10 +46,14 @@ public abstract class Mover : MonoBehaviour
     public virtual void dealDamage(int damageDealt, float stoppingPower) {
         this.currentHealth -= damageDealt;
         if (this.currentHealth <= 0) {
-            Destroy(gameObject);
+            this.initiateDeath();
         }
         this.stoppingPowerApplied = stoppingPower;
         this.stoppingPowerLastUpdate = Time.time;
+    }
+
+    protected virtual void initiateDeath() {
+        Destroy(gameObject);
     }
 
     public void moveInDirection(Vector3 direction) {

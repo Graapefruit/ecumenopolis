@@ -21,7 +21,7 @@ AnimatorState:
   m_MirrorParameterActive: 0
   m_CycleOffsetParameterActive: 0
   m_TimeParameterActive: 0
-  m_Motion: {fileID: 7400000, guid: 1d99ec3e7dfcda441957fd588f702f5a, type: 2}
+  m_Motion: {fileID: 7400000, guid: 12da5fa09c98ca64d94d759edebef09c, type: 2}
   m_Tag: 
   m_SpeedParameter: 
   m_MirrorParameter: 
@@ -33,7 +33,7 @@ AnimatorController:
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_Name: GuyAnimatorController
+  m_Name: UniversalCharacterRig
   serializedVersion: 5
   m_AnimatorParameters:
   - m_Name: isWalking
@@ -41,7 +41,7 @@ AnimatorController:
     m_DefaultFloat: 0
     m_DefaultInt: 0
     m_DefaultBool: 0
-    m_Controller: {fileID: 0}
+    m_Controller: {fileID: 9100000}
   m_AnimatorLayers:
   - serializedVersion: 5
     m_Name: Base Layer
@@ -138,7 +138,7 @@ AnimatorState:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_Name: Armature_Walk
-  m_Speed: 1
+  m_Speed: 1.35
   m_CycleOffset: 0
   m_Transitions:
   - {fileID: 1819236990378852360}
@@ -151,7 +151,7 @@ AnimatorState:
   m_MirrorParameterActive: 0
   m_CycleOffsetParameterActive: 0
   m_TimeParameterActive: 0
-  m_Motion: {fileID: 7400000, guid: 1e7e112ca2efdf04bbc20a85eb3c2d74, type: 2}
+  m_Motion: {fileID: 7400000, guid: cdf6a092e0ed6a6439de7cab137192b0, type: 2}
   m_Tag: 
   m_SpeedParameter: 
   m_MirrorParameter: 
