@@ -36,9 +36,11 @@ public class Enemy : Mover, Shooter
                 Vector3 direction = (this.target.transform.position - transform.position).normalized;
                 this.bite.primaryUsed(this as Shooter, transform.position, this.target.transform.position);
             } else {
+                this.setAsMoving();
                 this.navMeshAgent.destination = this.target.transform.position;
             }
         } else {
+            this.setAsIdle();
             // this.navMeshAgent.ResetPath(this.target.transform.position);
         }
     }

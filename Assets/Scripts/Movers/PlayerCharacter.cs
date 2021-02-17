@@ -8,6 +8,8 @@ public class PlayerCharacter : Mover, Shooter
     private Holdable held;
     private float xRotation;
     private Transform thirdPersonCamera;
+    private Vector3 moveDelta;
+    private CharacterController characterController;
     
     public override void Awake() {
         base.Awake();
@@ -20,6 +22,22 @@ public class PlayerCharacter : Mover, Shooter
         this.inventory.Add(newBuilder);
         this.held = newRifle;
         this.thirdPersonCamera = this.transform.GetChild(1);
+        this.moveDelta = Vector3.zero;
+        this.characterController = this.GetComponent<CharacterController>();
+    }
+
+    void Update() {
+        this.characterController.SimpleMove(this.moveDelta);
+        if (this.moveDelta != Vector3.zero) {
+            this.setAsMoving();
+        } else {
+            this.setAsIdle();
+        }
+        this.moveDelta = Vector3.zero;
+    }
+
+    public void setMovementDirection(Vector3 newDirection) {
+        this.moveDelta = newDirection * this.baseSpeed;
     }
 
     public void changeHeld(int index) {

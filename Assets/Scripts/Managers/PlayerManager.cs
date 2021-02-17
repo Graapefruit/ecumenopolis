@@ -51,14 +51,12 @@ public class PlayerManager : MonoBehaviour {
         xMagnitude += (Input.GetKey("a") ? -1.0f : 0.0f);
         zMagnitude += (Input.GetKey("w") ? 1.0f : 0.0f);
         zMagnitude += (Input.GetKey("s") ? -1.0f : 0.0f);
-        Vector3 movementDirection = new Vector3(xMagnitude, 0.0f, zMagnitude).normalized;
-        // Apply the current heading to the movement
-        movementDirection = playerCharacter.transform.rotation * movementDirection;
-        // Ignore any elevation in the current heading
-        movementDirection.y = 0;
-        movementDirection = movementDirection.normalized;
         if (xMagnitude != 0.0f || zMagnitude != 0.0f) {
-            playerCharacter.moveInDirection(movementDirection);
+            Vector3 movementDirection = new Vector3(xMagnitude, 0.0f, zMagnitude).normalized;
+            movementDirection = playerCharacter.transform.rotation * movementDirection;
+            movementDirection.y = 0;
+            movementDirection = movementDirection.normalized;
+            this.playerCharacter.setMovementDirection(movementDirection);
         }
     }
 

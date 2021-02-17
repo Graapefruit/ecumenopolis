@@ -11,29 +11,19 @@ public abstract class Mover : MonoBehaviour
     protected float stoppingPowerApplied;
     protected float stoppingPowerLastUpdate;
     protected int currentHealth;
-    private Rigidbody rigidBody;
-    private Vector3 movementDirection;
     private Vector3 positionOnFixedUpdate;
     protected Animator animator;
 
     public virtual void Awake() {
-        this.rigidBody = this.GetComponent<Rigidbody>();
-        this.movementDirection = Vector3.zero;
         this.animator = this.GetComponent<Animator>();
     }
 
-    private void FixedUpdate() {
-        this.updateMovingAnimation();
-        rigidBody.MovePosition(transform.position + (movementDirection * this.getSpeed() * Time.fixedDeltaTime));
-        this.movementDirection = Vector3.zero;
+    protected virtual void setAsMoving() {
+        this.animator.SetBool("isWalking", true);
     }
 
-    protected virtual void updateMovingAnimation() {
-        if (this.movementDirection == Vector3.zero) {
-            this.animator.SetBool("isWalking", false);
-        } else {
-            this.animator.SetBool("isWalking", true);
-        }
+    protected virtual void setAsIdle() {
+        this.animator.SetBool("isWalking", false);
     }
 
     public virtual void setup(int baseHealth, float baseSpeed) {
@@ -45,6 +35,7 @@ public abstract class Mover : MonoBehaviour
 
     public virtual void dealDamage(int damageDealt, float stoppingPower) {
         this.currentHealth -= damageDealt;
+        this.currentHealth = (currentHealth < 0 ? 0 : currentHealth);
         if (this.currentHealth <= 0) {
             this.initiateDeath();
         }
@@ -54,11 +45,6 @@ public abstract class Mover : MonoBehaviour
 
     protected virtual void initiateDeath() {
         Destroy(gameObject);
-    }
-
-    public void moveInDirection(Vector3 direction) {
-        this.updateStoppingPowerApplied();
-        this.movementDirection = direction;
     }
 
     private void updateStoppingPowerApplied() {
