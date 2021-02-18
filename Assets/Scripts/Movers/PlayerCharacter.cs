@@ -7,9 +7,10 @@ public class PlayerCharacter : Mover, Shooter
     private List<Holdable> inventory;
     private Holdable held;
     private float xRotation;
-    private Transform thirdPersonCamera;
+    private Transform followTarget;
     private Vector3 moveDelta;
     private CharacterController characterController;
+    private GameObject characterBody;
     
     public override void Awake() {
         base.Awake();
@@ -21,14 +22,16 @@ public class PlayerCharacter : Mover, Shooter
         this.inventory.Add(newRifle);
         this.inventory.Add(newBuilder);
         this.held = newRifle;
-        this.thirdPersonCamera = this.transform.GetChild(1);
+        this.followTarget = this.transform.GetChild(2);
         this.moveDelta = Vector3.zero;
         this.characterController = this.GetComponent<CharacterController>();
+        this.characterBody = this.transform.GetChild(0).gameObject;
     }
 
     void Update() {
         this.characterController.SimpleMove(this.moveDelta);
         if (this.moveDelta != Vector3.zero) {
+            this.characterBody.transform.rotation = Quaternion.LookRotation(this.moveDelta.normalized);
             this.setAsMoving();
         } else {
             this.setAsIdle();
@@ -37,7 +40,8 @@ public class PlayerCharacter : Mover, Shooter
     }
 
     public void setMovementDirection(Vector3 newDirection) {
-        this.moveDelta = newDirection * this.baseSpeed;
+        Quaternion relevantRotation = Quaternion.Euler(0.0f, this.followTarget.rotation.eulerAngles.y, 0.0f);
+        this.moveDelta = (relevantRotation * newDirection).normalized * this.baseSpeed;
     }
 
     public void changeHeld(int index) {
@@ -45,9 +49,9 @@ public class PlayerCharacter : Mover, Shooter
     }
 
     public void useHeld() {
-        Vector3 source = this.thirdPersonCamera.position;
-        Vector3 direction = (this.thirdPersonCamera.rotation * Vector3.forward).normalized;
-        this.held.primaryUsed(this as Shooter, source, direction);
+        // Vector3 source = this.thirdPersonCamera.position;
+        // Vector3 direction = (this.thirdPersonCamera.rotation * Vector3.forward).normalized;
+        // this.held.primaryUsed(this as Shooter, source, direction);
     }
 
     public void pickupAmmo(int amount) {
@@ -59,16 +63,15 @@ public class PlayerCharacter : Mover, Shooter
     }
 
     public void changeLookDirection(float mouseDeltaX, float mouseDeltaY) {
-        Vector3 playerRotation = this.transform.rotation.eulerAngles;
         float newClamp = xRotation - mouseDeltaY;
-        if (newClamp < 90.0f && newClamp > -90.0f) {
+        if (newClamp < 85.0f && newClamp > -85.0f) {
             xRotation -= mouseDeltaY;
-            this.thirdPersonCamera.RotateAround(this.transform.position, this.getCameraPivotAngle(), mouseDeltaY);
-            
+            this.followTarget.RotateAround(this.followTarget.position, this.getCameraPivotAngle(), mouseDeltaY);
         }
-        playerRotation.y += mouseDeltaX;
-        playerRotation.z = 0;
-        transform.rotation = Quaternion.Euler(playerRotation);
+        Vector3 followTargetRotation = this.followTarget.rotation.eulerAngles;
+        followTargetRotation.y += mouseDeltaX;
+        followTargetRotation.z = 0;
+        this.followTarget.rotation = Quaternion.Euler(followTargetRotation);
     }
 
     public bool isSelf(GameObject gameObject) {
@@ -93,13 +96,7 @@ public class PlayerCharacter : Mover, Shooter
         return ((Weapon) this.held).getName();
     }
 
-    private Vector3 getCameraPivotPoint() {
-        Vector3 pivotPoint = this.transform.position + this.thirdPersonCamera.position;
-        pivotPoint.z += 1.0f;
-        return pivotPoint;
-    }
-
     private Vector3 getCameraPivotAngle() {
-        return new Vector3(transform.forward.z, 0.0f, -transform.forward.x);
+        return new Vector3(this.followTarget.forward.z, 0.0f, -this.followTarget.transform.forward.x);
     }
 }
