@@ -4,8 +4,8 @@ using UnityEngine;
 
 public class PlayerCharacter : Mover, Shooter
 {
-    private List<Holdable> inventory;
-    private Holdable held;
+    public Item held;
+    private List<Item> inventory;
     private float xRotation;
     private Transform followTarget;
     private Vector3 moveDelta;
@@ -16,12 +16,10 @@ public class PlayerCharacter : Mover, Shooter
         base.Awake();
         base.setup(100, 3.0f);
         this.xRotation = 0.0f;
-        Holdable newRifle = new Rifle();
-        Holdable newBuilder = new Builder();
-        this.inventory = new List<Holdable>();
-        this.inventory.Add(newRifle);
-        this.inventory.Add(newBuilder);
-        this.held = newRifle;
+        this.inventory = new List<Item>();
+        this.inventory.Add(held);
+        // Item newBuilder = new Builder();
+        // this.inventory.Add(newBuilder);
         this.followTarget = this.transform.GetChild(2);
         this.moveDelta = Vector3.zero;
         this.characterController = this.GetComponent<CharacterController>();
@@ -49,17 +47,17 @@ public class PlayerCharacter : Mover, Shooter
     }
 
     public void useHeld() {
-        // Vector3 source = this.thirdPersonCamera.position;
-        // Vector3 direction = (this.thirdPersonCamera.rotation * Vector3.forward).normalized;
-        // this.held.primaryUsed(this as Shooter, source, direction);
+        Vector3 source = this.followTarget.position;
+        Vector3 direction = (this.followTarget.rotation * Vector3.forward).normalized;
+        this.held.primaryUsed(this as Shooter, source, direction);
     }
 
     public void pickupAmmo(int amount) {
-        ((Weapon) this.inventory[0]).refillAmmo(amount);
+        ((Gun) this.inventory[0]).refillAmmo(amount);
     }
 
     public void pickupScrap(int amount) {
-        ((Weapon) this.inventory[1]).refillAmmo(amount);
+        ((Gun) this.inventory[1]).refillAmmo(amount);
     }
 
     public void changeLookDirection(float mouseDeltaX, float mouseDeltaY) {
@@ -89,11 +87,11 @@ public class PlayerCharacter : Mover, Shooter
     }
 
     public int getCurrentWeaponAmmo() {
-        return ((Weapon) this.held).getRemainingAmmo();
+        return ((Gun) this.held).getRemainingAmmo();
     }
 
     public string getCurrentWeaponName() {
-        return ((Weapon) this.held).getName();
+        return ((Gun) this.held).getName();
     }
 
     private Vector3 getCameraPivotAngle() {

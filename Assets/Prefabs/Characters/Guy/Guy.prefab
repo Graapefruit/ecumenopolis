@@ -805,6 +805,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 0aaf721dd73322e4b87ea7979d977fcf, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  held: {fileID: 11400000, guid: 119bc1605ccfff547a3c4150950fbc90, type: 2}
 --- !u!136 &9053476786149679898
 CapsuleCollider:
   m_ObjectHideFlags: 0

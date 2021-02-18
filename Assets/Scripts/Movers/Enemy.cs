@@ -8,13 +8,13 @@ public class Enemy : Mover, Shooter
     private const int IGNORE_INTANGIBLE = ~(1 << 8);
     private bool isChasingPlayer;
     private PlayerCharacter target;
-    private Weapon bite;
+    private Gun bite;
     private NavMeshAgent navMeshAgent;
 
     public override void Awake() {
         base.Awake();
         base.setup(30, 3.0f);
-        this.bite = new DretchBite();
+        // this.bite = new DretchBite();
         this.navMeshAgent = this.GetComponent<NavMeshAgent>();
     }
 
