@@ -10,20 +10,22 @@ public class PlayerManager : MonoBehaviour {
 
     void Awake() {
         this.playerCharacter = ((GameObject) Instantiate(pcPrefab, new Vector3 (34.0f, 11.5f, 3.0f), Quaternion.identity)).GetComponent<PlayerCharacter>();
-        this.hud = new HudManager((GameObject) Instantiate(hudPrefab, Vector3.zero, Quaternion.identity));
+        this.hud = ((GameObject) Instantiate(hudPrefab, Vector3.zero, Quaternion.identity)).GetComponent<HudManager>();
     }
 
-    // Update is called once per frame
-    void Update()
-    {
+    void Start() {
+        this.hud.assignPlayer(this.playerCharacter);
+    }
+
+    void Update() {
         manageCameraLocking();
         if (Cursor.lockState == CursorLockMode.Locked) {
             manageMouseMovements();
             manageMovement();
-            manageInventory();
+            manageHotbar();
             manageGunShooting();
+            manageInventoryOpenClose();
         }
-        this.hud.updateHud(this.playerCharacter.getHp(), this.playerCharacter.getCurrentWeaponAmmo(), this.playerCharacter.getCurrentWeaponName());
     }
 
     public PlayerCharacter getPlayer() {
@@ -31,7 +33,7 @@ public class PlayerManager : MonoBehaviour {
     } 
 
     private void manageCameraLocking() {
-        if (Input.GetKeyDown(KeyCode.Space)) {
+        if (Input.GetKeyDown(KeyCode.BackQuote)) {
             Cursor.lockState = (Cursor.lockState == CursorLockMode.Locked ? CursorLockMode.None : CursorLockMode.Locked);
         }
     }
@@ -60,7 +62,7 @@ public class PlayerManager : MonoBehaviour {
         }
     }
 
-    private void manageInventory() {
+    private void manageHotbar() {
         if (Input.GetKeyDown(KeyCode.Alpha1)) {
             this.playerCharacter.changeHeld(0);
         } else if (Input.GetKeyDown(KeyCode.Alpha2)) {
@@ -71,6 +73,12 @@ public class PlayerManager : MonoBehaviour {
     private void manageGunShooting() {
         if (Input.GetMouseButton(0)) {
             this.playerCharacter.useHeld();
+        }
+    }
+
+    private void manageInventoryOpenClose() {
+        if (Input.GetKeyDown(KeyCode.I)) {
+            this.hud.toggleInventory();
         }
     }
 }

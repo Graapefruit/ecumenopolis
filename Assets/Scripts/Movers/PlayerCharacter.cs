@@ -5,7 +5,7 @@ using UnityEngine;
 public class PlayerCharacter : Mover, Shooter
 {
     public Item held;
-    private List<Item> inventory;
+    private Inventory inventory;
     private float xRotation;
     private Transform followTarget;
     private Vector3 moveDelta;
@@ -16,10 +16,8 @@ public class PlayerCharacter : Mover, Shooter
         base.Awake();
         base.setup(100, 3.0f);
         this.xRotation = 0.0f;
-        this.inventory = new List<Item>();
-        this.inventory.Add(held);
-        // Item newBuilder = new Builder();
-        // this.inventory.Add(newBuilder);
+        this.inventory = new Inventory();
+        this.inventory.Add(held, 0, 0);
         this.followTarget = this.transform.GetChild(2);
         this.moveDelta = Vector3.zero;
         this.characterController = this.GetComponent<CharacterController>();
@@ -37,13 +35,17 @@ public class PlayerCharacter : Mover, Shooter
         this.moveDelta = Vector3.zero;
     }
 
+    public Inventory getInventory() {
+        return this.inventory;
+    }
+
     public void setMovementDirection(Vector3 newDirection) {
         Quaternion relevantRotation = Quaternion.Euler(0.0f, this.followTarget.rotation.eulerAngles.y, 0.0f);
         this.moveDelta = (relevantRotation * newDirection).normalized * this.baseSpeed;
     }
 
     public void changeHeld(int index) {
-        this.held = this.inventory[index];
+        // this.held = this.inventory[index];
     }
 
     public void useHeld() {
@@ -53,11 +55,11 @@ public class PlayerCharacter : Mover, Shooter
     }
 
     public void pickupAmmo(int amount) {
-        ((Gun) this.inventory[0]).refillAmmo(amount);
+        // ((Gun) this.inventory[0]).refillAmmo(amount);
     }
 
     public void pickupScrap(int amount) {
-        ((Gun) this.inventory[1]).refillAmmo(amount);
+        // ((Gun) this.inventory[1]).refillAmmo(amount);
     }
 
     public void changeLookDirection(float mouseDeltaX, float mouseDeltaY) {

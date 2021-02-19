@@ -12,3 +12,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 3d9a2d171491760498e9566c9341ca73, type: 3}
   m_Name: Rifle
   m_EditorClassIdentifier: 
+  name: Rifle
+  damage: 7
+  fireCooldown: 0.125
+  range: 14
+  maxAmmo: 30
+  bulletSpread: 0.16
+  stoppingPower: 1.2

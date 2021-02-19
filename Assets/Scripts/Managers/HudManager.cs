@@ -3,23 +3,29 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI; 
 
-public class HudManager
-{
+public class HudManager : MonoBehaviour {
     private Text ammoDisplay;
     private Text heldDisplay;
     private Image hpFill;
     private Image hpTip;
+    private InventoryHudManager inventoryOverlay;
     private int hp;
     private int ammo;
     private string held;
-    public HudManager(GameObject hud) {
-        this.ammoDisplay = hud.transform.Find("AmmoDisplay").GetComponent<Text>();
-        this.heldDisplay = hud.transform.Find("CurrentHeldDisplay").GetComponent<Text>();
-        this.hpFill = hud.transform.Find("HpFill").GetComponent<Image>();
-        this.hpTip = hud.transform.Find("HpTip").GetComponent<Image>();
-        this.updateHud(0, 0, "none");
+    private PlayerCharacter playerCharacter;
+
+    void Awake() {
+        this.ammoDisplay = this.transform.Find("AmmoDisplay").GetComponent<Text>();
+        this.heldDisplay = this.transform.Find("CurrentHeldDisplay").GetComponent<Text>();
+        this.hpFill = this.transform.Find("HpFill").GetComponent<Image>();
+        this.hpTip = this.transform.Find("HpTip").GetComponent<Image>();
+        this.inventoryOverlay = this.transform.Find("InventoryOverlay").GetComponent<InventoryHudManager>();
     }
-    public void updateHud(int newHp, int newAmmo, string newHeld) {
+
+    void Update() {
+        int newHp = this.playerCharacter.getHp();
+        int newAmmo = this.playerCharacter.getCurrentWeaponAmmo();
+        string newHeld = this.playerCharacter.getCurrentWeaponName();
         if (this.hp != newHp) {
             this.updateHp(newHp);
         } if (this.ammo != newAmmo) {
@@ -27,6 +33,15 @@ public class HudManager
         } if (this.held != newHeld) {
             this.updateCurrentHeld(newHeld);
         }
+    }
+
+    public void assignPlayer(PlayerCharacter pc) {
+        this.playerCharacter = pc;
+        this.inventoryOverlay.assignInventory(this.playerCharacter.getInventory());
+    }
+
+    public bool toggleInventory() {
+        return this.inventoryOverlay.toggleInventory();
     }
 
     private void updateHp(int newHp) {
