@@ -60,6 +60,10 @@ public class PlayerManager : MonoBehaviour {
             movementDirection = movementDirection.normalized;
             this.playerCharacter.setMovementDirection(movementDirection);
         }
+
+        if (Input.GetKey(KeyCode.Space)) {
+            this.playerCharacter.jump();
+        }
     }
 
     private void manageHotbar() {

@@ -11,6 +11,7 @@ public class PlayerCharacter : Mover, Shooter
     private Vector3 moveDelta;
     private CharacterController characterController;
     private GameObject characterBody;
+    private PlayerCharacterModelHelper modelHelper;
     
     public override void Awake() {
         base.Awake();
@@ -22,17 +23,31 @@ public class PlayerCharacter : Mover, Shooter
         this.moveDelta = Vector3.zero;
         this.characterController = this.GetComponent<CharacterController>();
         this.characterBody = this.transform.GetChild(0).gameObject;
+        this.modelHelper = new PlayerCharacterModelHelper(this.characterBody);
+        this.modelHelper.holdItem(this.held);
     }
 
     void Update() {
-        this.characterController.SimpleMove(this.moveDelta);
-        if (this.moveDelta != Vector3.zero) {
-            this.characterBody.transform.rotation = Quaternion.LookRotation(this.moveDelta.normalized);
+        this.characterController.Move(this.moveDelta * Time.deltaTime);
+        if (this.moveDelta.x != 0.0f || this.moveDelta.z != 0.0f) {
+            Vector3 lookRotationVector = this.moveDelta;
+            lookRotationVector.y = 0.0f;
+            lookRotationVector = lookRotationVector.normalized;
+            this.characterBody.transform.rotation = Quaternion.LookRotation(lookRotationVector);
             this.setAsMoving();
         } else {
             this.setAsIdle();
         }
-        this.moveDelta = Vector3.zero;
+
+        if ((this.characterController.collisionFlags & CollisionFlags.Above) != 0) {
+            this.moveDelta.y = 0;
+        }
+
+        // TODO: isGrounded seems to tick on and off. Investigate further. This is why Jumping is GetKey rather than GetKeyDown
+        this.moveDelta.y -= 19.62f * Time.deltaTime;
+        if (this.characterController.isGrounded) {
+            this.moveDelta = Vector3.zero;
+        }
     }
 
     public Inventory getInventory() {
@@ -40,8 +55,16 @@ public class PlayerCharacter : Mover, Shooter
     }
 
     public void setMovementDirection(Vector3 newDirection) {
-        Quaternion relevantRotation = Quaternion.Euler(0.0f, this.followTarget.rotation.eulerAngles.y, 0.0f);
-        this.moveDelta = (relevantRotation * newDirection).normalized * this.baseSpeed;
+        if (this.characterController.isGrounded) {
+            Quaternion relevantRotation = Quaternion.Euler(0.0f, this.followTarget.rotation.eulerAngles.y, 0.0f);
+            this.moveDelta = (relevantRotation * newDirection).normalized * this.baseSpeed;
+        }
+    }
+
+    public void jump() {
+        if (this.characterController.isGrounded) {
+            moveDelta.y = 8.0f;
+        }
     }
 
     public void changeHeld(int index) {

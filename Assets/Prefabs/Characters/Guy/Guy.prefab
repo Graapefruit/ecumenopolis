@@ -28,7 +28,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 2274295476687401770}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 15.731694, y: 6.75, z: 13.239295}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children:
   - {fileID: 1943191970621796307}
@@ -127,7 +127,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 4093085913086329961}
   m_LocalRotation: {x: 0.018612117, y: 0.02057079, z: -0.000019015437, w: -0.9996152}
-  m_LocalPosition: {x: 0.49999905, y: 1.6549997, z: -1.5}
+  m_LocalPosition: {x: 0.5, y: 1.6550001, z: -1.75}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children:
   - {fileID: 589765135426408355}
@@ -259,7 +259,7 @@ MonoBehaviour:
   ShoulderOffset: {x: 0.5, y: -0.4, z: 0}
   VerticalArmLength: 0.6
   CameraSide: 1
-  CameraDistance: 1.5
+  CameraDistance: 1.75
   CameraCollisionFilter:
     serializedVersion: 2
     m_Bits: 1
@@ -424,6 +424,21 @@ PrefabInstance:
         type: 3}
       propertyPath: m_Name
       value: Guy
+      objectReference: {fileID: 0}
+    - target: {fileID: 8504309617613441659, guid: 695976148412e6340b9c9d7036768c09,
+        type: 3}
+      propertyPath: m_LocalScale.x
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 8504309617613441659, guid: 695976148412e6340b9c9d7036768c09,
+        type: 3}
+      propertyPath: m_LocalScale.y
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 8504309617613441659, guid: 695976148412e6340b9c9d7036768c09,
+        type: 3}
+      propertyPath: m_LocalScale.z
+      value: 1
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 695976148412e6340b9c9d7036768c09, type: 3}

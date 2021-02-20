@@ -10,6 +10,8 @@ public abstract class Item : ScriptableObject
     // TODO: Item parent class to this?
     // TODO: Change to source/destinatio
     new public string name;
+    public GameObject prefab;
+    public PlayerCharacterHoldTransform holdTransform;
     public string getName() {
         return this.name;
     }
