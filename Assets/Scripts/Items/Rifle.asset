@@ -13,6 +13,8 @@ MonoBehaviour:
   m_Name: Rifle
   m_EditorClassIdentifier: 
   name: Rifle
+  prefab: {fileID: 118234, guid: a4e476a037022df448ead5d0ceea7d06, type: 3}
+  holdTransform: {fileID: 11400000, guid: 7851b5620b693e740af926a1ea683321, type: 2}
   damage: 7
   fireCooldown: 0.125
   range: 14

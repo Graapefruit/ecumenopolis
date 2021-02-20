@@ -74,6 +74,7 @@ public class Gun : Item {
 
     // TODO: Normal Distribution
     // TODO: Vertical Spray
+    // TODO: Spray sucks, direction should be modified based on current orientation (x/z, y)
     protected Vector3 addSpray(Vector3 source, Vector3 direction) {
         float angle = Mathf.Atan2(direction.z, direction.x);
         angle += UnityEngine.Random.Range(-this.bulletSpread, this.bulletSpread);

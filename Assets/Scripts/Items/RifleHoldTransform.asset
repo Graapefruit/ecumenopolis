@@ -12,6 +12,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 83d23eb6f76729e4eb07ce0fe6c63a0e, type: 3}
   m_Name: RifleHoldTransform
   m_EditorClassIdentifier: 
-  relativePos: {x: 0, y: 0, z: 0}
-  relativeRotEuler: {x: 0, y: 0, z: 0}
-  relativeScale: {x: 0, y: 0, z: 0}
+  relativePos: {x: 0.00004, y: 0.00122, z: 0.00024}
+  relativeRotEuler: {x: -58.373, y: -115.475, z: 223.957}
+  relativeScale: {x: 0.01, y: 0.01, z: 0.01}

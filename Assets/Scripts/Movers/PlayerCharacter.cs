@@ -6,37 +6,39 @@ public class PlayerCharacter : Mover, Shooter
 {
     public Item held;
     private Inventory inventory;
-    private float xRotation;
+    private float upRotation;
+    private float horizontalRotation;
     private Transform followTarget;
     private Vector3 moveDelta;
     private CharacterController characterController;
     private GameObject characterBody;
     private PlayerCharacterModelHelper modelHelper;
+    private Vector3 lastDirection;
     
     public override void Awake() {
         base.Awake();
         base.setup(100, 3.0f);
-        this.xRotation = 0.0f;
+        this.upRotation = 0.0f;
+        this.horizontalRotation = 0.0f;
         this.inventory = new Inventory();
         this.inventory.Add(held, 0, 0);
         this.followTarget = this.transform.GetChild(2);
         this.moveDelta = Vector3.zero;
         this.characterController = this.GetComponent<CharacterController>();
         this.characterBody = this.transform.GetChild(0).gameObject;
-        this.modelHelper = new PlayerCharacterModelHelper(this.characterBody);
+        this.modelHelper = new PlayerCharacterModelHelper(this.characterBody, this.animator);
         this.modelHelper.holdItem(this.held);
+        this.lastDirection = Vector3.zero;
     }
 
-    void Update() {
+    void LateUpdate() {
         this.characterController.Move(this.moveDelta * Time.deltaTime);
         if (this.moveDelta.x != 0.0f || this.moveDelta.z != 0.0f) {
-            Vector3 lookRotationVector = this.moveDelta;
-            lookRotationVector.y = 0.0f;
-            lookRotationVector = lookRotationVector.normalized;
-            this.characterBody.transform.rotation = Quaternion.LookRotation(lookRotationVector);
-            this.setAsMoving();
+            this.lastDirection = this.moveDelta;
+            this.modelHelper.rotateLowerBody(this.lastDirection, this.followTarget.rotation.eulerAngles.y);
         } else {
-            this.setAsIdle();
+            Debug.Log("idle!");
+            this.animator.SetInteger("walkDirection", 0);
         }
 
         if ((this.characterController.collisionFlags & CollisionFlags.Above) != 0) {
@@ -44,10 +46,12 @@ public class PlayerCharacter : Mover, Shooter
         }
 
         // TODO: isGrounded seems to tick on and off. Investigate further. This is why Jumping is GetKey rather than GetKeyDown
-        this.moveDelta.y -= 19.62f * Time.deltaTime;
+        // This must be fixed when falling animations are introduced
         if (this.characterController.isGrounded) {
             this.moveDelta = Vector3.zero;
         }
+        this.moveDelta.y -= 19.62f * Time.deltaTime;
+        this.modelHelper.rotateUpperBody(horizontalRotation);
     }
 
     public Inventory getInventory() {
@@ -86,15 +90,16 @@ public class PlayerCharacter : Mover, Shooter
     }
 
     public void changeLookDirection(float mouseDeltaX, float mouseDeltaY) {
-        float newClamp = xRotation - mouseDeltaY;
+        float newClamp = upRotation - mouseDeltaY;
         if (newClamp < 85.0f && newClamp > -85.0f) {
-            xRotation -= mouseDeltaY;
+            upRotation -= mouseDeltaY;
             this.followTarget.RotateAround(this.followTarget.position, this.getCameraPivotAngle(), mouseDeltaY);
         }
         Vector3 followTargetRotation = this.followTarget.rotation.eulerAngles;
         followTargetRotation.y += mouseDeltaX;
         followTargetRotation.z = 0;
         this.followTarget.rotation = Quaternion.Euler(followTargetRotation);
+        this.horizontalRotation += mouseDeltaX;
     }
 
     public bool isSelf(GameObject gameObject) {
