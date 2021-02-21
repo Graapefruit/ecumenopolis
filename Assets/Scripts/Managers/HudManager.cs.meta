@@ -1,9 +1,11 @@
 fileFormatVersion: 2
-guid: 7244aff5462724c42889c86817163dde
+guid: 9f77a9da26977f845b17912b62059692
 MonoImporter:
   externalObjects: {}
   serializedVersion: 2
-  defaultReferences: []
+  defaultReferences:
+  - inventoryHudManagerPrefab: {fileID: 6132104302995412394, guid: fcce14bc34075ba4491be2849f011769,
+      type: 3}
   executionOrder: 0
   icon: {instanceID: 0}
   userData: 

@@ -3,7 +3,9 @@ guid: ac2f660d697d0134da9807438e791031
 MonoImporter:
   externalObjects: {}
   serializedVersion: 2
-  defaultReferences: []
+  defaultReferences:
+  - inventoryHudPanelPrefab: {fileID: 6132104302995412394, guid: fcce14bc34075ba4491be2849f011769,
+      type: 3}
   executionOrder: 0
   icon: {instanceID: 0}
   userData: 

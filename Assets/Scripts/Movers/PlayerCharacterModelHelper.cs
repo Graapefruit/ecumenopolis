@@ -43,7 +43,6 @@ public class PlayerCharacterModelHelper {
         float angle = this.lowerBodyInitialRotation + (Mathf.Atan2(direction.z, -direction.x) * Mathf.Rad2Deg);
         float contortionAngle = angle - headingAngle;
         while (contortionAngle < 0) {
-            Debug.Log(contortionAngle);
             contortionAngle += 360;
         }
         if (contortionAngle > 300 || contortionAngle < 60) {

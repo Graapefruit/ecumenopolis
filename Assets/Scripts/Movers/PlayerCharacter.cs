@@ -21,7 +21,7 @@ public class PlayerCharacter : Mover, Shooter
         this.upRotation = 0.0f;
         this.horizontalRotation = 0.0f;
         this.inventory = new Inventory();
-        this.inventory.Add(held, 0, 0);
+        this.inventory.add(held, 0, 0);
         this.followTarget = this.transform.GetChild(2);
         this.moveDelta = Vector3.zero;
         this.characterController = this.GetComponent<CharacterController>();
@@ -37,7 +37,6 @@ public class PlayerCharacter : Mover, Shooter
             this.lastDirection = this.moveDelta;
             this.modelHelper.rotateLowerBody(this.lastDirection, this.followTarget.rotation.eulerAngles.y);
         } else {
-            Debug.Log("idle!");
             this.animator.SetInteger("walkDirection", 0);
         }
 
@@ -56,6 +55,10 @@ public class PlayerCharacter : Mover, Shooter
 
     public Inventory getInventory() {
         return this.inventory;
+    }
+
+    public InventoryHudPanel getInventoryHud() {
+        return this.inventory.getHud();
     }
 
     public void setMovementDirection(Vector3 newDirection) {

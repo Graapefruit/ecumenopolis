@@ -1,69 +1,20 @@
-﻿using System.Collections;
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-using UnityEngine.UI; 
 
 public class HudManager : MonoBehaviour {
-    private Text ammoDisplay;
-    private Text heldDisplay;
-    private Image hpFill;
-    private Image hpTip;
-    private InventoryHudManager inventoryOverlay;
-    private int hp;
-    private int ammo;
-    private string held;
-    private PlayerCharacter playerCharacter;
-
+    public GameObject inventoryHudManagerPrefab;
+    private static HudManager hm;
+    
     void Awake() {
-        this.ammoDisplay = this.transform.Find("AmmoDisplay").GetComponent<Text>();
-        this.heldDisplay = this.transform.Find("CurrentHeldDisplay").GetComponent<Text>();
-        this.hpFill = this.transform.Find("HpFill").GetComponent<Image>();
-        this.hpTip = this.transform.Find("HpTip").GetComponent<Image>();
-        this.inventoryOverlay = this.transform.Find("InventoryOverlay").GetComponent<InventoryHudManager>();
-    }
-
-    void Update() {
-        int newHp = this.playerCharacter.getHp();
-        int newAmmo = this.playerCharacter.getCurrentWeaponAmmo();
-        string newHeld = this.playerCharacter.getCurrentWeaponName();
-        if (this.hp != newHp) {
-            this.updateHp(newHp);
-        } if (this.ammo != newAmmo) {
-            this.updateAmmo(newAmmo);
-        } if (this.held != newHeld) {
-            this.updateCurrentHeld(newHeld);
+        if (hm != null) {
+            Debug.LogWarning("Static hm object already found! Deleting and making another");
+            GameObject.Destroy(hm);
         }
+        hm = this;
     }
 
-    public void assignPlayer(PlayerCharacter pc) {
-        this.playerCharacter = pc;
-        this.inventoryOverlay.assignInventory(this.playerCharacter.getInventory());
-    }
-
-    public bool toggleInventory() {
-        return this.inventoryOverlay.toggleInventory();
-    }
-
-    private void updateHp(int newHp) {
-        this.hp = newHp;
-        Vector3 oldFillPos = this.hpFill.transform.position;
-        Vector3 oldFillScale = this.hpFill.transform.localScale;
-        Vector3 oldTipPos = this.hpTip.transform.position;
-        oldFillPos.x = 105 + (0.85f * newHp);
-        oldFillScale.x = 1.8f * newHp;
-        oldTipPos.x = 105 + (1.8f * newHp);
-        this.hpFill.transform.position = oldFillPos;
-        this.hpFill.transform.localScale = oldFillScale;
-        this.hpTip.transform.position = oldTipPos;
-    }
-
-    public void updateAmmo(int newAmount) {
-        this.ammo = newAmount;
-        this.ammoDisplay.text = string.Format("Ammo: {0}", newAmount);
-    }
-
-    public void updateCurrentHeld(string newHeld) {
-        this.held = newHeld;
-        this.heldDisplay.text = string.Format("Held: {0}", newHeld);
+    public static GameObject getInventoryHudManagerPrefab() {
+        return hm.inventoryHudManagerPrefab;
     }
 }

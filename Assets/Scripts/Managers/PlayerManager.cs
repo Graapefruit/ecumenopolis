@@ -5,12 +5,12 @@ using UnityEngine;
 public class PlayerManager : MonoBehaviour {
     public GameObject pcPrefab;
     public GameObject hudPrefab;
-    private HudManager hud;
+    private PlayerHud hud;
     private PlayerCharacter playerCharacter;
 
     void Awake() {
         this.playerCharacter = ((GameObject) Instantiate(pcPrefab, new Vector3 (34.0f, 11.5f, 3.0f), Quaternion.identity)).GetComponent<PlayerCharacter>();
-        this.hud = ((GameObject) Instantiate(hudPrefab, Vector3.zero, Quaternion.identity)).GetComponent<HudManager>();
+        this.hud = ((GameObject) Instantiate(hudPrefab, Vector3.zero, Quaternion.identity)).GetComponent<PlayerHud>();
     }
 
     void Start() {
