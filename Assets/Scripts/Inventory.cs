@@ -6,17 +6,12 @@ using UnityEngine;
 // TODO: Remove Monobehaviour
 public class Inventory {
     private Item[,] inventory;
-    private int[] hotbarMappings;
     private Item currentlyHeld;
     private int inventorySizeX = 6;
     private int inventorySizeY = 6;
     private InventoryHudPanel hud;
     public Inventory() {
         this.inventory = new Item[inventorySizeX, inventorySizeY];
-        this.hotbarMappings = new int[10];
-        foreach (int num in this.hotbarMappings) {
-            this.hotbarMappings[num] = -1;
-        }
     }
 
     public InventoryHudPanel getHud() {

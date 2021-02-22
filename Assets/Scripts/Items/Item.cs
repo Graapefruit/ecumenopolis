@@ -11,6 +11,8 @@ public abstract class Item : ScriptableObject
     // TODO: Item parent class to this?
     // TODO: Change to source/destinatio
     new public string name;
+    public Vector3 pickupOffset;
+    public Vector3 pickupRotation;
     public GameObject prefab;
     public Sprite avatar;
     public PlayerCharacterHoldTransform holdTransform;

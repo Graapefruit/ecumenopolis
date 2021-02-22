@@ -1,0 +1,14 @@
+fileFormatVersion: 2
+guid: 3fc4f9a7fc2504e4f90f468fd72b40b1
+MonoImporter:
+  externalObjects: {}
+  serializedVersion: 2
+  defaultReferences:
+  - riflePrefab: {fileID: 11400000, guid: 119bc1605ccfff547a3c4150950fbc90, type: 2}
+  - pickupPrefab: {fileID: 8206950969615775921, guid: 5416f0b5befc46346b9668a076d8868c,
+      type: 3}
+  executionOrder: 0
+  icon: {instanceID: 0}
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
