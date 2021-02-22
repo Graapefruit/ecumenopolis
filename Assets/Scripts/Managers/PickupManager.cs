@@ -24,7 +24,6 @@ public class PickupManager : MonoBehaviour {
         if (this.lastPickupTime >= pickupSpawnTime) {
             this.lastPickupTime = this.lastPickupTime % pickupSpawnTime;
             Vector3 pickupLocation = BoardManager.getRandomLocation();
-            Debug.Log(pickupLocation);
             GameObject newPickup = Instantiate(pickupPrefab, pickupLocation, Quaternion.identity);
             newPickup.GetComponent<Pickup>().setItem(ScriptableObject.Instantiate(riflePrefab));
         }

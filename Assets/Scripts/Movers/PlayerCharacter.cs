@@ -4,6 +4,8 @@ using UnityEngine;
 
 public class PlayerCharacter : Mover, Shooter
 {
+    private const int PICKUP_LAYER = (1 << 11);
+    private const float PICKUP_RANGE = 2.5f;
     public Item held;
     private Inventory inventory;
     private float upRotation;
@@ -30,6 +32,29 @@ public class PlayerCharacter : Mover, Shooter
         this.modelHelper.holdItem(this.held);
         this.lastDirection = Vector3.zero;
     }
+
+    public Pickup getFirstPickupInRange() {
+        RaycastHit hit;
+        Vector3 direction = (this.followTarget.rotation * Vector3.forward).normalized;
+        if (Physics.SphereCast(this.followTarget.transform.position, 0.8f, direction, out hit, PICKUP_RANGE, PICKUP_LAYER)) {
+            return hit.transform.GetComponent<Pickup>();
+        }
+        return null;
+    }
+
+    public bool addItemIfRoom(Item item) {
+        Vector2 openSlot = this.inventory.getNextOpenSlot();
+        int x = (int) openSlot.x;
+        int y = (int) openSlot.y;
+        if (x == -1 || y == -1) {
+            return false;
+        } else {
+            this.inventory.add(item, (int) openSlot.x, (int) openSlot.y);
+            return true;
+        }
+    }
+
+    // public void addItem(Item item, int x, int y) {}
 
     void LateUpdate() {
         this.characterController.Move(this.moveDelta * Time.deltaTime);

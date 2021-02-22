@@ -25,6 +25,7 @@ public class PlayerManager : MonoBehaviour {
             manageHotbar();
             manageGunShooting();
             manageInventoryOpenClose();
+            manageItemPickup();
         }
     }
 
@@ -83,6 +84,19 @@ public class PlayerManager : MonoBehaviour {
     private void manageInventoryOpenClose() {
         if (Input.GetKeyDown(KeyCode.I)) {
             this.hud.toggleInventory();
+        }
+    }
+
+    private void manageItemPickup() {
+        Pickup pickup = this.playerCharacter.getFirstPickupInRange();
+        if (pickup != null) {
+            this.hud.setPickupTextEnabled(true);
+            if (Input.GetKeyDown(KeyCode.E)) {
+                Item item = PickupManager.pickupItem(pickup);
+                bool itemWasAdded = this.playerCharacter.addItemIfRoom(item);
+            }
+        } else {
+            this.hud.setPickupTextEnabled(false);
         }
     }
 }

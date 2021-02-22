@@ -43,6 +43,17 @@ public class Inventory {
         }
     }
 
+    public Vector2 getNextOpenSlot() {
+        for (int y = 0; y < this.inventorySizeY; y++) {
+            for (int x = 0; x < this.inventorySizeX; x++) {
+                if (this.inventory[x, y] == null) {
+                    return new Vector2(x, y);
+                }
+            }
+        }
+        return new Vector2(-1, -1);
+    }
+
     // public void setHotbarMapping(int x, int y, int h) {
     //     this.hotbarMappings[h] = (x * this.inventorySizeY) + y;
     //     if (hud != null) {

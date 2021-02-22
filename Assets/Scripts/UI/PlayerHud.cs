@@ -6,6 +6,7 @@ using UnityEngine.UI;
 public class PlayerHud : MonoBehaviour {
     private Text ammoDisplay;
     private Text heldDisplay;
+    private Text pickupPopup;
     private Image hpFill;
     private Image hpTip;
     private InventoryHudPanel inventoryOverlay;
@@ -17,6 +18,7 @@ public class PlayerHud : MonoBehaviour {
     void Awake() {
         this.ammoDisplay = this.transform.Find("AmmoDisplay").GetComponent<Text>();
         this.heldDisplay = this.transform.Find("CurrentHeldDisplay").GetComponent<Text>();
+        this.pickupPopup = this.transform.Find("PickupPopup").GetComponent<Text>();
         this.hpFill = this.transform.Find("HpFill").GetComponent<Image>();
         this.hpTip = this.transform.Find("HpTip").GetComponent<Image>();
     }
@@ -32,6 +34,10 @@ public class PlayerHud : MonoBehaviour {
         } if (this.held != newHeld) {
             this.updateCurrentHeld(newHeld);
         }
+    }
+
+    public void setPickupTextEnabled(bool enabled) {
+        this.pickupPopup.gameObject.SetActive(enabled);
     }
 
     public void assignPlayer(PlayerCharacter pc) {
