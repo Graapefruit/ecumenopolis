@@ -10,16 +10,12 @@ public class InventoryHudPanel : MonoBehaviour{
     private int inventorySizeY;
     private GameObject[,] inventoryItemSquares;
     private GameObject[,] inventoryItemImages;
-    private Inventory inventory;
     private bool isActive;
 
     public void initializeInventoryHud(Inventory inventory) {
-        this.inventory = inventory;
-        Vector2 gridSize = this.inventory.getDimensions();
-        this.inventorySizeX = (int) gridSize.x;
-        this.inventorySizeY = (int) gridSize.y;
-        this.inventoryItemImages = new GameObject[inventorySizeX, inventorySizeY];
-        this.inventoryItemSquares = new GameObject[inventorySizeX, inventorySizeY];
+        Pair gridSize = inventory.getDimensions();
+        this.inventorySizeX = gridSize.x;
+        this.inventorySizeY = gridSize.y;
         RectTransform panelRectTransform = this.transform.GetComponent<RectTransform>();
         panelRectTransform.anchorMin = new Vector2(1, 0);
         panelRectTransform.anchorMax = new Vector2(0, 1);
@@ -30,17 +26,11 @@ public class InventoryHudPanel : MonoBehaviour{
     }
 
     public void add(Item item, int x, int y) {
-        Vector2 coords = this.indexToCoords(x, y);
-        float xPos = coords.x;
-        float yPos = coords.y;
-        GameObject itemAvatar = Instantiate(itemAvatarPrefab, new Vector3(xPos, yPos, 0.0f), Quaternion.identity);
+        Vector3 coords = this.indexToInventoryCoords(x, y);
+        GameObject itemAvatar = Instantiate(itemAvatarPrefab, coords, Quaternion.identity);
         itemAvatar.transform.SetParent(this.transform, false);
         this.inventoryItemImages[x, y] = itemAvatar;
         itemAvatar.GetComponent<Image>().sprite = item.getAvatar();
-    }
-
-    public void setHotbarImage(Item item, int h) {
-
     }
 
     public bool toggleInventory() {
@@ -50,10 +40,12 @@ public class InventoryHudPanel : MonoBehaviour{
     }
 
     private void initializeInventoryPanels() {
+        this.inventoryItemImages = new GameObject[inventorySizeX, inventorySizeY];
+        this.inventoryItemSquares = new GameObject[inventorySizeX, inventorySizeY];
         for(int x = 0; x < this.inventorySizeX; x++) {
             for(int y = 0; y < this.inventorySizeY; y++) {
-                Vector2 coords = this.indexToCoords(x, y);
-                GameObject newSquare = Instantiate(inventorySquarePrefab, new Vector3(coords.x, coords.y, 0.0f), Quaternion.identity);
+                Vector3 coords = this.indexToInventoryCoords(x, y);
+                GameObject newSquare = Instantiate(inventorySquarePrefab, coords, Quaternion.identity);
                 newSquare.transform.SetParent(this.transform, false);
                 this.inventoryItemSquares[x, y] = newSquare;
             }
@@ -64,7 +56,7 @@ public class InventoryHudPanel : MonoBehaviour{
         panel.sizeDelta = new Vector2(20 + (60 * this.inventorySizeX), 20 + (60 * this.inventorySizeY));
     }
 
-    private Vector2 indexToCoords(int x, int y) {
-        return new Vector2((-30 * (this.inventorySizeX - 1)) + (60 * x), (30 * (this.inventorySizeY - 1)) + (-60 * y));
+    private Vector3 indexToInventoryCoords(int x, int y) {
+        return new Vector3((-30 * (this.inventorySizeX - 1)) + (60 * x), (30 * (this.inventorySizeY - 1)) + (-60 * y), 0.0f);
     }
 }

@@ -4,9 +4,11 @@ MonoImporter:
   externalObjects: {}
   serializedVersion: 2
   defaultReferences:
+  - itemAvatarPrefab: {fileID: 2532754311602832889, guid: d08bb3c2bca4c8a498fe7871496e2b33,
+      type: 3}
   - inventorySquarePrefab: {fileID: 8704310171375016460, guid: 3fd3b1529e261714bb4ceaf580b138e8,
       type: 3}
-  - itemAvatarPrefab: {fileID: 2532754311602832889, guid: d08bb3c2bca4c8a498fe7871496e2b33,
+  - hotbarSquarePrefab: {fileID: 2171787353680782576, guid: ba83a789a8330a14c93c86c034454fb1,
       type: 3}
   executionOrder: 0
   icon: {instanceID: 0}

@@ -33,29 +33,6 @@ public class PlayerCharacter : Mover, Shooter
         this.lastDirection = Vector3.zero;
     }
 
-    public Pickup getFirstPickupInRange() {
-        RaycastHit hit;
-        Vector3 direction = (this.followTarget.rotation * Vector3.forward).normalized;
-        if (Physics.SphereCast(this.followTarget.transform.position, 0.8f, direction, out hit, PICKUP_RANGE, PICKUP_LAYER)) {
-            return hit.transform.GetComponent<Pickup>();
-        }
-        return null;
-    }
-
-    public bool addItemIfRoom(Item item) {
-        Vector2 openSlot = this.inventory.getNextOpenSlot();
-        int x = (int) openSlot.x;
-        int y = (int) openSlot.y;
-        if (x == -1 || y == -1) {
-            return false;
-        } else {
-            this.inventory.add(item, (int) openSlot.x, (int) openSlot.y);
-            return true;
-        }
-    }
-
-    // public void addItem(Item item, int x, int y) {}
-
     void LateUpdate() {
         this.characterController.Move(this.moveDelta * Time.deltaTime);
         if (this.moveDelta.x != 0.0f || this.moveDelta.z != 0.0f) {
@@ -78,12 +55,37 @@ public class PlayerCharacter : Mover, Shooter
         this.modelHelper.rotateUpperBody(horizontalRotation);
     }
 
+    public Pickup getFirstPickupInRange() {
+        RaycastHit hit;
+        Vector3 direction = (this.followTarget.rotation * Vector3.forward).normalized;
+        if (Physics.SphereCast(this.followTarget.transform.position, 0.8f, direction, out hit, PICKUP_RANGE, PICKUP_LAYER)) {
+            return hit.transform.GetComponent<Pickup>();
+        }
+        return null;
+    }
+
+    public bool addItemIfRoom(Item item) {
+        Pair openSlot = this.inventory.getNextOpenSlot();
+        if (openSlot == null) {
+            return false;
+        } else {
+            this.inventory.add(item, (int) openSlot.x, (int) openSlot.y);
+            return true;
+        }
+    }
+
+    // public void addItem(Item item, int x, int y) {}
+
     public Inventory getInventory() {
         return this.inventory;
     }
 
     public InventoryHudPanel getInventoryHud() {
         return this.inventory.getHud();
+    }
+
+    public HotbarHudPanel getHotbarHud() {
+        return this.inventory.getHotbarHud();
     }
 
     public void setMovementDirection(Vector3 newDirection) {

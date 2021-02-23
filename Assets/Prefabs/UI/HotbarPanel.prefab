@@ -1,6 +1,6 @@
 %YAML 1.1
 %TAG !u! tag:unity3d.com,2011:
---- !u!1 &6132104302995412394
+--- !u!1 &245006230004510192
 GameObject:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -8,51 +8,51 @@ GameObject:
   m_PrefabAsset: {fileID: 0}
   serializedVersion: 6
   m_Component:
-  - component: {fileID: 8635704652357464727}
-  - component: {fileID: 5883516316634215225}
-  - component: {fileID: 1229881855914086399}
-  - component: {fileID: -2902107808009307602}
+  - component: {fileID: 7619662940732933697}
+  - component: {fileID: 7353170558362078283}
+  - component: {fileID: 2796638932528153313}
+  - component: {fileID: 4428765806467161079}
   m_Layer: 5
-  m_Name: InventoryPanel
+  m_Name: HotbarPanel
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
   m_IsActive: 1
---- !u!224 &8635704652357464727
+--- !u!224 &7619662940732933697
 RectTransform:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 6132104302995412394}
-  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
+  m_GameObject: {fileID: 245006230004510192}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
   m_Father: {fileID: 0}
   m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
-  m_AnchorMin: {x: 0.5, y: 0.5}
-  m_AnchorMax: {x: 0.5, y: 0.5}
+  m_AnchorMin: {x: 0.5, y: 0}
+  m_AnchorMax: {x: 0.5, y: 0}
   m_AnchoredPosition: {x: 0, y: 0}
-  m_SizeDelta: {x: 90, y: 90}
+  m_SizeDelta: {x: 0, y: 0}
   m_Pivot: {x: 0.5, y: 0.5}
---- !u!222 &5883516316634215225
+--- !u!222 &7353170558362078283
 CanvasRenderer:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 6132104302995412394}
+  m_GameObject: {fileID: 245006230004510192}
   m_CullTransparentMesh: 1
---- !u!114 &1229881855914086399
+--- !u!114 &2796638932528153313
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 6132104302995412394}
+  m_GameObject: {fileID: 245006230004510192}
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: fe87c0e1cc204ed48ad3b37840f39efc, type: 3}
@@ -76,21 +76,19 @@ MonoBehaviour:
   m_FillOrigin: 0
   m_UseSpriteMesh: 0
   m_PixelsPerUnitMultiplier: 1
---- !u!114 &-2902107808009307602
+--- !u!114 &4428765806467161079
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 6132104302995412394}
+  m_GameObject: {fileID: 245006230004510192}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: c5b519c3834e278499a4f3f1afb13eaa, type: 3}
+  m_Script: {fileID: 11500000, guid: 4fbbdb250bede914dacfc9260aa10c3a, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
   itemAvatarPrefab: {fileID: 2532754311602832889, guid: d08bb3c2bca4c8a498fe7871496e2b33,
-    type: 3}
-  inventorySquarePrefab: {fileID: 8704310171375016460, guid: 3fd3b1529e261714bb4ceaf580b138e8,
     type: 3}
   hotbarSquarePrefab: {fileID: 2171787353680782576, guid: ba83a789a8330a14c93c86c034454fb1,
     type: 3}

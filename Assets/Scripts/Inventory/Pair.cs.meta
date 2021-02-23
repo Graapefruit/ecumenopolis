@@ -1,11 +1,9 @@
 fileFormatVersion: 2
-guid: ac2f660d697d0134da9807438e791031
+guid: e55f9411ca801ea43941d9f5bc681d3e
 MonoImporter:
   externalObjects: {}
   serializedVersion: 2
-  defaultReferences:
-  - inventoryHudPanelPrefab: {fileID: 6132104302995412394, guid: fcce14bc34075ba4491be2849f011769,
-      type: 3}
+  defaultReferences: []
   executionOrder: 0
   icon: {instanceID: 0}
   userData: 

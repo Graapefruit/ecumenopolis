@@ -6,23 +6,24 @@ using UnityEngine;
 // TODO: Remove Monobehaviour
 public class Inventory {
     private Item[,] inventory;
-    private Item currentlyHeld;
     private int inventorySizeX = 6;
     private int inventorySizeY = 6;
     private InventoryHudPanel hud;
+    private InventoryPlayerAttachment playerAttachment;
+
     public Inventory() {
         this.inventory = new Item[inventorySizeX, inventorySizeY];
     }
 
     public InventoryHudPanel getHud() {
         if (this.hud == null) {
-            this.createHud();
+            this.initializeHud();
         }
         return this.hud;
     }
 
-    private void createHud() {
-        this.hud = GameObject.Instantiate(HudManager.getInventoryHudManagerPrefab(), Vector3.zero, Quaternion.identity).GetComponent<InventoryHudPanel>();
+    private void initializeHud() {
+        this.hud = HudManager.getNewInventoryHudInstance();
         this.hud.initializeInventoryHud(this);
         for (int x = 0; x < this.inventorySizeX; x++) {
             for (int y = 0; y < this.inventorySizeY; y++) {
@@ -30,9 +31,6 @@ public class Inventory {
                     this.hud.add(this.inventory[x, y], x, y);
                 }
             }
-        }
-        for (int i = 0; i < 10; i++) {
-            // this.hud.setHotbarImage(this.getHotbarAt(i), i);
         }
     }
 
@@ -43,36 +41,44 @@ public class Inventory {
         }
     }
 
-    public Vector2 getNextOpenSlot() {
+    public Pair getNextOpenSlot() {
         for (int y = 0; y < this.inventorySizeY; y++) {
             for (int x = 0; x < this.inventorySizeX; x++) {
                 if (this.inventory[x, y] == null) {
-                    return new Vector2(x, y);
+                    return new Pair(x, y);
                 }
             }
         }
-        return new Vector2(-1, -1);
+        return new Pair(-1, -1);
     }
 
-    // public void setHotbarMapping(int x, int y, int h) {
-    //     this.hotbarMappings[h] = (x * this.inventorySizeY) + y;
-    //     if (hud != null) {
-    //         this.hud.setHotbarImage(this.getHotbarAt(h), h);
-    //     }
-    // }
+    public void assignMapping(int x, int y, int h) {
+        Item item = this.inventory[x, y];
+        this.playerAttachment.assignMapping(x, y, h, item);
+    }
 
-    // public Item getHotbarAt(int h) {
-    //     int x = this.hotbarMappings[h] / this.inventorySizeY;
-    //     int y = this.hotbarMappings[h] % this.inventorySizeY;
-    //     return this.inventory[x, y];
-    // }
+    public Item getHotbarAt(int h) {
+        Pair coords = this.playerAttachment.getMapping(h);
+        return this.inventory[coords.x, coords.y];
+    }
+
+    public HotbarHudPanel getHotbarHud() {
+        if (this.playerAttachment == null) {
+            this.playerAttachment = new InventoryPlayerAttachment();
+        } 
+        return this.playerAttachment.getHotbarHud();
+    }
 
     public Item switchHeld(int h) {
-        // this.currentlyHeld = this.getHotbarAt(h);
-        return this.currentlyHeld;
+        if (this.playerAttachment.assignNewHeld(h)) {
+            Pair pair = this.playerAttachment.getMapping(h);
+            return this.inventory[pair.x, pair.y];
+        } else {
+            return null;
+        }
     }
 
-    public Vector2 getDimensions() {
-        return new Vector2(inventorySizeX, inventorySizeY);
+    public Pair getDimensions() {
+        return new Pair(inventorySizeX, inventorySizeY);
     }
 }

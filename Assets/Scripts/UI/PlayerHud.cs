@@ -10,6 +10,7 @@ public class PlayerHud : MonoBehaviour {
     private Image hpFill;
     private Image hpTip;
     private InventoryHudPanel inventoryOverlay;
+    private HotbarHudPanel hotbarOverlay;
     private int hp;
     private int ammo;
     private string held;
@@ -43,7 +44,9 @@ public class PlayerHud : MonoBehaviour {
     public void assignPlayer(PlayerCharacter pc) {
         this.playerCharacter = pc;
         this.inventoryOverlay = pc.getInventoryHud();
+        this.hotbarOverlay = pc.getHotbarHud();
         this.inventoryOverlay.transform.SetParent(this.transform, false);
+        this.hotbarOverlay.transform.SetParent(this.transform, false);
     }
 
     public bool toggleInventory() {
