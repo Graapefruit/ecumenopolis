@@ -17,6 +17,7 @@ public class PlayerController : MonoBehaviour {
     }
 
     void Start() {
+        this.playerCharacter.finishInitialization();
         this.hud.assignPlayer(this.playerCharacter);
     }
 

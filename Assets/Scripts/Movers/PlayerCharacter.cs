@@ -7,7 +7,7 @@ public class PlayerCharacter : Mover, Shooter
     private const int PICKUP_LAYER = (1 << 11);
     private const float PICKUP_RANGE = 2.5f;
     public Item held;
-    private Inventory inventory;
+    private PlayerInventory inventory;
     private float upRotation;
     private float horizontalRotation;
     private Transform followTarget;
@@ -22,15 +22,18 @@ public class PlayerCharacter : Mover, Shooter
         base.setup(100, 3.0f);
         this.upRotation = 0.0f;
         this.horizontalRotation = 0.0f;
-        this.inventory = new Inventory();
-        this.inventory.add(held, 0, 0);
         this.followTarget = this.transform.GetChild(2);
         this.moveDelta = Vector3.zero;
         this.characterController = this.GetComponent<CharacterController>();
         this.characterBody = this.transform.GetChild(0).gameObject;
+        this.lastDirection = Vector3.zero;
+    }
+
+    public void finishInitialization() {
+        this.inventory = new PlayerInventory();
+        this.inventory.add(held, 0, 0);
         this.modelHelper = new PlayerCharacterModelHelper(this.characterBody, this.animator);
         this.modelHelper.holdItem(this.held);
-        this.lastDirection = Vector3.zero;
     }
 
     void LateUpdate() {

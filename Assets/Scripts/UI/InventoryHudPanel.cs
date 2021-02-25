@@ -56,7 +56,10 @@ public class InventoryHudPanel : MonoBehaviour{
     private void createNewSquare(Inventory inventory, int x, int y) {
         Vector3 coords = this.indexToInventoryCoords(x, y);
         GameObject newSquare = Instantiate(inventorySquarePrefab, coords, Quaternion.identity);
-        newSquare.GetComponent<InventorySlotSquare>().assignPartialHotbarMappingFunction(((int h) => { inventory.assignMapping(x, y, h); }));
+        if (inventory is PlayerInventory) {
+            PlayerInventory playerInventory = inventory as PlayerInventory;
+            newSquare.GetComponent<InventorySlotSquare>().assignPartialHotbarMappingFunction(((int h) => { playerInventory.assignMapping(x, y, h); }));
+        }
         newSquare.transform.SetParent(this.transform, false);
         this.inventoryItemSquares[x, y] = newSquare;
     }
