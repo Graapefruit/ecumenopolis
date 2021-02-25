@@ -10,4 +10,8 @@ public class Pair {
         this.x = x;
         this.y = y;
     }
+
+    public virtual bool equals(Pair pair) {
+        return (this.x == pair.x) && (this.y == pair.y);
+    }
 }

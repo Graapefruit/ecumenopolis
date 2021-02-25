@@ -8,7 +8,7 @@ MonoImporter:
       type: 3}
   - inventorySquarePrefab: {fileID: 8704310171375016460, guid: 3fd3b1529e261714bb4ceaf580b138e8,
       type: 3}
-  - hotbarSquarePrefab: {fileID: 2171787353680782576, guid: ba83a789a8330a14c93c86c034454fb1,
+  - hotbarAssignmentWrapperPrefab: {fileID: 6000103146750011882, guid: 0864354badc87b54abeb74de4df35648,
       type: 3}
   executionOrder: 0
   icon: {instanceID: 0}

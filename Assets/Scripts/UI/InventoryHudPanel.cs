@@ -6,10 +6,12 @@ using UnityEngine.UI;
 public class InventoryHudPanel : MonoBehaviour{
     public GameObject itemAvatarPrefab;
     public GameObject inventorySquarePrefab;
+    public GameObject hotbarAssignmentWrapperPrefab;
     private int inventorySizeX;
     private int inventorySizeY;
     private GameObject[,] inventoryItemSquares;
     private GameObject[,] inventoryItemImages;
+    private GameObject[,] hotbarAssignmentWrappers;
     private bool isActive;
 
     public void initializeInventoryHud(Inventory inventory) {
@@ -33,6 +35,14 @@ public class InventoryHudPanel : MonoBehaviour{
         itemAvatar.GetComponent<Image>().sprite = item.getAvatar();
     }
 
+    public void makeHotbarAssignment(int x, int y, int h) {
+        Vector3 coords = this.indexToInventoryCoords(x, y);
+        GameObject hotbarWrapper = Instantiate(hotbarAssignmentWrapperPrefab, coords, Quaternion.identity);
+        hotbarWrapper.GetComponent<HotbarAssignmentWrapper>().changeAssignment(h);
+        hotbarWrapper.transform.SetParent(this.transform, false);
+        this.hotbarAssignmentWrappers[x, y] = hotbarWrapper;
+    }
+
     public bool toggleInventory() {
         isActive = !isActive;
         this.gameObject.SetActive(isActive);
@@ -42,6 +52,7 @@ public class InventoryHudPanel : MonoBehaviour{
     private void initializeInventoryPanels(Inventory inventory) {
         this.inventoryItemImages = new GameObject[inventorySizeX, inventorySizeY];
         this.inventoryItemSquares = new GameObject[inventorySizeX, inventorySizeY];
+        this.hotbarAssignmentWrappers = new GameObject[inventorySizeX, inventorySizeY];
         for(int x = 0; x < this.inventorySizeX; x++) {
             for(int y = 0; y < this.inventorySizeY; y++) {
                 createNewSquare(inventory, x, y);

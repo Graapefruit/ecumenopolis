@@ -4,14 +4,18 @@ using UnityEngine;
 
 public class PlayerInventory : Inventory {
     private Pair[] hotbarMappings;
+    private int[,] inverseHotbarMappings;
     private int currentlyHeld;
     private HotbarHudPanel hotbarHud;
 
     public PlayerInventory() : base() {
         this.hotbarMappings = new Pair[10];
-        // for(int i = 0; i < 10; i++) {
-        //     this.hotbarMappings[i] = new Pair();
-        // }
+        this.inverseHotbarMappings = new int[this.inventorySizeX, this.inventorySizeY];
+        for(int x = 0; x < this.inventorySizeX; x++) {
+            for (int y = 0; y < this.inventorySizeY; y++) {
+                this.inverseHotbarMappings[x, y] = -1;
+            }
+        }
         this.currentlyHeld = 1;
         this.hotbarHud = HudManager.getNewHotbarHudInstance();
     }
@@ -20,9 +24,15 @@ public class PlayerInventory : Inventory {
     }
 
     public void assignMapping(int x, int y, int h) {
+        if (this.hotbarMappings[h] != null && this.inverseHotbarMappings[x, y] == h) {
+            return;
+        }
+
         Item item = this.inventory[x, y];
         if (item != null) {
             this.hotbarMappings[h] = new Pair(x, y);
+            this.inverseHotbarMappings[x, y] = h;
+            this.hud.makeHotbarAssignment(x, y, h);
             this.hotbarHud.setHotbarImage(item, h);
         }
     }
