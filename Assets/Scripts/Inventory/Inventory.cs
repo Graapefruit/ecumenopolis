@@ -2,8 +2,6 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-// TODO: State for "player attachement"? Would contain hud, and currentlyheld
-// TODO: Remove Monobehaviour
 public class Inventory {
     private Item[,] inventory;
     private int inventorySizeX = 6;
@@ -54,7 +52,9 @@ public class Inventory {
 
     public void assignMapping(int x, int y, int h) {
         Item item = this.inventory[x, y];
-        this.playerAttachment.assignMapping(x, y, h, item);
+        if (item != null) {
+            this.playerAttachment.assignMapping(x, y, h, item);
+        }
     }
 
     public Item getHotbarAt(int h) {

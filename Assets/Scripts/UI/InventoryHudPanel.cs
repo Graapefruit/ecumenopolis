@@ -20,7 +20,7 @@ public class InventoryHudPanel : MonoBehaviour{
         panelRectTransform.anchorMin = new Vector2(1, 0);
         panelRectTransform.anchorMax = new Vector2(0, 1);
         panelRectTransform.pivot = new Vector2(0.5f, 0.5f);
-        this.initializeInventoryPanels();
+        this.initializeInventoryPanels(inventory);
         this.isActive = true;
         this.toggleInventory();
     }
@@ -39,21 +39,26 @@ public class InventoryHudPanel : MonoBehaviour{
         return isActive;
     }
 
-    private void initializeInventoryPanels() {
+    private void initializeInventoryPanels(Inventory inventory) {
         this.inventoryItemImages = new GameObject[inventorySizeX, inventorySizeY];
         this.inventoryItemSquares = new GameObject[inventorySizeX, inventorySizeY];
         for(int x = 0; x < this.inventorySizeX; x++) {
             for(int y = 0; y < this.inventorySizeY; y++) {
-                Vector3 coords = this.indexToInventoryCoords(x, y);
-                GameObject newSquare = Instantiate(inventorySquarePrefab, coords, Quaternion.identity);
-                newSquare.transform.SetParent(this.transform, false);
-                this.inventoryItemSquares[x, y] = newSquare;
+                createNewSquare(inventory, x, y);
             }
         }
         RectTransform panel = this.GetComponent<RectTransform>();
         panel.anchorMax = new Vector2(0.5f, 0.5f);
         panel.anchorMin = new Vector2(0.5f, 0.5f);
         panel.sizeDelta = new Vector2(20 + (60 * this.inventorySizeX), 20 + (60 * this.inventorySizeY));
+    }
+
+    private void createNewSquare(Inventory inventory, int x, int y) {
+        Vector3 coords = this.indexToInventoryCoords(x, y);
+        GameObject newSquare = Instantiate(inventorySquarePrefab, coords, Quaternion.identity);
+        newSquare.GetComponent<InventorySlotSquare>().assignPartialHotbarMappingFunction(((int h) => { inventory.assignMapping(x, y, h); }));
+        newSquare.transform.SetParent(this.transform, false);
+        this.inventoryItemSquares[x, y] = newSquare;
     }
 
     private Vector3 indexToInventoryCoords(int x, int y) {

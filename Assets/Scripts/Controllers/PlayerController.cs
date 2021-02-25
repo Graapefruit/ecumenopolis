@@ -1,16 +1,19 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.EventSystems;
 
-public class PlayerManager : MonoBehaviour {
+public class PlayerController : MonoBehaviour {
     public GameObject pcPrefab;
     public GameObject hudPrefab;
     private PlayerHud hud;
     private PlayerCharacter playerCharacter;
+    private bool inventoryIsOpen;
 
     void Awake() {
         this.playerCharacter = ((GameObject) Instantiate(pcPrefab, new Vector3 (34.0f, 11.5f, 3.0f), Quaternion.identity)).GetComponent<PlayerCharacter>();
         this.hud = ((GameObject) Instantiate(hudPrefab, Vector3.zero, Quaternion.identity)).GetComponent<PlayerHud>();
+        this.inventoryIsOpen = false;
     }
 
     void Start() {
@@ -18,13 +21,14 @@ public class PlayerManager : MonoBehaviour {
     }
 
     void Update() {
-        manageCameraLocking();
-        if (Cursor.lockState == CursorLockMode.Locked) {
+        checkForInterfaceUpdates();
+        if (this.inventoryIsOpen) {
+            manageHotbarAssignments();
+        } else if (cameraIsLocked()) {
             manageMouseMovements();
             manageMovement();
             manageHotbar();
             manageGunShooting();
-            manageInventoryOpenClose();
             manageItemPickup();
         }
     }
@@ -33,10 +37,46 @@ public class PlayerManager : MonoBehaviour {
         return this.playerCharacter;
     } 
 
-    private void manageCameraLocking() {
-        if (Input.GetKeyDown(KeyCode.BackQuote)) {
-            Cursor.lockState = (Cursor.lockState == CursorLockMode.Locked ? CursorLockMode.None : CursorLockMode.Locked);
+    private void checkForInterfaceUpdates() {
+        if (Input.GetKeyDown(KeyCode.I)) {
+            this.hud.toggleInventory();
+            this.inventoryIsOpen = !this.inventoryIsOpen;
+            Cursor.lockState = (this.inventoryIsOpen ? CursorLockMode.None : CursorLockMode.Locked);
+        } if (Input.GetMouseButton(0) && !this.inventoryIsOpen) {
+            Cursor.lockState = CursorLockMode.Locked;
         }
+    }
+
+    private void manageHotbarAssignments() {
+        int hotbarSlot = this.getHotbarSlotDown();
+        if (hotbarSlot < 0) {
+            return;
+        }
+        PointerEventData pointerEventData = new PointerEventData(EventSystem.current);
+        pointerEventData.position = Input.mousePosition;
+        List<RaycastResult> results = new List<RaycastResult>();
+        EventSystem.current.RaycastAll(pointerEventData, results);
+        foreach (RaycastResult result in results) {
+            InventorySlotSquare square = result.gameObject.GetComponent<InventorySlotSquare>();
+            if (square != null) {
+                square.assignHotbarMapping(hotbarSlot);
+                return;
+            }
+        }
+    }
+
+    private int getHotbarSlotDown() {
+        // ASCII
+        for (int i = 48; i < 58; i++) {
+            if (Input.GetKey(""+((char) i))) {
+                return i - 48;
+            }
+        }
+        return -1;
+    }
+
+    private bool cameraIsLocked() {
+        return Cursor.lockState == CursorLockMode.Locked;
     }
 
     private void manageMouseMovements() {
@@ -78,12 +118,6 @@ public class PlayerManager : MonoBehaviour {
     private void manageGunShooting() {
         if (Input.GetMouseButton(0)) {
             this.playerCharacter.useHeld();
-        }
-    }
-
-    private void manageInventoryOpenClose() {
-        if (Input.GetKeyDown(KeyCode.I)) {
-            this.hud.toggleInventory();
         }
     }
 

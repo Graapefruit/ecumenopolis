@@ -24,6 +24,9 @@ public class HotbarHudPanel : MonoBehaviour {
         Vector3 coords = this.indexToHotbarCoords(h);
         GameObject itemAvatar = Instantiate(itemAvatarPrefab, coords, Quaternion.identity);
         itemAvatar.transform.SetParent(this.transform, false);
+        Vector3 relativeItemPos = itemAvatar.transform.position;
+        relativeItemPos.y += 20.0f;
+        itemAvatar.transform.position = relativeItemPos;
         this.hotbarSquares[h] = itemAvatar;
         itemAvatar.GetComponent<Image>().sprite = item.getAvatar();
     }

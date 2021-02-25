@@ -12,6 +12,7 @@ GameObject:
   - component: {fileID: 1534386587683304487}
   - component: {fileID: 1163116236117461123}
   - component: {fileID: 3071737312548996144}
+  - component: {fileID: 8489274139390593633}
   m_Layer: 5
   m_Name: InventorySquare
   m_TagString: Untagged
@@ -120,3 +121,15 @@ MonoBehaviour:
   m_OnClick:
     m_PersistentCalls:
       m_Calls: []
+--- !u!114 &8489274139390593633
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8704310171375016460}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 3dff10aee42878145a07961f8662e82d, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 

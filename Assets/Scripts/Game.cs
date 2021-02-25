@@ -10,7 +10,7 @@ public class Game : MonoBehaviour
     private const float ammoSpawnHeight = 0.5f;
     private const float ammoBaseCooldown = 3.5f;
     private float remainingAmmoCooldown = 3.5f;
-    private PlayerManager playerManager;
+    private PlayerController playerController;
     public static Game game;
     
     // Start is called before the first frame update
@@ -21,8 +21,8 @@ public class Game : MonoBehaviour
             GameObject.Destroy(game);
         }
         game = this;
-        game.playerManager = pmObject.GetComponent<PlayerManager>();
-        game.player = game.playerManager.getPlayer();
+        game.playerController = pmObject.GetComponent<PlayerController>();
+        game.player = game.playerController.getPlayer();
     }
 
     // Update is called once per frame
