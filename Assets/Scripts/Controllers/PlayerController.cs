@@ -8,6 +8,7 @@ public class PlayerController : MonoBehaviour {
     public GameObject hudPrefab;
     private PlayerHud hud;
     private PlayerCharacter playerCharacter;
+    private PlayerInventory playerInventory;
     private bool inventoryIsOpen;
 
     void Awake() {
@@ -18,6 +19,7 @@ public class PlayerController : MonoBehaviour {
 
     void Start() {
         this.playerCharacter.finishInitialization();
+        this.playerInventory = this.playerCharacter.getInventory();
         this.hud.assignPlayer(this.playerCharacter);
     }
 
@@ -25,6 +27,7 @@ public class PlayerController : MonoBehaviour {
         checkForInterfaceUpdates();
         if (this.inventoryIsOpen) {
             manageHotbarAssignments();
+            manageDropping();
         } else if (cameraIsLocked()) {
             manageMouseMovements();
             manageMovement();
@@ -53,6 +56,23 @@ public class PlayerController : MonoBehaviour {
         if (hotbarSlot < 0) {
             return;
         }
+        InventorySlotSquare square = this.getItemButtonHovered();
+        if (square != null) {
+            square.assignHotbarMapping(hotbarSlot);
+        }
+    }
+
+    private void manageDropping() {
+        if (Input.GetKeyDown("q")) {
+            InventorySlotSquare square = this.getItemButtonHovered();
+            if (square == null) {
+                return;
+            }
+            PickupManager.dropItem(this.playerCharacter.transform.position, square.pop());
+        }
+    }
+
+    private InventorySlotSquare getItemButtonHovered() {
         PointerEventData pointerEventData = new PointerEventData(EventSystem.current);
         pointerEventData.position = Input.mousePosition;
         List<RaycastResult> results = new List<RaycastResult>();
@@ -60,16 +80,16 @@ public class PlayerController : MonoBehaviour {
         foreach (RaycastResult result in results) {
             InventorySlotSquare square = result.gameObject.GetComponent<InventorySlotSquare>();
             if (square != null) {
-                square.assignHotbarMapping(hotbarSlot);
-                return;
+                return square;
             }
         }
+        return null;
     }
 
     private int getHotbarSlotDown() {
         // ASCII
         for (int i = 48; i < 58; i++) {
-            if (Input.GetKey(""+((char) i))) {
+            if (Input.GetKeyDown(""+((char) i))) {
                 return i - 48;
             }
         }

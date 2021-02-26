@@ -75,4 +75,11 @@ public class PlayerInventory : Inventory {
         }
         return this.inventory[coords.x, coords.y];
     }
+
+    public override Item pop(int x, int y) {
+        if (this.inverseHotbarMappings[x, y] != -1) {
+            this.removeMapping(x, y);
+        }
+        return base.pop(x, y);
+    }
 }

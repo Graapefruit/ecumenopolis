@@ -29,6 +29,12 @@ public class PickupManager : MonoBehaviour {
         }
     }
 
+    public static void dropItem(Vector3 source, Item item) {
+        Vector3 dropLocation = BoardManager.getClosestDropLocation(source);
+        GameObject newPickup = Instantiate(pm.pickupPrefab, dropLocation, Quaternion.identity);
+        newPickup.GetComponent<Pickup>().setItem(ScriptableObject.Instantiate(pm.riflePrefab));
+    }
+
     public static Item pickupItem(Pickup pickup) {
         Item item = pickup.getPickup();
         Destroy(pickup.gameObject);

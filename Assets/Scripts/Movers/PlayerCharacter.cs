@@ -79,7 +79,7 @@ public class PlayerCharacter : Mover, Shooter
 
     // public void addItem(Item item, int x, int y) {}
 
-    public Inventory getInventory() {
+    public PlayerInventory getInventory() {
         return this.inventory;
     }
 

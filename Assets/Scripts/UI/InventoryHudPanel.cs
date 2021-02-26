@@ -35,6 +35,11 @@ public class InventoryHudPanel : MonoBehaviour{
         itemAvatar.GetComponent<Image>().sprite = item.getAvatar();
     }
 
+    public void removeItem(int x, int y) {
+        Destroy(this.inventoryItemImages[x, y]);
+        this.inventoryItemImages[x, y] = null;
+    }
+
     public void makeHotbarAssignment(int x, int y, int h) {
         Vector3 coords = this.indexToInventoryCoords(x, y);
         GameObject hotbarWrapper = Instantiate(hotbarAssignmentWrapperPrefab, coords, Quaternion.identity);
@@ -74,7 +79,9 @@ public class InventoryHudPanel : MonoBehaviour{
         GameObject newSquare = Instantiate(inventorySquarePrefab, coords, Quaternion.identity);
         if (inventory is PlayerInventory) {
             PlayerInventory playerInventory = inventory as PlayerInventory;
-            newSquare.GetComponent<InventorySlotSquare>().assignPartialHotbarMappingFunction(((int h) => { playerInventory.assignMapping(x, y, h); }));
+            newSquare.GetComponent<InventorySlotSquare>().assignPartialFunctions(
+                ((int h) => { playerInventory.assignMapping(x, y, h); }),
+                (() => { return playerInventory.pop(x, y); }));
         }
         newSquare.transform.SetParent(this.transform, false);
         this.inventoryItemSquares[x, y] = newSquare;

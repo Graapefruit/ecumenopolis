@@ -24,6 +24,13 @@ public class Inventory {
         }
     }
 
+    public virtual Item pop(int x, int y) {
+        Item item = this.inventory[x, y];
+        this.hud.removeItem(x, y);
+        this.inventory[x, y] = null;
+        return item;
+    }
+
     public Pair getNextOpenSlot() {
         for (int y = 0; y < this.inventorySizeY; y++) {
             for (int x = 0; x < this.inventorySizeX; x++) {

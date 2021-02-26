@@ -18,4 +18,10 @@ public class BoardManager : MonoBehaviour {
         }
         return Vector3.zero;
     }
+
+    public static Vector3 getClosestDropLocation(Vector3 source) {
+        NavMeshHit navHit;
+        NavMesh.SamplePosition (source, out navHit, 5.0f, NavMesh.AllAreas);
+        return navHit.position;
+    }
 }
