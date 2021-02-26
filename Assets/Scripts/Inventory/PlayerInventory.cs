@@ -24,17 +24,39 @@ public class PlayerInventory : Inventory {
     }
 
     public void assignMapping(int x, int y, int h) {
-        if (this.hotbarMappings[h] != null && this.inverseHotbarMappings[x, y] == h) {
+        if (this.inverseHotbarMappings[x, y] == h) {
             return;
+        }
+        if (this.inverseHotbarMappings[x, y] != -1) {
+            this.removeMapping(x, y);
         }
 
         Item item = this.inventory[x, y];
         if (item != null) {
+            if (this.hotbarMappings[h] != null) {
+                this.removeMapping(h);
+            }
             this.hotbarMappings[h] = new Pair(x, y);
             this.inverseHotbarMappings[x, y] = h;
             this.hud.makeHotbarAssignment(x, y, h);
             this.hotbarHud.setHotbarImage(item, h);
         }
+    }
+
+    public void removeMapping(int x, int y) {
+        int h = this.inverseHotbarMappings[x, y];
+        this.inverseHotbarMappings[x, y] = -1;
+        this.hotbarMappings[h] = null;
+        this.hud.removeHotbarAssignment(x, y);
+        this.hotbarHud.removeHotbarAssignment(h);
+    }
+
+    public void removeMapping(int h) {
+        Pair pair = this.hotbarMappings[h];
+        this.inverseHotbarMappings[pair.x, pair.y] = -1;
+        this.hotbarMappings[h] = null;
+        this.hud.removeHotbarAssignment(pair.x, pair.y);
+        this.hotbarHud.removeHotbarAssignment(h);
     }
 
     public Item getHotbarAt(int h) {

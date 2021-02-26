@@ -27,8 +27,13 @@ public class HotbarHudPanel : MonoBehaviour {
         Vector3 relativeItemPos = itemAvatar.transform.position;
         relativeItemPos.y += 20.0f;
         itemAvatar.transform.position = relativeItemPos;
-        this.hotbarSquares[h] = itemAvatar;
+        this.hotbarItemImages[h] = itemAvatar;
         itemAvatar.GetComponent<Image>().sprite = item.getAvatar();
+    }
+
+    public void removeHotbarAssignment(int h) {
+        Destroy(this.hotbarItemImages[h]);
+        this.hotbarItemImages[h] = null;
     }
 
     private Vector3 indexToHotbarCoords(int h) {

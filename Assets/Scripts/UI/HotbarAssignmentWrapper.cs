@@ -13,7 +13,6 @@ public class HotbarAssignmentWrapper : MonoBehaviour {
     void Awake() {
         this.itemWrapper = this.GetComponent<Image>();
         this.hotbarNum = this.transform.GetChild(0).GetComponent<Text>();
-        Debug.Log("hi!");
     }
 
     public void changeAssignment(int i) {

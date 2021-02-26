@@ -43,6 +43,11 @@ public class InventoryHudPanel : MonoBehaviour{
         this.hotbarAssignmentWrappers[x, y] = hotbarWrapper;
     }
 
+    public void removeHotbarAssignment(int x, int y) {
+        Destroy(this.hotbarAssignmentWrappers[x, y]);
+        this.hotbarAssignmentWrappers[x, y] = null;
+    }
+
     public bool toggleInventory() {
         isActive = !isActive;
         this.gameObject.SetActive(isActive);
