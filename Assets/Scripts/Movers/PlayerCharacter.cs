@@ -6,7 +6,7 @@ public class PlayerCharacter : Mover, Shooter
 {
     private const int PICKUP_LAYER = (1 << 11);
     private const float PICKUP_RANGE = 2.5f;
-    public Item held;
+    public Item startingItem;
     private PlayerInventory inventory;
     private float upRotation;
     private float horizontalRotation;
@@ -31,9 +31,10 @@ public class PlayerCharacter : Mover, Shooter
 
     public void finishInitialization() {
         this.inventory = new PlayerInventory();
-        this.inventory.add(held, 0, 0);
         this.modelHelper = new PlayerCharacterModelHelper(this.characterBody, this.animator);
-        this.modelHelper.holdItem(this.held);
+        this.inventory.add(startingItem, 0, 0);
+        this.inventory.assignMapping(0, 0, 0);
+        this.changeHeld(0);
     }
 
     void LateUpdate() {
@@ -105,13 +106,14 @@ public class PlayerCharacter : Mover, Shooter
     }
 
     public void changeHeld(int index) {
-        // this.held = this.inventory[index];
+        this.inventory.switchHeld(index);
+        this.modelHelper.holdItem(this.inventory.getHotbarAt(index));
     }
 
     public void useHeld() {
         Vector3 source = this.followTarget.position;
         Vector3 direction = (this.followTarget.rotation * Vector3.forward).normalized;
-        this.held.primaryUsed(this as Shooter, source, direction);
+        this.inventory.getHeld().primaryUsed(this as Shooter, source, direction);
     }
 
     public void pickupAmmo(int amount) {
@@ -150,11 +152,11 @@ public class PlayerCharacter : Mover, Shooter
     }
 
     public int getCurrentWeaponAmmo() {
-        return ((Gun) this.held).getRemainingAmmo();
+        return ((Gun) this.inventory.getHeld()).getRemainingAmmo();
     }
 
     public string getCurrentWeaponName() {
-        return ((Gun) this.held).getName();
+        return ((Gun) this.inventory.getHeld()).name;
     }
 
     private Vector3 getCameraPivotAngle() {

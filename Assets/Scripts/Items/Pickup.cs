@@ -8,7 +8,8 @@ public class Pickup : MonoBehaviour {
 
     public void setItem(Item item) {
         this.item = item;
-        this.itemAvatar = Instantiate(item.prefab, this.transform.position + item.pickupOffset, Quaternion.Euler(item.pickupRotation));
+        this.itemAvatar = Instantiate(item.prefab, this.transform.position, Quaternion.identity);
+        this.item.pickupTransform.applyTransformation(this.itemAvatar);
         this.itemAvatar.transform.SetParent(this.transform);
     }
 

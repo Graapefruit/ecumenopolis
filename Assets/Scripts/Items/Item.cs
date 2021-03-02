@@ -11,17 +11,11 @@ public abstract class Item : ScriptableObject
     // TODO: Item parent class to this?
     // TODO: Change to source/destinatio
     new public string name;
-    public Vector3 pickupOffset;
-    public Vector3 pickupRotation;
     public GameObject prefab;
     public Sprite avatar;
-    public PlayerCharacterHoldTransform holdTransform;
-    public string getName() {
-        return this.name;
-    }
-    public Sprite getAvatar() {
-        return this.avatar;
-    }
+    public SOTransform pickupTransform;
+    public SOTransform holdTransform;
+    public string heldAnimationLayerName;
     public abstract void primaryUsed(Shooter shooter, Vector3 source, Vector3 direction);
     //private abstract void secondaryUsed();
 }

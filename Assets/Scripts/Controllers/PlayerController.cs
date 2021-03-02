@@ -59,6 +59,9 @@ public class PlayerController : MonoBehaviour {
         InventorySlotSquare square = this.getItemButtonHovered();
         if (square != null) {
             square.assignHotbarMapping(hotbarSlot);
+            if (this.playerInventory.getHeldIndex() == hotbarSlot) {
+                this.playerCharacter.changeHeld(hotbarSlot);
+            }
         }
     }
 
@@ -129,10 +132,9 @@ public class PlayerController : MonoBehaviour {
     }
 
     private void manageHotbar() {
-        if (Input.GetKeyDown(KeyCode.Alpha1)) {
-            this.playerCharacter.changeHeld(0);
-        } else if (Input.GetKeyDown(KeyCode.Alpha2)) {
-            this.playerCharacter.changeHeld(1);
+        int hotbarKeyDown = getHotbarSlotDown();
+        if (hotbarKeyDown != -1) {
+            this.playerCharacter.changeHeld(hotbarKeyDown);
         }
     }
 

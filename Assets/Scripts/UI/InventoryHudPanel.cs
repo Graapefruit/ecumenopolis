@@ -32,7 +32,7 @@ public class InventoryHudPanel : MonoBehaviour{
         GameObject itemAvatar = Instantiate(itemAvatarPrefab, coords, Quaternion.identity);
         itemAvatar.transform.SetParent(this.transform, false);
         this.inventoryItemImages[x, y] = itemAvatar;
-        itemAvatar.GetComponent<Image>().sprite = item.getAvatar();
+        itemAvatar.GetComponent<Image>().sprite = item.avatar;
     }
 
     public void removeItem(int x, int y) {

@@ -29,7 +29,7 @@ public class PlayerCharacterModelHelper {
 
     public void holdItem(Item newHeldItem) {
         if (heldItem != null) {
-
+            GameObject.Destroy(this.heldGameObject);
         }
         this.heldItem = newHeldItem;
         this.heldGameObject = GameObject.Instantiate(newHeldItem.prefab, Vector3.zero, Quaternion.identity) as GameObject;

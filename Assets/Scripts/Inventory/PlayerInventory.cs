@@ -16,7 +16,7 @@ public class PlayerInventory : Inventory {
                 this.inverseHotbarMappings[x, y] = -1;
             }
         }
-        this.currentlyHeld = 1;
+        this.currentlyHeld = 0;
         this.hotbarHud = HudManager.getNewHotbarHudInstance();
     }
     public HotbarHudPanel getHotbarHud() {
@@ -74,6 +74,15 @@ public class PlayerInventory : Inventory {
             return null;
         }
         return this.inventory[coords.x, coords.y];
+    }
+
+    public Item getHeld() {
+        Pair coords = this.hotbarMappings[this.currentlyHeld];
+        return this.inventory[coords.x, coords.y];
+    }
+
+    public int getHeldIndex() {
+        return this.currentlyHeld;
     }
 
     public override Item pop(int x, int y) {

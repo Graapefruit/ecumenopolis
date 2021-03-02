@@ -9,7 +9,7 @@ public class HotbarHudPanel : MonoBehaviour {
     private GameObject[] hotbarSquares;
     private GameObject[] hotbarItemImages;
 
-    void Start() {
+    void Awake() {
         this.hotbarSquares = new GameObject[10];
         this.hotbarItemImages = new GameObject[10];
         for (int i = 0; i < 10; i++) {
@@ -28,7 +28,7 @@ public class HotbarHudPanel : MonoBehaviour {
         relativeItemPos.y += 20.0f;
         itemAvatar.transform.position = relativeItemPos;
         this.hotbarItemImages[h] = itemAvatar;
-        itemAvatar.GetComponent<Image>().sprite = item.getAvatar();
+        itemAvatar.GetComponent<Image>().sprite = item.avatar;
     }
 
     public void removeHotbarAssignment(int h) {
