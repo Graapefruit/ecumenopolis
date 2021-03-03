@@ -30,12 +30,15 @@ public class PlayerCharacterModelHelper {
     }
 
     public void holdItem(Item newHeldItem) {
-        if (heldItem != null) {
+        if (this.heldItem == newHeldItem) {
+            return;
+        }
+        if (this.heldItem != null) {
             setLayerWeight(this.heldItem.heldAnimationLayerName, ANIMATION_LAYER_OFF);
             GameObject.Destroy(this.heldGameObject);
         }
+        this.heldItem = newHeldItem;
         if (newHeldItem != null) {
-            this.heldItem = newHeldItem;
             this.heldGameObject = GameObject.Instantiate(newHeldItem.prefab, Vector3.zero, Quaternion.identity) as GameObject;
             this.heldGameObject.transform.SetParent(this.rightHand.transform);
             this.heldItem.holdTransform.assignTransformation(this.heldGameObject);

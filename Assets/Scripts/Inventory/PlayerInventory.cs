@@ -89,9 +89,10 @@ public class PlayerInventory : Inventory {
     }
 
     public override Item pop(int x, int y) {
-        if (this.inverseHotbarMappings[x, y] != -1) {
+        Item item = base.pop(x, y);
+        if (item != null && this.inverseHotbarMappings[x, y] != -1) {
             this.removeMapping(x, y);
         }
-        return base.pop(x, y);
+        return item;
     }
 }

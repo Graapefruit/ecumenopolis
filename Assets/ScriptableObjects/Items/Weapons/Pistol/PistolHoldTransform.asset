@@ -10,8 +10,8 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 83d23eb6f76729e4eb07ce0fe6c63a0e, type: 3}
-  m_Name: PistolHeldItemTransform
+  m_Name: PistolHoldTransform
   m_EditorClassIdentifier: 
-  relativePos: {x: -0.000418667, y: 0.00163462, z: 0.0003839165}
-  relativeRotEuler: {x: -175.462, y: 9.251007, z: 87.412}
-  relativeScale: {x: 0.01800004, y: 0.01799988, z: 0.018}
+  position: {x: -0.000418667, y: 0.00163462, z: 0.0003839165}
+  rotationEuler: {x: -175.462, y: 9.251007, z: 87.412}
+  scale: {x: 0.01800004, y: 0.01799988, z: 0.018}

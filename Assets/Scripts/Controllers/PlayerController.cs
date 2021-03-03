@@ -6,14 +6,16 @@ using UnityEngine.EventSystems;
 public class PlayerController : MonoBehaviour {
     public GameObject pcPrefab;
     public GameObject hudPrefab;
-    private PlayerHud hud;
     private PlayerCharacter playerCharacter;
+    private PlayerHud hud;
+    private ItemDragHelper itemDragHelper;
     private PlayerInventory playerInventory;
     private bool inventoryIsOpen;
 
     void Awake() {
         this.playerCharacter = ((GameObject) Instantiate(pcPrefab, new Vector3 (34.0f, 11.5f, 3.0f), Quaternion.identity)).GetComponent<PlayerCharacter>();
         this.hud = ((GameObject) Instantiate(hudPrefab, Vector3.zero, Quaternion.identity)).GetComponent<PlayerHud>();
+        this.itemDragHelper = this.hud.transform.Find("DraggedItem").GetComponent<ItemDragHelper>();
         this.inventoryIsOpen = false;
     }
 
@@ -27,6 +29,7 @@ public class PlayerController : MonoBehaviour {
         checkForInterfaceUpdates();
         if (this.inventoryIsOpen) {
             manageHotbarAssignments();
+            manageDragging();
             manageDropping();
         } else if (cameraIsLocked()) {
             manageMouseMovements();
@@ -46,6 +49,10 @@ public class PlayerController : MonoBehaviour {
             this.hud.toggleInventory();
             this.inventoryIsOpen = !this.inventoryIsOpen;
             Cursor.lockState = (this.inventoryIsOpen ? CursorLockMode.None : CursorLockMode.Locked);
+            this.itemDragHelper.gameObject.SetActive(false);
+            if (this.itemDragHelper.hasItem()) {
+                PickupManager.dropItem(this.playerCharacter.transform.position, this.itemDragHelper.releaseItem());
+            }
         } if (Input.GetMouseButton(0) && !this.inventoryIsOpen) {
             Cursor.lockState = CursorLockMode.Locked;
         }
@@ -62,6 +69,29 @@ public class PlayerController : MonoBehaviour {
             if (this.playerInventory.getHeldIndex() == hotbarSlot) {
                 this.playerCharacter.changeHeld(hotbarSlot);
             }
+        }
+    }
+
+    private void manageDragging() {
+        if (this.itemDragHelper.hasItem() && Input.GetMouseButtonUp(0)) {
+            InventorySlotSquare square = this.getItemButtonHovered();
+            Item releasedItem = this.itemDragHelper.releaseItem();
+            if (square != null) {
+                Item swappedItem = square.placeItem(releasedItem);
+                if (swappedItem != null) {
+                    this.itemDragHelper.dragItem(swappedItem);
+                }
+            } else {
+                PickupManager.dropItem(this.playerCharacter.transform.position, releasedItem);
+            }
+        } else if (!this.itemDragHelper.hasItem() && Input.GetMouseButtonDown(0)) {
+            InventorySlotSquare square = this.getItemButtonHovered();
+            if (square != null) {
+                Item poppedItem = square.pop();
+                if (poppedItem != null) {
+                    this.itemDragHelper.dragItem(poppedItem);
+                }
+            } 
         }
     }
 

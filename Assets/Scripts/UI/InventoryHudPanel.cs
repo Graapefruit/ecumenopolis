@@ -81,7 +81,13 @@ public class InventoryHudPanel : MonoBehaviour{
             PlayerInventory playerInventory = inventory as PlayerInventory;
             newSquare.GetComponent<InventorySlotSquare>().assignPartialFunctions(
                 ((int h) => { playerInventory.assignMapping(x, y, h); }),
-                (() => { return playerInventory.pop(x, y); }));
+                (() => { return playerInventory.pop(x, y); }),
+                ((Item item) => {
+                    Item toReturn = playerInventory.pop(x, y);
+                    playerInventory.add(item, x, y);
+                    return toReturn;
+                } )
+                );
         }
         newSquare.transform.SetParent(this.transform, false);
         this.inventoryItemSquares[x, y] = newSquare;

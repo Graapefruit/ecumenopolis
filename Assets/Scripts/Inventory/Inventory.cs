@@ -26,8 +26,10 @@ public class Inventory {
 
     public virtual Item pop(int x, int y) {
         Item item = this.inventory[x, y];
-        this.hud.removeItem(x, y);
-        this.inventory[x, y] = null;
+        if (item != null) {
+            this.hud.removeItem(x, y);
+            this.inventory[x, y] = null;
+        }
         return item;
     }
 

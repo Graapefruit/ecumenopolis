@@ -37,6 +37,10 @@ public class PlayerCharacter : Mover, Shooter
         this.changeHeld(0);
     }
 
+    void Update() {
+        manageHeldItem();
+    }
+
     void LateUpdate() {
         this.characterController.Move(this.moveDelta * Time.deltaTime);
         if (this.moveDelta.x != 0.0f || this.moveDelta.z != 0.0f) {
@@ -57,6 +61,10 @@ public class PlayerCharacter : Mover, Shooter
         }
         this.moveDelta.y -= 19.62f * Time.deltaTime;
         this.modelHelper.rotateUpperBody(horizontalRotation);
+    }
+
+    private void manageHeldItem() {
+        this.modelHelper.holdItem(this.inventory.getHeld());
     }
 
     public Pickup getFirstPickupInRange() {
@@ -107,13 +115,15 @@ public class PlayerCharacter : Mover, Shooter
 
     public void changeHeld(int index) {
         this.inventory.switchHeld(index);
-        this.modelHelper.holdItem(this.inventory.getHotbarAt(index));
     }
 
     public void useHeld() {
-        Vector3 source = this.followTarget.position;
-        Vector3 direction = (this.followTarget.rotation * Vector3.forward).normalized;
-        this.inventory.getHeld().primaryUsed(this as Shooter, source, direction);
+        Item held = this.inventory.getHeld();
+        if (held != null) {
+            Vector3 source = this.followTarget.position;
+            Vector3 direction = (this.followTarget.rotation * Vector3.forward).normalized;
+            this.inventory.getHeld().primaryUsed(this as Shooter, source, direction);
+        }
     }
 
     public void pickupAmmo(int amount) {

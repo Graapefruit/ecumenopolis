@@ -10,17 +10,17 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 3d9a2d171491760498e9566c9341ca73, type: 3}
-  m_Name: Rifle
+  m_Name: Pistol
   m_EditorClassIdentifier: 
-  name: Rifle
-  pickupOffset: {x: 0, y: 0.035, z: 0}
-  pickupRotation: {x: 0, y: 0, z: 90}
-  prefab: {fileID: 118234, guid: a4e476a037022df448ead5d0ceea7d06, type: 3}
-  avatar: {fileID: 21300000, guid: d78a392517974cb4b9bcb1c6f3941b43, type: 3}
-  holdTransform: {fileID: 11400000, guid: 7851b5620b693e740af926a1ea683321, type: 2}
-  damage: 7
-  fireCooldown: 0.125
+  name: Pistol
+  prefab: {fileID: 117070, guid: 38075ff1c3cff91428ade499a59bdc97, type: 3}
+  avatar: {fileID: 21300000, guid: a35e1f9dc4818bb49b29e4d7241bbd16, type: 3}
+  pickupTransform: {fileID: 11400000, guid: e1b6529cf8cf27f4eb1ad6df060e4448, type: 2}
+  holdTransform: {fileID: 11400000, guid: 4ab74fa9990fc5e40b783b9a6b90b054, type: 2}
+  heldAnimationLayerName: UpperBodyPistol
+  damage: 5
+  fireCooldown: 0.3
   range: 14
-  maxAmmo: 30
-  bulletSpread: 0.16
-  stoppingPower: 1.2
+  maxAmmo: 12
+  bulletSpread: 0.12
+  stoppingPower: 1
