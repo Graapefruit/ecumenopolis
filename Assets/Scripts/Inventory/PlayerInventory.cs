@@ -78,6 +78,9 @@ public class PlayerInventory : Inventory {
 
     public Item getHeld() {
         Pair coords = this.hotbarMappings[this.currentlyHeld];
+        if (coords == null) {
+            return null;
+        }
         return this.inventory[coords.x, coords.y];
     }
 

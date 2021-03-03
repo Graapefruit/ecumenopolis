@@ -13,7 +13,6 @@ public class PlayerHud : MonoBehaviour {
     private HotbarHudPanel hotbarOverlay;
     private int hp;
     private int ammo;
-    private string held;
     private PlayerCharacter playerCharacter;
 
     void Awake() {
@@ -25,16 +24,8 @@ public class PlayerHud : MonoBehaviour {
     }
 
     void Update() {
-        int newHp = this.playerCharacter.getHp();
-        int newAmmo = this.playerCharacter.getCurrentWeaponAmmo();
-        string newHeld = this.playerCharacter.getCurrentWeaponName();
-        if (this.hp != newHp) {
-            this.updateHp(newHp);
-        } if (this.ammo != newAmmo) {
-            this.updateAmmo(newAmmo);
-        } if (this.held != newHeld) {
-            this.updateCurrentHeld(newHeld);
-        }
+        updateHp();
+        updateHeld();
     }
 
     public void setPickupTextEnabled(bool enabled) {
@@ -53,7 +44,11 @@ public class PlayerHud : MonoBehaviour {
         return this.inventoryOverlay.toggleInventory();
     }
 
-    private void updateHp(int newHp) {
+    private void updateHp() {
+        int newHp = this.playerCharacter.getHp();
+        if (this.hp == newHp) {
+            return;
+        } 
         this.hp = newHp;
         Vector3 oldFillPos = this.hpFill.transform.position;
         Vector3 oldFillScale = this.hpFill.transform.localScale;
@@ -66,13 +61,18 @@ public class PlayerHud : MonoBehaviour {
         this.hpTip.transform.position = oldTipPos;
     }
 
-    public void updateAmmo(int newAmount) {
-        this.ammo = newAmount;
-        this.ammoDisplay.text = string.Format("Ammo: {0}", newAmount);
-    }
-
-    public void updateCurrentHeld(string newHeld) {
-        this.held = newHeld;
-        this.heldDisplay.text = string.Format("Held: {0}", newHeld);
+    private void updateHeld() {
+        Item heldItem = this.playerCharacter.getInventory().getHeld();
+        if (heldItem == null) {
+            this.ammoDisplay.gameObject.SetActive(false);
+            this.heldDisplay.text = "Unarmed";
+        } else if (heldItem is Gun) {
+            this.ammoDisplay.gameObject.SetActive(true);
+            this.heldDisplay.text = heldItem.name;
+            this.ammoDisplay.text = string.Format("Ammo: {0}", ((Gun) heldItem).getRemainingAmmo());
+        } else {
+            this.ammoDisplay.gameObject.SetActive(false);
+            this.heldDisplay.text = heldItem.name;
+        }
     }
 }

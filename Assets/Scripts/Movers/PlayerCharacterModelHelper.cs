@@ -3,6 +3,8 @@ using System.Collections.Generic;
 using UnityEngine;
 
 public class PlayerCharacterModelHelper {
+    private const float ANIMATION_LAYER_ON = 1.0f;
+    private const float ANIMATION_LAYER_OFF = 0.0f;
     private GameObject playerModel;
     private Animator animator;
     private GameObject lowerBodyStart;
@@ -29,12 +31,16 @@ public class PlayerCharacterModelHelper {
 
     public void holdItem(Item newHeldItem) {
         if (heldItem != null) {
+            setLayerWeight(this.heldItem.heldAnimationLayerName, ANIMATION_LAYER_OFF);
             GameObject.Destroy(this.heldGameObject);
         }
-        this.heldItem = newHeldItem;
-        this.heldGameObject = GameObject.Instantiate(newHeldItem.prefab, Vector3.zero, Quaternion.identity) as GameObject;
-        this.heldGameObject.transform.SetParent(this.rightHand.transform);
-        this.heldItem.holdTransform.assignTransformation(this.heldGameObject);
+        if (newHeldItem != null) {
+            this.heldItem = newHeldItem;
+            this.heldGameObject = GameObject.Instantiate(newHeldItem.prefab, Vector3.zero, Quaternion.identity) as GameObject;
+            this.heldGameObject.transform.SetParent(this.rightHand.transform);
+            this.heldItem.holdTransform.assignTransformation(this.heldGameObject);
+            setLayerWeight(this.heldItem.heldAnimationLayerName, ANIMATION_LAYER_ON);
+        }
     }
 
     public void rotateLowerBody(Vector3 direction, float headingAngle) {
@@ -66,5 +72,10 @@ public class PlayerCharacterModelHelper {
         Vector3 upperBodyEuler = this.upperBodyStart.transform.eulerAngles;
         upperBodyEuler.y += rotationAmount;
         this.upperBodyStart.transform.rotation = Quaternion.Euler(upperBodyEuler);
+    }
+
+    private void setLayerWeight(string layerName, float newWeight) {
+        int relevantLayerIndex = this.animator.GetLayerIndex(layerName);
+        this.animator.SetLayerWeight(relevantLayerIndex, newWeight);
     }
 }

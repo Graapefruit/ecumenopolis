@@ -151,14 +151,6 @@ public class PlayerCharacter : Mover, Shooter
         return this.currentHealth;
     }
 
-    public int getCurrentWeaponAmmo() {
-        return ((Gun) this.inventory.getHeld()).getRemainingAmmo();
-    }
-
-    public string getCurrentWeaponName() {
-        return ((Gun) this.inventory.getHeld()).name;
-    }
-
     private Vector3 getCameraPivotAngle() {
         return new Vector3(this.followTarget.forward.z, 0.0f, -this.followTarget.transform.forward.x);
     }
