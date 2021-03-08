@@ -9,24 +9,20 @@ public class PlayerCharacter : Mover, Shooter
     public Item startingItem;
     private PlayerInventory inventory;
     private float upRotation;
-    private float horizontalRotation;
     private Transform followTarget;
     private Vector3 moveDelta;
     private CharacterController characterController;
     private GameObject characterBody;
     private PlayerCharacterModelHelper modelHelper;
-    private Vector3 lastDirection;
     
     public override void Awake() {
         base.Awake();
         base.setup(100, 3.0f);
         this.upRotation = 0.0f;
-        this.horizontalRotation = 0.0f;
         this.followTarget = this.transform.GetChild(2);
         this.moveDelta = Vector3.zero;
         this.characterController = this.GetComponent<CharacterController>();
         this.characterBody = this.transform.GetChild(0).gameObject;
-        this.lastDirection = Vector3.zero;
     }
 
     public void finishInitialization() {
@@ -41,26 +37,33 @@ public class PlayerCharacter : Mover, Shooter
         manageHeldItem();
     }
 
+    // Model updates must be called here, to override changes from the animations themselves
     void LateUpdate() {
+        manageHorizontalMovement();
+        manageVerticalMovement();
+    }
+
+    private void manageHorizontalMovement() {
         this.characterController.Move(this.moveDelta * Time.deltaTime);
-        if (this.moveDelta.x != 0.0f || this.moveDelta.z != 0.0f) {
-            this.lastDirection = this.moveDelta;
-            this.modelHelper.rotateLowerBody(this.lastDirection, this.followTarget.rotation.eulerAngles.y);
-        } else {
-            this.animator.SetInteger("walkDirection", 0);
-        }
+        this.modelHelper.movementDirection = this.moveDelta;
+        this.modelHelper.doUpdate();
+    }
 
-        if ((this.characterController.collisionFlags & CollisionFlags.Above) != 0) {
-            this.moveDelta.y = 0;
-        }
-
+    private void manageVerticalMovement() {
+        manageHeadBumping();
         // TODO: isGrounded seems to tick on and off. Investigate further. This is why Jumping is GetKey rather than GetKeyDown
         // This must be fixed when falling animations are introduced
         if (this.characterController.isGrounded) {
             this.moveDelta = Vector3.zero;
+        } else {
+            this.moveDelta.y -= 19.62f * Time.deltaTime;
         }
-        this.moveDelta.y -= 19.62f * Time.deltaTime;
-        this.modelHelper.rotateUpperBody(horizontalRotation);
+    }
+
+    private void manageHeadBumping() {
+        if ((this.characterController.collisionFlags & CollisionFlags.Above) != 0) {
+            this.moveDelta.y = (this.moveDelta.y > 0.0f ? 0.0f : this.moveDelta.y);
+        }
     }
 
     private void manageHeldItem() {
@@ -100,7 +103,7 @@ public class PlayerCharacter : Mover, Shooter
         return this.inventory.getHotbarHud();
     }
 
-    public void setMovementDirection(Vector3 newDirection) {
+    public void setMovement(Vector3 newDirection) {
         if (this.characterController.isGrounded) {
             Quaternion relevantRotation = Quaternion.Euler(0.0f, this.followTarget.rotation.eulerAngles.y, 0.0f);
             this.moveDelta = (relevantRotation * newDirection).normalized * this.baseSpeed;
@@ -144,7 +147,7 @@ public class PlayerCharacter : Mover, Shooter
         followTargetRotation.y += mouseDeltaX;
         followTargetRotation.z = 0;
         this.followTarget.rotation = Quaternion.Euler(followTargetRotation);
-        this.horizontalRotation += mouseDeltaX;
+        this.modelHelper.heading += mouseDeltaX;
     }
 
     public bool isSelf(GameObject gameObject) {

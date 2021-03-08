@@ -13,7 +13,7 @@ public class PlayerController : MonoBehaviour {
     private bool inventoryIsOpen;
 
     void Awake() {
-        this.playerCharacter = ((GameObject) Instantiate(pcPrefab, new Vector3 (34.0f, 11.5f, 3.0f), Quaternion.identity)).GetComponent<PlayerCharacter>();
+        this.playerCharacter = ((GameObject) Instantiate(pcPrefab, new Vector3 (24.0f, 10.0f, 13.0f), Quaternion.identity)).GetComponent<PlayerCharacter>();
         this.hud = ((GameObject) Instantiate(hudPrefab, Vector3.zero, Quaternion.identity)).GetComponent<PlayerHud>();
         this.itemDragHelper = this.hud.transform.Find("DraggedItem").GetComponent<ItemDragHelper>();
         this.inventoryIsOpen = false;
@@ -148,13 +148,11 @@ public class PlayerController : MonoBehaviour {
         xMagnitude += (Input.GetKey("a") ? -1.0f : 0.0f);
         zMagnitude += (Input.GetKey("w") ? 1.0f : 0.0f);
         zMagnitude += (Input.GetKey("s") ? -1.0f : 0.0f);
-        if (xMagnitude != 0.0f || zMagnitude != 0.0f) {
-            Vector3 movementDirection = new Vector3(xMagnitude, 0.0f, zMagnitude).normalized;
-            movementDirection = playerCharacter.transform.rotation * movementDirection;
-            movementDirection.y = 0;
-            movementDirection = movementDirection.normalized;
-            this.playerCharacter.setMovementDirection(movementDirection);
-        }
+        Vector3 movementDirection = new Vector3(xMagnitude, 0.0f, zMagnitude).normalized;
+        movementDirection = playerCharacter.transform.rotation * movementDirection;
+        movementDirection.y = 0;
+        movementDirection = movementDirection.normalized;
+        this.playerCharacter.setMovement(movementDirection);
 
         if (Input.GetKey(KeyCode.Space)) {
             this.playerCharacter.jump();
