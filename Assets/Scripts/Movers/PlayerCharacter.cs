@@ -30,7 +30,6 @@ public class PlayerCharacter : Mover, Shooter
         this.modelHelper = new PlayerCharacterModelHelper(this.characterBody, this.animator);
         this.inventory.add(startingItem, 0, 0);
         this.inventory.assignMapping(0, 0, 0);
-        this.changeHeld(0);
     }
 
     void Update() {
@@ -88,8 +87,6 @@ public class PlayerCharacter : Mover, Shooter
             return true;
         }
     }
-
-    // public void addItem(Item item, int x, int y) {}
 
     public PlayerInventory getInventory() {
         return this.inventory;

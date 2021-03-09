@@ -16,8 +16,9 @@ public class PlayerInventory : Inventory {
                 this.inverseHotbarMappings[x, y] = -1;
             }
         }
-        this.currentlyHeld = 0;
         this.hotbarHud = HudManager.getNewHotbarHudInstance();
+        // TODO: Calling this causes the hotbar square to vanish off the screen. Likely has to with  
+        // this.switchHeld(0);
     }
     public HotbarHudPanel getHotbarHud() {
         return this.hotbarHud;
@@ -69,6 +70,7 @@ public class PlayerInventory : Inventory {
 
     public Item switchHeld(int h) {
         this.currentlyHeld = h;
+        this.hotbarHud.CurrentlyHeld = h;
         Pair coords = this.hotbarMappings[h];
         if (coords == null) {
             return null;

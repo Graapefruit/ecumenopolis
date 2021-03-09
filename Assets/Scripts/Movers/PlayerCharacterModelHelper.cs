@@ -60,7 +60,6 @@ public class PlayerCharacterModelHelper {
         if (this.movementDirection.x == 0.0f && this.movementDirection.z == 0.0f) {
             this.animator.SetInteger("walkDirection", 0);
             this.swivelHelper.manageSwivel(this.heading, this.lowerBodyRotation);
-            Debug.Log(this.lowerBodyRotation);
             this.lowerBodyRotation += Time.deltaTime * this.swivelHelper.getSwivelAmountWithoutDeltaTime();
         } else {
             this.swivelHelper.stopSwiveling();
