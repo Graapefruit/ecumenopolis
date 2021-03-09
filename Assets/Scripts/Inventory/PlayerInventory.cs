@@ -17,7 +17,7 @@ public class PlayerInventory : Inventory {
             }
         }
         this.hotbarHud = HudManager.getNewHotbarHudInstance();
-        // TODO: Calling this causes the hotbar square to vanish off the screen. Likely has to with  
+        // TODO: Calling this causes the hotbar square to vanish off the screen. Likely has to with 
         // this.switchHeld(0);
     }
     public HotbarHudPanel getHotbarHud() {

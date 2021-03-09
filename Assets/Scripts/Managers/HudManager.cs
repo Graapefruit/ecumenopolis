@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 
 public class HudManager : MonoBehaviour {
+    public GameObject playerHudPrefab;
     public GameObject inventoryHudPrefab;
     public GameObject hotbarHudPrefab;
     private static HudManager hm;
@@ -13,6 +14,10 @@ public class HudManager : MonoBehaviour {
             GameObject.Destroy(hm);
         }
         hm = this;
+    }
+
+    public static PlayerHud getNewPlayerHudInstance() {
+        return Instantiate(hm.playerHudPrefab, Vector3.zero, Quaternion.identity).GetComponent<PlayerHud>();
     }
 
     public static InventoryHudPanel getNewInventoryHudInstance() {

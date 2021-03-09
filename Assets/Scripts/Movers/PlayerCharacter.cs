@@ -4,30 +4,44 @@ using UnityEngine;
 
 public class PlayerCharacter : Mover, Shooter
 {
+    public Item startingItem;
     private const int PICKUP_LAYER = (1 << 11);
     private const float PICKUP_RANGE = 2.5f;
-    public Item startingItem;
-    private PlayerInventory inventory;
+    private const float RUN_SPEED = 5.0f;
+    private const float MAX_STAMINA = 100.0f;
+    public bool Sprinting {
+        get { return sprinting; }
+        set { 
+            sprinting = value;
+            if (sprinting) {
+                this.currentSpeed = RUN_SPEED;
+            } else {
+                this.currentSpeed = this.baseSpeed;
+            }
+        }
+    }
+    private float currentStamina;
+    private bool sprinting;
     private float upRotation;
+    private PlayerInventory inventory;
     private Transform followTarget;
     private Vector3 moveDelta;
     private CharacterController characterController;
-    private GameObject characterBody;
     private PlayerCharacterModelHelper modelHelper;
     
     public override void Awake() {
         base.Awake();
         base.setup(100, 3.0f);
+        this.currentStamina = MAX_STAMINA;
         this.upRotation = 0.0f;
         this.followTarget = this.transform.GetChild(2);
         this.moveDelta = Vector3.zero;
         this.characterController = this.GetComponent<CharacterController>();
-        this.characterBody = this.transform.GetChild(0).gameObject;
     }
 
     public void finishInitialization() {
         this.inventory = new PlayerInventory();
-        this.modelHelper = new PlayerCharacterModelHelper(this.characterBody, this.animator);
+        this.modelHelper = new PlayerCharacterModelHelper(this.transform.GetChild(0).gameObject, this.animator);
         this.inventory.add(startingItem, 0, 0);
         this.inventory.assignMapping(0, 0, 0);
     }
@@ -36,7 +50,7 @@ public class PlayerCharacter : Mover, Shooter
         manageHeldItem();
     }
 
-    // Model updates must be called here, to override changes from the animations themselves
+    // Model updates must be called in LATE update to override changes from the animations themselves
     void LateUpdate() {
         manageHorizontalMovement();
         manageVerticalMovement();
@@ -92,18 +106,10 @@ public class PlayerCharacter : Mover, Shooter
         return this.inventory;
     }
 
-    public InventoryHudPanel getInventoryHud() {
-        return this.inventory.getHud();
-    }
-
-    public HotbarHudPanel getHotbarHud() {
-        return this.inventory.getHotbarHud();
-    }
-
     public void setMovement(Vector3 newDirection) {
         if (this.characterController.isGrounded) {
             Quaternion relevantRotation = Quaternion.Euler(0.0f, this.followTarget.rotation.eulerAngles.y, 0.0f);
-            this.moveDelta = (relevantRotation * newDirection).normalized * this.baseSpeed;
+            this.moveDelta = (relevantRotation * newDirection).normalized * this.currentSpeed;
         }
     }
 

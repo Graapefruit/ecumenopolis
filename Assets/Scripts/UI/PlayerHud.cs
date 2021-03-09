@@ -11,9 +11,9 @@ public class PlayerHud : MonoBehaviour {
     private Image hpTip;
     private InventoryHudPanel inventoryOverlay;
     private HotbarHudPanel hotbarOverlay;
-    private int hp;
-    private int ammo;
     private PlayerCharacter playerCharacter;
+    private int lastHp;
+    private Item lastHeld;
 
     void Awake() {
         this.ammoDisplay = this.transform.Find("AmmoDisplay").GetComponent<Text>();
@@ -21,6 +21,15 @@ public class PlayerHud : MonoBehaviour {
         this.pickupPopup = this.transform.Find("PickupPopup").GetComponent<Text>();
         this.hpFill = this.transform.Find("HpFill").GetComponent<Image>();
         this.hpTip = this.transform.Find("HpTip").GetComponent<Image>();
+    }
+
+    public void assignPlayer(PlayerCharacter pc) {
+        this.playerCharacter = pc;
+        PlayerInventory inventory = pc.getInventory();
+        this.inventoryOverlay = inventory.getHud();
+        this.inventoryOverlay.transform.SetParent(this.transform, false);
+        this.hotbarOverlay = inventory.getHotbarHud();
+        this.hotbarOverlay.transform.SetParent(this.transform, false);
     }
 
     void Update() {
@@ -32,24 +41,16 @@ public class PlayerHud : MonoBehaviour {
         this.pickupPopup.gameObject.SetActive(enabled);
     }
 
-    public void assignPlayer(PlayerCharacter pc) {
-        this.playerCharacter = pc;
-        this.inventoryOverlay = pc.getInventoryHud();
-        this.hotbarOverlay = pc.getHotbarHud();
-        this.inventoryOverlay.transform.SetParent(this.transform, false);
-        this.hotbarOverlay.transform.SetParent(this.transform, false);
-    }
-
     public bool toggleInventory() {
         return this.inventoryOverlay.toggleInventory();
     }
 
-    private void updateHp() {
+    public void updateHp() {
         int newHp = this.playerCharacter.getHp();
-        if (this.hp == newHp) {
+        if (this.lastHp == newHp) {
             return;
         } 
-        this.hp = newHp;
+        this.lastHp = newHp;
         Vector3 oldFillPos = this.hpFill.transform.position;
         Vector3 oldFillScale = this.hpFill.transform.localScale;
         Vector3 oldTipPos = this.hpTip.transform.position;
@@ -61,8 +62,12 @@ public class PlayerHud : MonoBehaviour {
         this.hpTip.transform.position = oldTipPos;
     }
 
-    private void updateHeld() {
+    public void updateHeld() {
         Item heldItem = this.playerCharacter.getInventory().getHeld();
+        if (heldItem == this.lastHeld) {
+            return;
+        }
+        this.lastHeld = heldItem;
         if (heldItem == null) {
             this.ammoDisplay.gameObject.SetActive(false);
             this.heldDisplay.text = "Unarmed";

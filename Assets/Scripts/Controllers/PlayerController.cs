@@ -5,7 +5,6 @@ using UnityEngine.EventSystems;
 
 public class PlayerController : MonoBehaviour {
     public GameObject pcPrefab;
-    public GameObject hudPrefab;
     private PlayerCharacter playerCharacter;
     private PlayerHud hud;
     private ItemDragHelper itemDragHelper;
@@ -14,14 +13,14 @@ public class PlayerController : MonoBehaviour {
 
     void Awake() {
         this.playerCharacter = ((GameObject) Instantiate(pcPrefab, new Vector3 (24.0f, 10.0f, 13.0f), Quaternion.identity)).GetComponent<PlayerCharacter>();
-        this.hud = ((GameObject) Instantiate(hudPrefab, Vector3.zero, Quaternion.identity)).GetComponent<PlayerHud>();
-        this.itemDragHelper = this.hud.transform.Find("DraggedItem").GetComponent<ItemDragHelper>();
         this.inventoryIsOpen = false;
     }
 
     void Start() {
         this.playerCharacter.finishInitialization();
         this.playerInventory = this.playerCharacter.getInventory();
+        this.hud = HudManager.getNewPlayerHudInstance();
+        this.itemDragHelper = this.hud.transform.Find("DraggedItem").GetComponent<ItemDragHelper>();
         this.hud.assignPlayer(this.playerCharacter);
     }
 
@@ -142,6 +141,7 @@ public class PlayerController : MonoBehaviour {
     }
 
     private void manageMovement() {
+        manageSprinting();
         float xMagnitude = 0.0f;
         float zMagnitude = 0.0f;
         xMagnitude += (Input.GetKey("d") ? 1.0f : 0.0f);
@@ -153,9 +153,20 @@ public class PlayerController : MonoBehaviour {
         movementDirection.y = 0;
         movementDirection = movementDirection.normalized;
         this.playerCharacter.setMovement(movementDirection);
+        manageJumping();
+    }
 
+    private void manageJumping() {
         if (Input.GetKey(KeyCode.Space)) {
             this.playerCharacter.jump();
+        }
+    }
+
+    private void manageSprinting() {
+        if (Input.GetKey(KeyCode.LeftShift) && !(this.playerCharacter.Sprinting)) {
+            this.playerCharacter.Sprinting = true;
+        } else if (!(Input.GetKey(KeyCode.LeftShift)) && this.playerCharacter.Sprinting) {
+            this.playerCharacter.Sprinting = false;
         }
     }
 
