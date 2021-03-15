@@ -4,16 +4,20 @@ using UnityEngine;
 using UnityEngine.UI; 
 
 public class PlayerHud : MonoBehaviour {
+    private const float STAMINA_END = 105.5f;
+    private const float STAMINA_SCALE_MAX = 160.0f;
     private Text ammoDisplay;
     private Text heldDisplay;
     private Text pickupPopup;
     private Image hpFill;
     private Image hpTip;
+    private Image staminaFill;
+    private Image staminaTip;
     private InventoryHudPanel inventoryOverlay;
     private HotbarHudPanel hotbarOverlay;
     private PlayerCharacter playerCharacter;
     private int lastHp;
-    private Item lastHeld;
+    private float lastStamina;
 
     void Awake() {
         this.ammoDisplay = this.transform.Find("AmmoDisplay").GetComponent<Text>();
@@ -21,6 +25,8 @@ public class PlayerHud : MonoBehaviour {
         this.pickupPopup = this.transform.Find("PickupPopup").GetComponent<Text>();
         this.hpFill = this.transform.Find("HpFill").GetComponent<Image>();
         this.hpTip = this.transform.Find("HpTip").GetComponent<Image>();
+        this.staminaFill = this.transform.Find("StaminaFill").GetComponent<Image>();
+        this.staminaTip = this.transform.Find("StaminaTip").GetComponent<Image>();
     }
 
     public void assignPlayer(PlayerCharacter pc) {
@@ -34,6 +40,7 @@ public class PlayerHud : MonoBehaviour {
 
     void Update() {
         updateHp();
+        updateStamina();
         updateHeld();
     }
 
@@ -62,12 +69,27 @@ public class PlayerHud : MonoBehaviour {
         this.hpTip.transform.position = oldTipPos;
     }
 
-    public void updateHeld() {
-        Item heldItem = this.playerCharacter.getInventory().getHeld();
-        if (heldItem == this.lastHeld) {
+    public void updateStamina() {
+        float newStamina = this.playerCharacter.getStamina();
+        if (this.lastStamina == newStamina) {
             return;
         }
-        this.lastHeld = heldItem;
+        this.lastStamina = newStamina;
+        Vector3 oldFillPos = this.staminaFill.transform.position;
+        Vector2 oldFillScale = this.staminaFill.rectTransform.sizeDelta;
+        Vector3 oldTipPos = this.staminaTip.transform.position;
+        float staminaRatio = (newStamina / PlayerCharacter.MAX_STAMINA);
+        oldFillPos.x = STAMINA_END + (staminaRatio * (STAMINA_SCALE_MAX / 2));
+        oldFillScale.x = staminaRatio * STAMINA_SCALE_MAX;
+        oldTipPos.x = STAMINA_END + (staminaRatio * STAMINA_SCALE_MAX);
+        this.staminaFill.transform.position = oldFillPos;
+        this.staminaFill.rectTransform.sizeDelta = oldFillScale;
+        this.staminaTip.transform.position = oldTipPos;
+        
+    }
+
+    public void updateHeld() {
+        Item heldItem = this.playerCharacter.getInventory().getHeld();
         if (heldItem == null) {
             this.ammoDisplay.gameObject.SetActive(false);
             this.heldDisplay.text = "Unarmed";

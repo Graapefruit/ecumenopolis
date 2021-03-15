@@ -22,5 +22,8 @@ MonoBehaviour:
   fireCooldown: 0.125
   range: 14
   maxAmmo: 30
-  bulletSpread: 0.16
   stoppingPower: 1.2
+  bloomPerShot: 0
+  bloomRecoveryRate: 1
+  minBloom: 0
+  maxBloom: 0

@@ -136,7 +136,7 @@ public class PlayerController : MonoBehaviour {
         float mouseDeltaX = Input.GetAxis("Mouse X");
         float mouseDeltaY = Input.GetAxis("Mouse Y");
         if (mouseDeltaX != 0 || mouseDeltaY != 0) {
-            playerCharacter.changeLookDirection(mouseDeltaX, mouseDeltaY);
+            playerCharacter.changeLookDirection(mouseDeltaX, mouseDeltaY * -1);
         }
     }
 

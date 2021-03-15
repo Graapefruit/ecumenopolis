@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
@@ -10,21 +10,26 @@ public class Gun : Item {
     public float fireCooldown;
     public float range;
     public int maxAmmo;
-    public float bulletSpread;
     public float stoppingPower;
+    public float bloomPerShot;
+    public float bloomRecoveryRate;
+    public float minBloom;
+    public float maxBloom;
+    private float bloomPerShotRad;
+    private float currentBloom;
     private float timeLastShot;
     private int ammoRemaining;
 
     void OnEnable() {
         this.timeLastShot = 0.0f;
         this.ammoRemaining = this.maxAmmo;
+        this.currentBloom = this.minBloom;
+        this.timeLastShot = Time.time;
     }
 
     public override void primaryUsed(Shooter shooter, Vector3 source, Vector3 direction) {
         if (this.gunIsReady()) {
-            timeLastShot = Time.time;
-            Vector3 directionWithSpray = this.addSpray(source, direction);
-            this.fireWeapon(shooter, source, directionWithSpray);
+            this.fireWeapon(shooter, source, direction.normalized);
             this.ammoRemaining--;
         }
     }
@@ -42,9 +47,10 @@ public class Gun : Item {
     }
 
     protected void fireWeapon(Shooter shooter, Vector3 source, Vector3 direction) {
+        Vector3 directionWithSpray = this.manageBloom(direction);
         Vector3 tracerStart = shooter.getTracerSource();
-        Vector3 tracerEnd = tracerStart + (direction * this.range);
-        RaycastHit[] objectsHit = Physics.RaycastAll(new Ray(source, direction), this.range, GUN_IGNORE_LAYER);
+        Vector3 tracerEnd = tracerStart + (directionWithSpray * this.range);
+        RaycastHit[] objectsHit = Physics.RaycastAll(new Ray(source, directionWithSpray), this.range, GUN_IGNORE_LAYER);
         Array.Sort<RaycastHit>(objectsHit, new Comparison<RaycastHit>((i1, i2) => i2.distance.CompareTo(i1.distance)));
         // Because RaycastHit is not nullable and has no public constructor, modularizing the code without making a container class is difficult
         RaycastHit hit;
@@ -72,16 +78,20 @@ public class Gun : Item {
         }
     }
 
-    // TODO: Normal Distribution
-    // TODO: Vertical Spray
-    // TODO: Spray sucks, direction should be modified based on current orientation (x/z, y)
-    protected Vector3 addSpray(Vector3 source, Vector3 direction) {
-        float angle = Mathf.Atan2(direction.z, direction.x);
-        angle += UnityEngine.Random.Range(-this.bulletSpread, this.bulletSpread);
-        float newX = Mathf.Cos(angle);
-        float newZ = Mathf.Sin(angle);
-        Vector3 newDirection = new Vector3(newX, direction.y, newZ);
-        return newDirection.normalized;
+    private Vector3 manageBloom(Vector3 direction) {
+        this.currentBloom -= this.bloomRecoveryRate * (Time.time - this.timeLastShot);
+        this.currentBloom = Mathf.Min(Mathf.Max(this.currentBloom, this.minBloom), this.maxBloom);
+        Vector3 directionWithSpray = this.getSpray(direction);
+        this.currentBloom += this.bloomPerShot;
+        this.timeLastShot = Time.time;
+        return directionWithSpray;
+    }
+
+    protected Vector3 getSpray(Vector3 direction) {
+        Vector2 deltaPoints = GrapeMath.getRandomLocationInSphere(this.currentBloom);
+        float verticalAngle = Mathf.Atan2(Mathf.Sqrt(Mathf.Pow(direction.x, 2) + Mathf.Pow(direction.z, 2)), direction.y) + deltaPoints.y;
+        float horizontalAngle = Mathf.Atan2(direction.z, direction.x) + deltaPoints.x;
+        return new Vector3(Mathf.Cos(horizontalAngle), Mathf.Cos(verticalAngle), Mathf.Sin(horizontalAngle)).normalized;
     }
 
     protected bool isMover(GameObject gameObject) {

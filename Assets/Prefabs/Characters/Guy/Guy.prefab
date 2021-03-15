@@ -112,6 +112,7 @@ GameObject:
   m_Component:
   - component: {fileID: 1095759784557943172}
   - component: {fileID: 4168822353124123465}
+  - component: {fileID: 5853156958412133114}
   m_Layer: 0
   m_Name: PlayerShoulderVC
   m_TagString: Untagged
@@ -169,6 +170,24 @@ MonoBehaviour:
         m_Calls: []
   m_LegacyBlendHint: 0
   m_ComponentOwner: {fileID: 589765135426408355}
+--- !u!114 &5853156958412133114
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4093085913086329961}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 2588cc5dedbb75e49a44aada63f7b939, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  AimCollisionFilter:
+    serializedVersion: 2
+    m_Bits: 512
+  IgnoreTag: 
+  AimDistance: 200
+  AimTargetReticle: {fileID: 0}
 --- !u!1 &5450149746352852972
 GameObject:
   m_ObjectHideFlags: 0

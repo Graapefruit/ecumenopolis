@@ -4,22 +4,30 @@ using UnityEngine;
 
 public class PlayerCharacter : Mover, Shooter
 {
+    public const float MAX_STAMINA = 5.0f;
     public Item startingItem;
     private const int PICKUP_LAYER = (1 << 11);
     private const float PICKUP_RANGE = 2.5f;
-    private const float RUN_SPEED = 5.0f;
-    private const float MAX_STAMINA = 100.0f;
+    private const float SPRINT_SPEED = 5.0f;
+    private const float SPRINT_COOLDOWN = 1.5f;
+    private const float SPRINT_COST = 1.5f;
+    private const float STAMINA_RECOVERY_RATE = 0.75f;
     public bool Sprinting {
         get { return sprinting; }
-        set { 
-            sprinting = value;
-            if (sprinting) {
-                this.currentSpeed = RUN_SPEED;
+        set {
+            if (value) {
+                if (Time.time > (this.lastSprintTime + SPRINT_COOLDOWN)) {
+                    sprinting = true;
+                    this.currentSpeed = SPRINT_SPEED;
+                }
             } else {
+                this.lastSprintTime = Time.time;
+                this.sprinting = false;
                 this.currentSpeed = this.baseSpeed;
             }
         }
     }
+    private float lastSprintTime;
     private float currentStamina;
     private bool sprinting;
     private float upRotation;
@@ -32,6 +40,7 @@ public class PlayerCharacter : Mover, Shooter
     public override void Awake() {
         base.Awake();
         base.setup(100, 3.0f);
+        this.lastSprintTime = -SPRINT_COOLDOWN;
         this.currentStamina = MAX_STAMINA;
         this.upRotation = 0.0f;
         this.followTarget = this.transform.GetChild(2);
@@ -48,12 +57,25 @@ public class PlayerCharacter : Mover, Shooter
 
     void Update() {
         manageHeldItem();
+        updateStamina();
     }
 
     // Model updates must be called in LATE update to override changes from the animations themselves
     void LateUpdate() {
         manageHorizontalMovement();
         manageVerticalMovement();
+    }
+
+    private void updateStamina() {
+        if (this.sprinting) {
+            this.currentStamina -= Time.deltaTime * SPRINT_COST;
+            if (this.currentStamina < 0.0f) {
+                this.Sprinting = false;
+            }
+        } else {
+            float newStamina = this.currentStamina + (Time.deltaTime * STAMINA_RECOVERY_RATE);
+            this.currentStamina = (newStamina < MAX_STAMINA ? newStamina : MAX_STAMINA);
+        }
     }
 
     private void manageHorizontalMovement() {
@@ -165,6 +187,10 @@ public class PlayerCharacter : Mover, Shooter
 
     public int getHp() {
         return this.currentHealth;
+    }
+
+    public float getStamina() {
+        return this.currentStamina;
     }
 
     private Vector3 getCameraPivotAngle() {
