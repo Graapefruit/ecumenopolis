@@ -66,6 +66,11 @@ public class PlayerCharacter : Mover, Shooter
         manageVerticalMovement();
     }
 
+    public void reload() {
+        // TODO: this.modelHelper.beginReload();
+        this.inventory.reloadHeldWeapon();
+    }
+
     private void updateStamina() {
         if (this.sprinting) {
             this.currentStamina -= Time.deltaTime * SPRINT_COST;

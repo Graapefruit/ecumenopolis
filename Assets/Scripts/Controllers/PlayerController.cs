@@ -31,6 +31,7 @@ public class PlayerController : MonoBehaviour {
             manageDragging();
             manageDropping();
         } else if (cameraIsLocked()) {
+            manageReload();
             manageMouseMovements();
             manageMovement();
             manageHotbar();
@@ -42,6 +43,12 @@ public class PlayerController : MonoBehaviour {
     public PlayerCharacter getPlayer() {
         return this.playerCharacter;
     } 
+
+    private void manageReload() {
+        if (Input.GetKeyDown(KeyCode.R)) {
+            this.playerCharacter.reload();
+        }
+    }
 
     private void checkForInterfaceUpdates() {
         if (Input.GetKeyDown(KeyCode.I)) {

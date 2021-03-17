@@ -46,6 +46,12 @@ public class Gun : Item {
         return this.ammoRemaining;
     }
 
+    public int reloadReturnRemaining(int amount) {
+        int amountUsed = Mathf.Min(amount, this.maxAmmo - this.ammoRemaining);
+        this.ammoRemaining += amountUsed;
+        return amount - amountUsed;
+    }
+
     protected void fireWeapon(Shooter shooter, Vector3 source, Vector3 direction) {
         Vector3 directionWithSpray = this.manageBloom(direction);
         Vector3 tracerStart = shooter.getTracerSource();

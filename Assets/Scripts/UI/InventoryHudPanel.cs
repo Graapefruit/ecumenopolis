@@ -33,6 +33,7 @@ public class InventoryHudPanel : MonoBehaviour{
         itemAvatar.transform.SetParent(this.transform, false);
         this.inventoryItemImages[x, y] = itemAvatar;
         itemAvatar.GetComponent<Image>().sprite = item.avatar;
+        this.updateStack(itemAvatar, item);
     }
 
     public void removeItem(int x, int y) {
@@ -74,6 +75,10 @@ public class InventoryHudPanel : MonoBehaviour{
         panel.sizeDelta = new Vector2(20 + (60 * this.inventorySizeX), 20 + (60 * this.inventorySizeY));
     }
 
+    public void updateStackSize(Pair pair, Item item) {
+        this.updateStack(this.inventoryItemImages[pair.x, pair.y], item);
+    }
+
     private void createNewSquare(Inventory inventory, int x, int y) {
         Vector3 coords = this.indexToInventoryCoords(x, y);
         GameObject newSquare = Instantiate(inventorySquarePrefab, coords, Quaternion.identity);
@@ -91,6 +96,17 @@ public class InventoryHudPanel : MonoBehaviour{
         }
         newSquare.transform.SetParent(this.transform, false);
         this.inventoryItemSquares[x, y] = newSquare;
+    }
+
+    private void updateStack(GameObject gameObject, Item item) {
+        Transform stackText = gameObject.transform.Find("Stack");
+        stackText.SetParent(gameObject.transform);
+        // stackText.localPosition = new Vector3(-5.0f, -5.0f, 0.0f);
+        if (item.stackable) {
+            stackText.GetComponent<Text>().text = item.currentStackSize.ToString();
+        } else {
+            stackText.gameObject.SetActive(false);
+        }
     }
 
     private Vector3 indexToInventoryCoords(int x, int y) {

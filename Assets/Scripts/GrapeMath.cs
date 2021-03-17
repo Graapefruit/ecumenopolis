@@ -28,7 +28,6 @@ public static class GrapeMath {
         float randomTheta = Random.Range(0.0f, 1.0f) * 2 * Mathf.PI;
         float x = Mathf.Cos(randomTheta) * randomRadius;
         float y = Mathf.Sin(randomTheta) * randomRadius;
-        Debug.LogFormat("x: {0}, y: {1}", x, y);
         return new Vector2(x, y);
     }
 }

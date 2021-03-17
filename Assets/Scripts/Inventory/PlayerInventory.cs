@@ -97,4 +97,31 @@ public class PlayerInventory : Inventory {
         }
         return item;
     }
+
+    public void reloadHeldWeapon() {
+        Item heldItem = this.getHeld();
+        if (heldItem && heldItem is Gun) {
+            Pair ammoLocation = this.findAmmo();
+            if (ammoLocation != null) {
+                Ammo ammo = this.inventory[ammoLocation.x, ammoLocation.y] as Ammo;
+                ammo.restoreAmmo((heldItem as Gun));
+                if (ammo.currentStackSize > 0) {
+                    this.hud.updateStackSize(ammoLocation, ammo);
+                } else {
+                    this.pop(ammoLocation.x, ammoLocation.y);
+                }
+            }
+        }
+    }
+
+    private Pair findAmmo() {
+        for (int x = 0; x < this.inventorySizeX; x++) {
+            for (int y = 0; y < this.inventorySizeY; y++) {
+                if (this.inventory[x, y] is Ammo) {
+                    return new Pair(x, y);
+                }
+            }
+        }
+        return null;
+    }
 }

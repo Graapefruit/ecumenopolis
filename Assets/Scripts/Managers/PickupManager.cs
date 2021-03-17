@@ -3,12 +3,11 @@ using System.Collections.Generic;
 using UnityEngine;
 
 public class PickupManager : MonoBehaviour {
-    public Item pistolPrefab;
+    public Item ammoPrefab;
     public GameObject pickupPrefab;
     private const float pickupSpawnTime = 5.0f;
     private static PickupManager pm;
-
-    float lastPickupTime;
+    private float lastPickupTime;
     
     void Awake() {
         if (pm != null) {
@@ -25,7 +24,7 @@ public class PickupManager : MonoBehaviour {
             this.lastPickupTime = this.lastPickupTime % pickupSpawnTime;
             Vector3 pickupLocation = BoardManager.getRandomLocation();
             GameObject newPickup = Instantiate(pickupPrefab, pickupLocation, Quaternion.identity);
-            newPickup.GetComponent<Pickup>().setItem(ScriptableObject.Instantiate(pistolPrefab));
+            newPickup.GetComponent<Pickup>().setItem(ScriptableObject.Instantiate(ammoPrefab));
         }
     }
 

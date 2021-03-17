@@ -16,6 +16,9 @@ public abstract class Item : ScriptableObject
     public SOTransform pickupTransform;
     public SOTransform holdTransform;
     public string heldAnimationLayerName;
+    public bool stackable;
+    public int maxStackSize;
+    public int currentStackSize;
     public abstract void primaryUsed(Shooter shooter, Vector3 source, Vector3 direction);
     //private abstract void secondaryUsed();
 }
