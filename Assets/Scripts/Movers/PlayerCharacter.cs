@@ -57,21 +57,22 @@ public class PlayerCharacter : Mover, Shooter {
     }
 
     void Update() {
-        // manageHeldItem();
+        manageHeldItem();
         // updateStamina();
     }
 
     // Model updates must be called in LATE update to override changes from the animations themselves
     void LateUpdate() {
-        // manageHorizontalMovement();
-        // manageVerticalMovement();
         this.stateManager.doUpdate();
+        this.modelHelper.doUpdate();
     }
 
     private void initializeStates() {
         State idleState = new State(
             (() => {}),
-            (() => {}),
+            (() => {
+                manageHorizontalMovement();
+            }),
             (() => {})
         );
 
@@ -151,7 +152,6 @@ public class PlayerCharacter : Mover, Shooter {
     private void manageHorizontalMovement() {
         this.characterController.Move(this.moveDelta * Time.deltaTime);
         this.modelHelper.movementDirection = this.moveDelta;
-        this.modelHelper.doUpdate();
     }
 
     private void manageVerticalMovement() {
@@ -222,14 +222,6 @@ public class PlayerCharacter : Mover, Shooter {
             Vector3 direction = (this.followTarget.rotation * Vector3.forward).normalized;
             this.inventory.getHeld().primaryUsed(this as Shooter, source, direction);
         }
-    }
-
-    public void pickupAmmo(int amount) {
-        // ((Gun) this.inventory[0]).refillAmmo(amount);
-    }
-
-    public void pickupScrap(int amount) {
-        // ((Gun) this.inventory[1]).refillAmmo(amount);
     }
 
     public void changeLookDirection(float mouseDeltaX, float mouseDeltaY) {

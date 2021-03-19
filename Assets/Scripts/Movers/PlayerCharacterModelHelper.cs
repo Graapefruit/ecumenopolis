@@ -17,6 +17,8 @@ public class PlayerCharacterModelHelper {
     private Item heldItem;
     private GameObject heldGameObject;
     private PlayerSwivelHelper swivelHelper;
+    private StateManager upperBodyStateManager;
+    private StateManager lowerBodyStateManager;
 
     public PlayerCharacterModelHelper(GameObject playerModel, Animator animator) {
         this.heading = 0.0f;
@@ -32,6 +34,70 @@ public class PlayerCharacterModelHelper {
             .Find("RightArm")
             .Find("RightForeArm")
             .Find("RightHand").gameObject;
+            this.initializeStateManager();
+    }
+
+    private void initializeStateManager() {
+        this.initializeUpperBodyStateManager();
+        this.initializeLowerBodyStateManager();
+    }
+
+    private void initializeUpperBodyStateManager() {
+        State reactiveState = new State(
+            (() => {}),
+            (() => {
+                Vector3 upperBodyEuler = this.upperBodyStart.transform.eulerAngles;
+                upperBodyEuler.y = this.heading;
+                this.upperBodyStart.transform.rotation = Quaternion.Euler(upperBodyEuler);}),
+            (() => {})
+        );
+        reactiveState.setOnGetNextState(() => {
+            return reactiveState;
+        });
+        this.upperBodyStateManager = new StateManager(reactiveState);
+    }
+
+    private void initializeLowerBodyStateManager() {
+        State reactiveState = new State(
+            (() => {}),
+            (() => {
+                if (this.movementDirection.x == 0.0f && this.movementDirection.z == 0.0f) {
+                    this.animator.SetInteger("walkDirection", 0);
+                    this.swivelHelper.manageSwivel(this.heading, this.lowerBodyRotation);
+                    this.lowerBodyRotation += Time.deltaTime * this.swivelHelper.getSwivelAmountWithoutDeltaTime();
+                } else {
+                    this.swivelHelper.stopSwiveling();
+                    this.snapLowerBodyToMovement();
+                    float contortionAngle = this.calculateContortion();
+                    if (contortionAngle > 300 || contortionAngle < 60) {
+                        this.animator.SetInteger("walkDirection", 1);
+                    } else if (contortionAngle >= 240 && contortionAngle <= 300) {
+                        this.lowerBodyRotation += 90;
+                        this.animator.SetInteger("walkDirection", 2);
+                    } else if (contortionAngle >= 60 && contortionAngle <= 120) {
+                        this.lowerBodyRotation -= 90;
+                        this.animator.SetInteger("walkDirection", 3);
+                    } else {
+                        this.lowerBodyRotation += 180;
+                        this.animator.SetInteger("walkDirection", 4);
+                    }
+                }
+                Vector3 lowerBodyEuler = this.lowerBodyStart.transform.eulerAngles;
+                lowerBodyEuler.y += this.lowerBodyRotation;
+                this.lowerBodyStart.transform.rotation = Quaternion.Euler(lowerBodyEuler);
+        }),
+            (() => {})
+        );
+        reactiveState.setOnGetNextState(() => {
+            return reactiveState;
+        });
+        this.lowerBodyStateManager = new StateManager(reactiveState);
+    }
+
+    public void doUpdate() {
+        // The bone for the lower body is the parent of all bones, so it should be updated first, so it's effects on the lower body can be overwritten
+        this.lowerBodyStateManager.doUpdate();
+        this.upperBodyStateManager.doUpdate();
     }
 
     public void holdItem(Item newHeldItem) {
@@ -49,44 +115,6 @@ public class PlayerCharacterModelHelper {
             this.heldItem.holdTransform.assignTransformation(this.heldGameObject);
             setLayerWeight(this.heldItem.heldAnimationLayerName, ANIMATION_LAYER_ON);
         }
-    }
-
-    public void doUpdate() {
-        this.rotateLowerBody();
-        this.rotateUpperBody();
-    }
-
-    private void rotateLowerBody() {
-        if (this.movementDirection.x == 0.0f && this.movementDirection.z == 0.0f) {
-            this.animator.SetInteger("walkDirection", 0);
-            this.swivelHelper.manageSwivel(this.heading, this.lowerBodyRotation);
-            this.lowerBodyRotation += Time.deltaTime * this.swivelHelper.getSwivelAmountWithoutDeltaTime();
-        } else {
-            this.swivelHelper.stopSwiveling();
-            this.snapLowerBodyToMovement();
-            float contortionAngle = this.calculateContortion();
-            if (contortionAngle > 300 || contortionAngle < 60) {
-                this.animator.SetInteger("walkDirection", 1);
-            } else if (contortionAngle >= 240 && contortionAngle <= 300) {
-                this.lowerBodyRotation += 90;
-                this.animator.SetInteger("walkDirection", 2);
-            } else if (contortionAngle >= 60 && contortionAngle <= 120) {
-                this.lowerBodyRotation -= 90;
-                this.animator.SetInteger("walkDirection", 3);
-            } else {
-                this.lowerBodyRotation += 180;
-                this.animator.SetInteger("walkDirection", 4);
-            }
-        }
-        Vector3 lowerBodyEuler = this.lowerBodyStart.transform.eulerAngles;
-        lowerBodyEuler.y += this.lowerBodyRotation;
-        this.lowerBodyStart.transform.rotation = Quaternion.Euler(lowerBodyEuler);
-    }
-
-    private void rotateUpperBody() {
-        Vector3 upperBodyEuler = this.upperBodyStart.transform.eulerAngles;
-        upperBodyEuler.y = this.heading;
-        this.upperBodyStart.transform.rotation = Quaternion.Euler(upperBodyEuler);
     }
 
     private void setLayerWeight(string layerName, float newWeight) {
