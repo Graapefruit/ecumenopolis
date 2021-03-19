@@ -4,16 +4,21 @@ using UnityEngine;
 using UnityEngine.EventSystems;
 
 public class PlayerController : MonoBehaviour {
+    private enum State {
+        Normal,
+        InventoryOpen
+    }
     public GameObject pcPrefab;
     private PlayerCharacter playerCharacter;
     private PlayerHud hud;
     private ItemDragHelper itemDragHelper;
     private PlayerInventory playerInventory;
-    private bool inventoryIsOpen;
+    private State state;
 
     void Awake() {
+        this.state = State.Normal;
         this.playerCharacter = ((GameObject) Instantiate(pcPrefab, new Vector3 (24.0f, 10.0f, 13.0f), Quaternion.identity)).GetComponent<PlayerCharacter>();
-        this.inventoryIsOpen = false;
+        this.state = State.Normal;
     }
 
     void Start() {
@@ -25,18 +30,21 @@ public class PlayerController : MonoBehaviour {
     }
 
     void Update() {
-        checkForInterfaceUpdates();
-        if (this.inventoryIsOpen) {
-            manageHotbarAssignments();
-            manageDragging();
-            manageDropping();
-        } else if (cameraIsLocked()) {
-            manageReload();
-            manageMouseMovements();
-            manageMovement();
-            manageHotbar();
-            manageGunShooting();
-            manageItemPickup();
+        manageStateChanges();
+        switch(this.state) {
+            case State.Normal:
+                manageReload();
+                manageMouseMovements();
+                manageMovement();
+                manageHotbar();
+                manageGunShooting();
+                manageItemPickup();
+                break;
+            case State.InventoryOpen:
+                manageHotbarAssignments();
+                manageDragging();
+                manageDropping();
+                break;
         }
     }
 
@@ -50,17 +58,26 @@ public class PlayerController : MonoBehaviour {
         }
     }
 
-    private void checkForInterfaceUpdates() {
-        if (Input.GetKeyDown(KeyCode.I)) {
-            this.hud.toggleInventory();
-            this.inventoryIsOpen = !this.inventoryIsOpen;
-            Cursor.lockState = (this.inventoryIsOpen ? CursorLockMode.None : CursorLockMode.Locked);
-            this.itemDragHelper.gameObject.SetActive(false);
-            if (this.itemDragHelper.hasItem()) {
-                PickupManager.dropItem(this.playerCharacter.transform.position, this.itemDragHelper.releaseItem());
-            }
-        } if (Input.GetMouseButton(0) && !this.inventoryIsOpen) {
-            Cursor.lockState = CursorLockMode.Locked;
+    private void manageStateChanges() {
+        switch (this.state) {
+            case State.Normal:
+                if (Input.GetKeyDown(KeyCode.I)) {
+                    this.hud.toggleInventory();
+                    this.state = State.InventoryOpen;
+                }
+                Cursor.lockState = CursorLockMode.Locked;
+                break;
+            case State.InventoryOpen:
+                if (Input.GetKeyDown(KeyCode.I)) {
+                    this.hud.toggleInventory();
+                    this.state = State.Normal;
+                    this.itemDragHelper.gameObject.SetActive(false);
+                }
+                if (this.itemDragHelper.hasItem()) {
+                    PickupManager.dropItem(this.playerCharacter.transform.position, this.itemDragHelper.releaseItem());
+                }
+                Cursor.lockState = CursorLockMode.None;
+                break;
         }
     }
 
@@ -148,7 +165,7 @@ public class PlayerController : MonoBehaviour {
     }
 
     private void manageMovement() {
-        manageSprinting();
+        // manageSprinting();
         float xMagnitude = 0.0f;
         float zMagnitude = 0.0f;
         xMagnitude += (Input.GetKey("d") ? 1.0f : 0.0f);
@@ -169,13 +186,13 @@ public class PlayerController : MonoBehaviour {
         }
     }
 
-    private void manageSprinting() {
-        if (Input.GetKey(KeyCode.LeftShift) && !(this.playerCharacter.Sprinting)) {
-            this.playerCharacter.Sprinting = true;
-        } else if (!(Input.GetKey(KeyCode.LeftShift)) && this.playerCharacter.Sprinting) {
-            this.playerCharacter.Sprinting = false;
-        }
-    }
+    // private void manageSprinting() {
+    //     if (Input.GetKey(KeyCode.LeftShift) && !(this.playerCharacter.Sprinting)) {
+    //         this.playerCharacter.Sprinting = true;
+    //     } else if (!(Input.GetKey(KeyCode.LeftShift)) && this.playerCharacter.Sprinting) {
+    //         this.playerCharacter.Sprinting = false;
+    //     }
+    // }
 
     private void manageHotbar() {
         int hotbarKeyDown = getHotbarSlotDown();

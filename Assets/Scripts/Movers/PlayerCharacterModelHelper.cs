@@ -83,6 +83,17 @@ public class PlayerCharacterModelHelper {
         this.lowerBodyStart.transform.rotation = Quaternion.Euler(lowerBodyEuler);
     }
 
+    private void rotateUpperBody() {
+        Vector3 upperBodyEuler = this.upperBodyStart.transform.eulerAngles;
+        upperBodyEuler.y = this.heading;
+        this.upperBodyStart.transform.rotation = Quaternion.Euler(upperBodyEuler);
+    }
+
+    private void setLayerWeight(string layerName, float newWeight) {
+        int relevantLayerIndex = this.animator.GetLayerIndex(layerName);
+        this.animator.SetLayerWeight(relevantLayerIndex, newWeight);
+    }
+
     private void snapLowerBodyToMovement() {
         this.lowerBodyRotation = LOWER_BODY_INITIAL_ROTATION + (Mathf.Atan2(this.movementDirection.z, -this.movementDirection.x) * Mathf.Rad2Deg);
     }
@@ -93,16 +104,5 @@ public class PlayerCharacterModelHelper {
             contortionAngle += 360;
         }
         return contortionAngle;
-    }
-
-    private void rotateUpperBody() {
-        Vector3 upperBodyEuler = this.upperBodyStart.transform.eulerAngles;
-        upperBodyEuler.y = this.heading;
-        this.upperBodyStart.transform.rotation = Quaternion.Euler(upperBodyEuler);
-    }
-
-    private void setLayerWeight(string layerName, float newWeight) {
-        int relevantLayerIndex = this.animator.GetLayerIndex(layerName);
-        this.animator.SetLayerWeight(relevantLayerIndex, newWeight);
     }
 }

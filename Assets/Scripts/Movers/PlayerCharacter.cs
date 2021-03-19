@@ -2,8 +2,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public class PlayerCharacter : Mover, Shooter
-{
+public class PlayerCharacter : Mover, Shooter {
     public const float MAX_STAMINA = 5.0f;
     public Item startingItem;
     private const int PICKUP_LAYER = (1 << 11);
@@ -12,30 +11,30 @@ public class PlayerCharacter : Mover, Shooter
     private const float SPRINT_COOLDOWN = 1.5f;
     private const float SPRINT_COST = 1.5f;
     private const float STAMINA_RECOVERY_RATE = 0.75f;
-    public bool Sprinting {
-        get { return sprinting; }
-        set {
-            if (value) {
-                if (Time.time > (this.lastSprintTime + SPRINT_COOLDOWN)) {
-                    sprinting = true;
-                    this.currentSpeed = SPRINT_SPEED;
-                }
-            } else {
-                this.lastSprintTime = Time.time;
-                this.sprinting = false;
-                this.currentSpeed = this.baseSpeed;
-            }
-        }
-    }
+    // public bool Sprinting {
+    //     get { return sprinting; }
+    //     set {
+    //         if (value) {
+    //             if (Time.time > (this.lastSprintTime + SPRINT_COOLDOWN)) {
+    //                 sprinting = true;
+    //                 this.currentSpeed = SPRINT_SPEED;
+    //             }
+    //         } else {
+    //             this.lastSprintTime = Time.time;
+    //             this.sprinting = false;
+    //             this.currentSpeed = this.baseSpeed;
+    //         }
+    //     }
+    // }
     private float lastSprintTime;
     private float currentStamina;
-    private bool sprinting;
     private float upRotation;
     private PlayerInventory inventory;
     private Transform followTarget;
     private Vector3 moveDelta;
     private CharacterController characterController;
     private PlayerCharacterModelHelper modelHelper;
+    private StateManager stateManager;
     
     public override void Awake() {
         base.Awake();
@@ -46,8 +45,10 @@ public class PlayerCharacter : Mover, Shooter
         this.followTarget = this.transform.GetChild(2);
         this.moveDelta = Vector3.zero;
         this.characterController = this.GetComponent<CharacterController>();
+        this.initializeStates();
     }
 
+    // TODO: Start?
     public void finishInitialization() {
         this.inventory = new PlayerInventory();
         this.modelHelper = new PlayerCharacterModelHelper(this.transform.GetChild(0).gameObject, this.animator);
@@ -56,14 +57,78 @@ public class PlayerCharacter : Mover, Shooter
     }
 
     void Update() {
-        manageHeldItem();
-        updateStamina();
+        // manageHeldItem();
+        // updateStamina();
     }
 
     // Model updates must be called in LATE update to override changes from the animations themselves
     void LateUpdate() {
-        manageHorizontalMovement();
-        manageVerticalMovement();
+        // manageHorizontalMovement();
+        // manageVerticalMovement();
+        this.stateManager.doUpdate();
+    }
+
+    private void initializeStates() {
+        State idleState = new State(
+            (() => {}),
+            (() => {}),
+            (() => {})
+        );
+
+        State walkingState = new State(
+            (() => {}),
+            (() => { 
+                manageHorizontalMovement();
+            }),
+            (() => {})
+        );
+
+        State midairState = new State(
+            (() => {}),
+            (() => {
+                manageHorizontalMovement();
+                manageVerticalMovement();
+            }),
+            (() => {})
+        );
+
+        idleState.setOnGetNextState(() => {
+            if (!this.characterController.isGrounded) {
+                return midairState;
+            } else if (moveDelta.x != 0.0f || moveDelta.z != 0.0f) {
+                return walkingState;
+            } else {
+                return idleState;
+            }
+        });
+
+        walkingState.setOnGetNextState(() => {
+            if (!this.characterController.isGrounded) {
+                return midairState;
+            } else if (moveDelta == Vector3.zero) {
+                return idleState;
+            } else {
+                return walkingState;
+            }
+        });
+
+        midairState.setOnGetNextState(() => {
+            if (this.characterController.isGrounded) {
+                if (moveDelta == Vector3.zero) {
+                    return idleState;
+                } else {
+                    return walkingState;
+                }
+            } else {
+                return midairState;
+            }
+        });
+
+        this.stateManager = new StateManager(idleState);
+    }
+
+    private void maintainAnimation() {
+        
     }
 
     public void reload() {
@@ -71,17 +136,17 @@ public class PlayerCharacter : Mover, Shooter
         this.inventory.reloadHeldWeapon();
     }
 
-    private void updateStamina() {
-        if (this.sprinting) {
-            this.currentStamina -= Time.deltaTime * SPRINT_COST;
-            if (this.currentStamina < 0.0f) {
-                this.Sprinting = false;
-            }
-        } else {
-            float newStamina = this.currentStamina + (Time.deltaTime * STAMINA_RECOVERY_RATE);
-            this.currentStamina = (newStamina < MAX_STAMINA ? newStamina : MAX_STAMINA);
-        }
-    }
+    // private void updateStamina() {
+    //     if (this.sprinting) {
+    //         this.currentStamina -= Time.deltaTime * SPRINT_COST;
+    //         if (this.currentStamina < 0.0f) {
+    //             this.Sprinting = false;
+    //         }
+    //     } else {
+    //         float newStamina = this.currentStamina + (Time.deltaTime * STAMINA_RECOVERY_RATE);
+    //         this.currentStamina = (newStamina < MAX_STAMINA ? newStamina : MAX_STAMINA);
+    //     }
+    // }
 
     private void manageHorizontalMovement() {
         this.characterController.Move(this.moveDelta * Time.deltaTime);
