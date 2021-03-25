@@ -15,6 +15,7 @@ public class PlayerCharacter : Mover, Shooter {
     private const float JUMP_STAMINA_COST = 1.5f;
     public Item startingItem;
     public bool sprinting;
+    public bool shooting;
     public Vector3 HorizontalDirection {
         get { return this.horizontalDirection; }
         set { 
@@ -38,6 +39,7 @@ public class PlayerCharacter : Mover, Shooter {
         base.Awake();
         base.setup(100, 3.0f);
         this.sprinting = false;
+        this.shooting = false;
         this.horizontalDirection = Vector3.zero;
         this.verticalDirection = 0.0f;
         this.currentStamina = MAX_STAMINA;
@@ -59,10 +61,12 @@ public class PlayerCharacter : Mover, Shooter {
     void LateUpdate() {
         this.stateManager.doUpdate();
         this.modelHelper.doUpdate();
+        // Debug.Log(this.stateManager.getCurrentStateName());
     }
 
     private void initializeStates() {
         State idleState = new State(
+            "idle",
             (() => {
                 this.currentSpeed = 0.0f;
                 this.modelHelper.movementDirection = Vector3.zero;
@@ -70,11 +74,13 @@ public class PlayerCharacter : Mover, Shooter {
             (() => {
                 modifyStamina(STAMINA_RECOVERY_RATE_IDLE);
                 manageHeldItem();
+                manageShooting();
             }),
             (() => {})
         );
 
         State walkingState = new State(
+            "walking",
             (() => {
                 this.currentSpeed = WALK_SPEED;
             }),
@@ -82,15 +88,18 @@ public class PlayerCharacter : Mover, Shooter {
                 modifyStamina(STAMINA_RECOVERY_RATE_WALKING);
                 manageHeldItem();
                 manageHorizontalMovement();
+                manageShooting();
             }),
             (() => {})
         );
 
         State sprintingState = new State(
+            "sprinting",
             (() => {
                 this.currentSpeed = SPRINT_SPEED;
+                this.modelHelper.shooting = false;
             }),
-            (() => { 
+            (() => {
                 modifyStamina(STAMINA_DRAIN_RATE_SPRINTING);
                 manageHeldItem();
                 manageHorizontalMovement();
@@ -99,6 +108,7 @@ public class PlayerCharacter : Mover, Shooter {
         );
 
         State midairState = new State(
+            "midair",
             (() => {
                 
             }),
@@ -106,6 +116,7 @@ public class PlayerCharacter : Mover, Shooter {
                 manageHeldItem();
                 manageHorizontalMovement();
                 manageVerticalMovement();
+                manageShooting();
             }),
             (() => {})
         );
@@ -162,16 +173,6 @@ public class PlayerCharacter : Mover, Shooter {
         this.stateManager = new StateManager(idleState);
     }
 
-    public void reload() {
-        // TODO: this.modelHelper.beginReload();
-        this.inventory.reloadHeldWeapon();
-    }
-
-    private void modifyStamina(float amount) {
-        float newStamina = this.currentStamina + (Time.deltaTime * amount);
-        this.currentStamina = Mathf.Max(MIN_STAMINA, Mathf.Min(MAX_STAMINA, newStamina));
-    }
-
     private void manageHorizontalMovement() {
         this.characterController.Move(this.horizontalDirection * this.currentSpeed * Time.deltaTime);
         this.modelHelper.movementDirection = this.horizontalDirection * this.currentSpeed;
@@ -197,6 +198,30 @@ public class PlayerCharacter : Mover, Shooter {
 
     private void manageHeldItem() {
         this.modelHelper.holdItem(this.inventory.getHeld());
+    }
+
+    private void manageShooting() {
+        if (this.shooting) {
+            Item held = this.inventory.getHeld();
+            if (held != null) {
+                Vector3 source = this.followTarget.position;
+                Vector3 direction = (this.followTarget.rotation * Vector3.forward).normalized;
+                this.inventory.getHeld().primaryUsed(this as Shooter, source, direction);
+            }
+        }
+        this.modelHelper.shooting = this.shooting;
+    }
+
+    private void modifyStamina(float amount) {
+        float newStamina = this.currentStamina + (Time.deltaTime * amount);
+        this.currentStamina = Mathf.Max(MIN_STAMINA, Mathf.Min(MAX_STAMINA, newStamina));
+    }
+
+    // ================== PUBLIC METHODS ==================
+
+    public void reload() {
+        // TODO: this.modelHelper.beginReload();
+        this.inventory.reloadHeldWeapon();
     }
 
     public Pickup getFirstPickupInRange() {
@@ -225,7 +250,6 @@ public class PlayerCharacter : Mover, Shooter {
     public void jump() {
         if (this.characterController.isGrounded) {
             float jumpStrength = Mathf.Min(1.0f, this.currentStamina / JUMP_STAMINA_COST);
-            Debug.Log(jumpStrength);
             verticalDirection = 8.0f * jumpStrength;
             this.currentStamina = Mathf.Max(this.currentStamina - JUMP_STAMINA_COST, 0.0f);
         }
@@ -233,15 +257,6 @@ public class PlayerCharacter : Mover, Shooter {
 
     public void changeHeld(int index) {
         this.inventory.switchHeld(index);
-    }
-
-    public void useHeld() {
-        Item held = this.inventory.getHeld();
-        if (held != null) {
-            Vector3 source = this.followTarget.position;
-            Vector3 direction = (this.followTarget.rotation * Vector3.forward).normalized;
-            this.inventory.getHeld().primaryUsed(this as Shooter, source, direction);
-        }
     }
 
     public void changeLookDirection(float mouseDeltaX, float mouseDeltaY) {
@@ -255,6 +270,10 @@ public class PlayerCharacter : Mover, Shooter {
         followTargetRotation.z = 0;
         this.followTarget.rotation = Quaternion.Euler(followTargetRotation);
         this.modelHelper.heading += mouseDeltaX;
+    }
+
+    private Vector3 getCameraPivotAngle() {
+        return new Vector3(this.followTarget.forward.z, 0.0f, -this.followTarget.transform.forward.x);
     }
 
     public bool isSelf(GameObject gameObject) {
@@ -273,9 +292,5 @@ public class PlayerCharacter : Mover, Shooter {
 
     public float getStamina() {
         return this.currentStamina;
-    }
-
-    private Vector3 getCameraPivotAngle() {
-        return new Vector3(this.followTarget.forward.z, 0.0f, -this.followTarget.transform.forward.x);
     }
 }

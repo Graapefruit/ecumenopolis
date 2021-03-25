@@ -8,6 +8,7 @@ public class PlayerCharacterModelHelper {
     private const float LOWER_BODY_INITIAL_ROTATION = -90.0f; 
     public float heading;
     public Vector3 movementDirection;
+    public bool shooting;
     private float lowerBodyRotation;
     private GameObject playerModel;
     private Animator animator;
@@ -44,73 +45,120 @@ public class PlayerCharacterModelHelper {
 
     private void initializeUpperBodyStateManager() {
         State reactiveState = new State(
+            "reactive",
             (() => {}),
             (() => {
-                Vector3 upperBodyEuler = this.upperBodyStart.transform.eulerAngles;
-                upperBodyEuler.y = this.heading;
-                this.upperBodyStart.transform.rotation = Quaternion.Euler(upperBodyEuler);}),
+                setUpperBodyRotation();
+            }),
             (() => {})
         );
+
+        State shootingState = new State(
+            "shooting",
+            (() => {
+                this.animator.SetBool("shooting", true);
+            }),
+            (() => {
+                setUpperBodyRotation();
+            }),
+            (() => {
+                this.animator.SetBool("shooting", false);
+            })
+        );
+
+        reactiveState.setOnGetNextState(() => {
+            if (this.shooting) {
+                return shootingState;
+            } else {
+                return reactiveState;
+            }
+        });
+
+        shootingState.setOnGetNextState(() => {
+            if (!this.shooting) {
+                return reactiveState;
+            } else {
+                return shootingState;
+            }
+        });
         
         this.upperBodyStateManager = new StateManager(reactiveState);
     }
 
     private void initializeLowerBodyStateManager() {
-        State reactiveState = new State(
-            (() => {}),
+        State idleState = new State(
+            "idle",
             (() => {
-                if (this.movementDirection == Vector3.zero) {
-                    this.animator.SetInteger("walkDirection", 0);
-                    this.swivelHelper.manageSwivel(this.heading, this.lowerBodyRotation);
-                    this.lowerBodyRotation += Time.deltaTime * this.swivelHelper.getSwivelAmountWithoutDeltaTime();
-                } else {
-                    this.swivelHelper.stopSwiveling();
-                    this.snapLowerBodyToMovement();
-                    float contortionAngle = this.calculateContortion();
-                    if (contortionAngle > 300 || contortionAngle < 60) {
-                        this.animator.SetInteger("walkDirection", 1);
-                    } else if (contortionAngle >= 240 && contortionAngle <= 300) {
-                        this.lowerBodyRotation += 90;
-                        this.animator.SetInteger("walkDirection", 2);
-                    } else if (contortionAngle >= 60 && contortionAngle <= 120) {
-                        this.lowerBodyRotation -= 90;
-                        this.animator.SetInteger("walkDirection", 3);
-                    } else {
-                        this.lowerBodyRotation += 180;
-                        this.animator.SetInteger("walkDirection", 4);
-                    }
-                }
-                Vector3 lowerBodyEuler = this.lowerBodyStart.transform.eulerAngles;
-                lowerBodyEuler.y += this.lowerBodyRotation;
-                this.lowerBodyStart.transform.rotation = Quaternion.Euler(lowerBodyEuler);
+                this.animator.SetInteger("walkDirection", 0);
+            }),
+            (() => {
+                this.swivelHelper.manageSwivel(this.heading, this.lowerBodyRotation);
+                this.lowerBodyRotation += Time.deltaTime * this.swivelHelper.getSwivelAmountWithoutDeltaTime();
+                setLowerBodyRotation();
         }),
             (() => {})
         );
+
+        State walkingState = new State(
+            "walking",
+            (() => {}),
+            (() => {
+                this.swivelHelper.stopSwiveling();
+                this.snapLowerBodyToMovement();
+                float contortionAngle = this.calculateContortion();
+                if (contortionAngle > 300 || contortionAngle < 60) {
+                    this.animator.SetInteger("walkDirection", 1);
+                } else if (contortionAngle >= 240 && contortionAngle <= 300) {
+                    this.lowerBodyRotation += 90;
+                    this.animator.SetInteger("walkDirection", 2);
+                } else if (contortionAngle >= 60 && contortionAngle <= 120) {
+                    this.lowerBodyRotation -= 90;
+                    this.animator.SetInteger("walkDirection", 3);
+                } else {
+                    this.lowerBodyRotation += 180;
+                    this.animator.SetInteger("walkDirection", 4);
+                }
+                setLowerBodyRotation();
+            }),
+            (() => {})
+        );
+
+        idleState.setOnGetNextState(() => {
+            if (this.movementDirection != Vector3.zero) {
+                return walkingState;
+            } else {
+                return idleState;
+            }
+        });
+
+        walkingState.setOnGetNextState(() => {
+            if (this.movementDirection == Vector3.zero) {
+                return idleState;
+            } else {
+                return walkingState;
+            }
+        });
         
-        this.lowerBodyStateManager = new StateManager(reactiveState);
+        this.lowerBodyStateManager = new StateManager(idleState);
     }
 
     public void doUpdate() {
         // The bone for the lower body is the parent of all bones, so it should be updated first, so it's effects on the lower body can be overwritten
         this.lowerBodyStateManager.doUpdate();
         this.upperBodyStateManager.doUpdate();
+        Debug.Log(this.upperBodyStateManager.getCurrentStateName());
     }
 
-    public void holdItem(Item newHeldItem) {
-        if (this.heldItem == newHeldItem) {
-            return;
-        }
-        if (this.heldItem != null) {
-            setLayerWeight(this.heldItem.heldAnimationLayerName, ANIMATION_LAYER_OFF);
-            GameObject.Destroy(this.heldGameObject);
-        }
-        this.heldItem = newHeldItem;
-        if (newHeldItem != null) {
-            this.heldGameObject = GameObject.Instantiate(newHeldItem.prefab, Vector3.zero, Quaternion.identity) as GameObject;
-            this.heldGameObject.transform.SetParent(this.rightHand.transform);
-            this.heldItem.holdTransform.assignTransformation(this.heldGameObject);
-            setLayerWeight(this.heldItem.heldAnimationLayerName, ANIMATION_LAYER_ON);
-        }
+    private void setLowerBodyRotation() {
+        Vector3 lowerBodyEuler = this.lowerBodyStart.transform.eulerAngles;
+        lowerBodyEuler.y += this.lowerBodyRotation;
+        this.lowerBodyStart.transform.rotation = Quaternion.Euler(lowerBodyEuler);
+    }
+
+    private void setUpperBodyRotation() {
+        Vector3 upperBodyEuler = this.upperBodyStart.transform.eulerAngles;
+        upperBodyEuler.y = this.heading;
+        this.upperBodyStart.transform.rotation = Quaternion.Euler(upperBodyEuler);
     }
 
     private void setLayerWeight(string layerName, float newWeight) {
@@ -128,5 +176,24 @@ public class PlayerCharacterModelHelper {
             contortionAngle += 360;
         }
         return contortionAngle;
+    }
+
+    // ================== PUBLIC METHODS ==================
+
+    public void holdItem(Item newHeldItem) {
+        if (this.heldItem == newHeldItem) {
+            return;
+        }
+        if (this.heldItem != null) {
+            setLayerWeight(this.heldItem.heldAnimationLayerName, ANIMATION_LAYER_OFF);
+            GameObject.Destroy(this.heldGameObject);
+        }
+        this.heldItem = newHeldItem;
+        if (newHeldItem != null) {
+            this.heldGameObject = GameObject.Instantiate(newHeldItem.prefab, Vector3.zero, Quaternion.identity) as GameObject;
+            this.heldGameObject.transform.SetParent(this.rightHand.transform);
+            this.heldItem.holdTransform.assignTransformation(this.heldGameObject);
+            setLayerWeight(this.heldItem.heldAnimationLayerName, ANIMATION_LAYER_ON);
+        }
     }
 }

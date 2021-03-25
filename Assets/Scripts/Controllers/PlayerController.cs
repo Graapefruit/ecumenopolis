@@ -198,9 +198,7 @@ public class PlayerController : MonoBehaviour {
     }
 
     private void manageGunShooting() {
-        if (Input.GetMouseButton(0)) {
-            this.playerCharacter.useHeld();
-        }
+        this.playerCharacter.shooting = Input.GetMouseButton(0);
     }
 
     private void manageItemPickup() {

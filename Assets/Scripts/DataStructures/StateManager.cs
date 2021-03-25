@@ -8,6 +8,7 @@ public class StateManager {
     public StateManager(State startingState) {
         this.currentState = startingState;
     }
+
     public void doUpdate() {
         State nextState = this.currentState.getNextState();
         if (nextState != this.currentState && nextState.canTransitionInto()) {
@@ -16,5 +17,9 @@ public class StateManager {
             this.currentState.enter();
         }
         this.currentState.update();
+    }
+
+    public string getCurrentStateName() {
+        return this.currentState.getName();
     }
 }
