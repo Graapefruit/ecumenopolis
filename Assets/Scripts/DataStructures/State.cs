@@ -4,7 +4,9 @@ using UnityEngine;
 
 public delegate void StateDelegate();
 public delegate State StateChangeDelegate();
+public delegate bool StateTransitionableDelegate();
 public class State {
+    private StateTransitionableDelegate transitionIntoPrerequisite;
     private StateDelegate onEnter;
     private StateDelegate onUpdate;
     private StateChangeDelegate onGetNextState;
@@ -14,10 +16,22 @@ public class State {
         this.onEnter = onEnter;
         this.onUpdate = onUpdate;
         this.onExit = onExit;
+        this.onGetNextState = (() => { return this; });
+        this.transitionIntoPrerequisite = (() => { return true; });
     }
+
+    public void setCanTransitionInto(StateTransitionableDelegate transitionIntoPrerequisite) {
+        this.transitionIntoPrerequisite = transitionIntoPrerequisite;
+    }
+
     public void setOnGetNextState(StateChangeDelegate onGetNextState) {
         this.onGetNextState = onGetNextState;
     }
+
+    public bool canTransitionInto() {
+        return this.transitionIntoPrerequisite();
+    }
+
     public void enter() {
         this.onEnter();
     }

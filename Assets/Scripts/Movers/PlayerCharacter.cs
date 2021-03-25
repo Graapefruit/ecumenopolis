@@ -4,34 +4,32 @@ using UnityEngine;
 
 public class PlayerCharacter : Mover, Shooter {
     public const float MAX_STAMINA = 5.0f;
-    public Item startingItem;
+    public const float MIN_STAMINA = 0.0f;
     private const int PICKUP_LAYER = (1 << 11);
     private const float PICKUP_RANGE = 2.5f;
-    private const float SPRINT_SPEED = 5.0f;
-    private const float SPRINT_COOLDOWN = 1.5f;
-    private const float SPRINT_COST = 1.5f;
-    private const float STAMINA_RECOVERY_RATE = 0.75f;
-    // public bool Sprinting {
-    //     get { return sprinting; }
-    //     set {
-    //         if (value) {
-    //             if (Time.time > (this.lastSprintTime + SPRINT_COOLDOWN)) {
-    //                 sprinting = true;
-    //                 this.currentSpeed = SPRINT_SPEED;
-    //             }
-    //         } else {
-    //             this.lastSprintTime = Time.time;
-    //             this.sprinting = false;
-    //             this.currentSpeed = this.baseSpeed;
-    //         }
-    //     }
-    // }
-    private float lastSprintTime;
+    private const float WALK_SPEED = 4.2f;
+    private const float SPRINT_SPEED = 6.0f;
+    private const float STAMINA_RECOVERY_RATE_IDLE = 0.85f;
+    private const float STAMINA_RECOVERY_RATE_WALKING = 0.65f;
+    private const float STAMINA_DRAIN_RATE_SPRINTING = -1.5f;
+    private const float JUMP_STAMINA_COST = 1.5f;
+    public Item startingItem;
+    public bool sprinting;
+    public Vector3 HorizontalDirection {
+        get { return this.horizontalDirection; }
+        set { 
+            if (this.characterController.isGrounded) {
+                Quaternion relevantRotation = Quaternion.Euler(0.0f, this.followTarget.rotation.eulerAngles.y, 0.0f);
+                this.horizontalDirection = (relevantRotation * value).normalized;
+            }
+        }
+    }
+    private Vector3 horizontalDirection;
+    private float verticalDirection;
     private float currentStamina;
     private float upRotation;
     private PlayerInventory inventory;
     private Transform followTarget;
-    private Vector3 moveDelta;
     private CharacterController characterController;
     private PlayerCharacterModelHelper modelHelper;
     private StateManager stateManager;
@@ -39,11 +37,12 @@ public class PlayerCharacter : Mover, Shooter {
     public override void Awake() {
         base.Awake();
         base.setup(100, 3.0f);
-        this.lastSprintTime = -SPRINT_COOLDOWN;
+        this.sprinting = false;
+        this.horizontalDirection = Vector3.zero;
+        this.verticalDirection = 0.0f;
         this.currentStamina = MAX_STAMINA;
         this.upRotation = 0.0f;
         this.followTarget = this.transform.GetChild(2);
-        this.moveDelta = Vector3.zero;
         this.characterController = this.GetComponent<CharacterController>();
         this.initializeStates();
     }
@@ -56,11 +55,6 @@ public class PlayerCharacter : Mover, Shooter {
         this.inventory.assignMapping(0, 0, 0);
     }
 
-    void Update() {
-        manageHeldItem();
-        // updateStamina();
-    }
-
     // Model updates must be called in LATE update to override changes from the animations themselves
     void LateUpdate() {
         this.stateManager.doUpdate();
@@ -69,34 +63,58 @@ public class PlayerCharacter : Mover, Shooter {
 
     private void initializeStates() {
         State idleState = new State(
-            (() => {}),
             (() => {
-                manageHorizontalMovement();
+                this.currentSpeed = 0.0f;
+                this.modelHelper.movementDirection = Vector3.zero;
+            }),
+            (() => {
+                modifyStamina(STAMINA_RECOVERY_RATE_IDLE);
+                manageHeldItem();
             }),
             (() => {})
         );
 
         State walkingState = new State(
-            (() => {}),
+            (() => {
+                this.currentSpeed = WALK_SPEED;
+            }),
             (() => { 
+                modifyStamina(STAMINA_RECOVERY_RATE_WALKING);
+                manageHeldItem();
+                manageHorizontalMovement();
+            }),
+            (() => {})
+        );
+
+        State sprintingState = new State(
+            (() => {
+                this.currentSpeed = SPRINT_SPEED;
+            }),
+            (() => { 
+                modifyStamina(STAMINA_DRAIN_RATE_SPRINTING);
+                manageHeldItem();
                 manageHorizontalMovement();
             }),
             (() => {})
         );
 
         State midairState = new State(
-            (() => {}),
             (() => {
+                
+            }),
+            (() => {
+                manageHeldItem();
                 manageHorizontalMovement();
                 manageVerticalMovement();
             }),
             (() => {})
         );
 
+        // TODO: Jumping works badly rn. Relies on the inconsistencies of isGrounded to begin jumping
         idleState.setOnGetNextState(() => {
-            if (!this.characterController.isGrounded) {
+            if (!this.characterController.isGrounded || this.verticalDirection != 0.0f) {
                 return midairState;
-            } else if (moveDelta.x != 0.0f || moveDelta.z != 0.0f) {
+            } else if (this.horizontalDirection != Vector3.zero) {
                 return walkingState;
             } else {
                 return idleState;
@@ -104,19 +122,35 @@ public class PlayerCharacter : Mover, Shooter {
         });
 
         walkingState.setOnGetNextState(() => {
-            if (!this.characterController.isGrounded) {
+            if (!this.characterController.isGrounded || this.verticalDirection != 0.0f) {
                 return midairState;
-            } else if (moveDelta == Vector3.zero) {
+            } else if (this.sprinting) {
+                return sprintingState;
+            } else if (this.horizontalDirection == Vector3.zero) {
                 return idleState;
             } else {
                 return walkingState;
             }
         });
 
+        sprintingState.setOnGetNextState(() => {
+            if (!this.characterController.isGrounded || this.verticalDirection != 0.0f) {
+                return midairState;
+            } else if (this.horizontalDirection == Vector3.zero) {
+                return idleState;
+            } else if (!this.sprinting) {
+                return walkingState;
+            } else {
+                return sprintingState;
+            }
+        });
+
         midairState.setOnGetNextState(() => {
             if (this.characterController.isGrounded) {
-                if (moveDelta == Vector3.zero) {
+                if (this.horizontalDirection == Vector3.zero) {
                     return idleState;
+                } else if (this.sprinting) {
+                    return sprintingState;
                 } else {
                     return walkingState;
                 }
@@ -128,46 +162,36 @@ public class PlayerCharacter : Mover, Shooter {
         this.stateManager = new StateManager(idleState);
     }
 
-    private void maintainAnimation() {
-        
-    }
-
     public void reload() {
         // TODO: this.modelHelper.beginReload();
         this.inventory.reloadHeldWeapon();
     }
 
-    // private void updateStamina() {
-    //     if (this.sprinting) {
-    //         this.currentStamina -= Time.deltaTime * SPRINT_COST;
-    //         if (this.currentStamina < 0.0f) {
-    //             this.Sprinting = false;
-    //         }
-    //     } else {
-    //         float newStamina = this.currentStamina + (Time.deltaTime * STAMINA_RECOVERY_RATE);
-    //         this.currentStamina = (newStamina < MAX_STAMINA ? newStamina : MAX_STAMINA);
-    //     }
-    // }
+    private void modifyStamina(float amount) {
+        float newStamina = this.currentStamina + (Time.deltaTime * amount);
+        this.currentStamina = Mathf.Max(MIN_STAMINA, Mathf.Min(MAX_STAMINA, newStamina));
+    }
 
     private void manageHorizontalMovement() {
-        this.characterController.Move(this.moveDelta * Time.deltaTime);
-        this.modelHelper.movementDirection = this.moveDelta;
+        this.characterController.Move(this.horizontalDirection * this.currentSpeed * Time.deltaTime);
+        this.modelHelper.movementDirection = this.horizontalDirection * this.currentSpeed;
     }
 
     private void manageVerticalMovement() {
-        manageHeadBumping();
         // TODO: isGrounded seems to tick on and off. Investigate further. This is why Jumping is GetKey rather than GetKeyDown
         // This must be fixed when falling animations are introduced
+        this.characterController.Move(new Vector3(0.0f, this.verticalDirection * Time.deltaTime, 0.0f));
         if (this.characterController.isGrounded) {
-            this.moveDelta = Vector3.zero;
+            this.verticalDirection = 0.0f;
         } else {
-            this.moveDelta.y -= 19.62f * Time.deltaTime;
+            manageHeadBumping();
+            this.verticalDirection -= 19.62f * Time.deltaTime;
         }
     }
 
     private void manageHeadBumping() {
         if ((this.characterController.collisionFlags & CollisionFlags.Above) != 0) {
-            this.moveDelta.y = (this.moveDelta.y > 0.0f ? 0.0f : this.moveDelta.y);
+            this.verticalDirection = (this.verticalDirection > 0.0f ? 0.0f : this.verticalDirection);
         }
     }
 
@@ -198,16 +222,12 @@ public class PlayerCharacter : Mover, Shooter {
         return this.inventory;
     }
 
-    public void setMovement(Vector3 newDirection) {
-        if (this.characterController.isGrounded) {
-            Quaternion relevantRotation = Quaternion.Euler(0.0f, this.followTarget.rotation.eulerAngles.y, 0.0f);
-            this.moveDelta = (relevantRotation * newDirection).normalized * this.currentSpeed;
-        }
-    }
-
     public void jump() {
         if (this.characterController.isGrounded) {
-            moveDelta.y = 8.0f;
+            float jumpStrength = Mathf.Min(1.0f, this.currentStamina / JUMP_STAMINA_COST);
+            Debug.Log(jumpStrength);
+            verticalDirection = 8.0f * jumpStrength;
+            this.currentStamina = Mathf.Max(this.currentStamina - JUMP_STAMINA_COST, 0.0f);
         }
     }
 

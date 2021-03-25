@@ -165,7 +165,7 @@ public class PlayerController : MonoBehaviour {
     }
 
     private void manageMovement() {
-        // manageSprinting();
+        manageSprinting();
         float xMagnitude = 0.0f;
         float zMagnitude = 0.0f;
         xMagnitude += (Input.GetKey("d") ? 1.0f : 0.0f);
@@ -176,7 +176,7 @@ public class PlayerController : MonoBehaviour {
         movementDirection = playerCharacter.transform.rotation * movementDirection;
         movementDirection.y = 0;
         movementDirection = movementDirection.normalized;
-        this.playerCharacter.setMovement(movementDirection);
+        this.playerCharacter.HorizontalDirection = movementDirection;
         manageJumping();
     }
 
@@ -186,13 +186,9 @@ public class PlayerController : MonoBehaviour {
         }
     }
 
-    // private void manageSprinting() {
-    //     if (Input.GetKey(KeyCode.LeftShift) && !(this.playerCharacter.Sprinting)) {
-    //         this.playerCharacter.Sprinting = true;
-    //     } else if (!(Input.GetKey(KeyCode.LeftShift)) && this.playerCharacter.Sprinting) {
-    //         this.playerCharacter.Sprinting = false;
-    //     }
-    // }
+    private void manageSprinting() {
+        this.playerCharacter.sprinting = Input.GetKey(KeyCode.LeftShift);
+    }
 
     private void manageHotbar() {
         int hotbarKeyDown = getHotbarSlotDown();

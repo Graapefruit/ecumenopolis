@@ -51,9 +51,7 @@ public class PlayerCharacterModelHelper {
                 this.upperBodyStart.transform.rotation = Quaternion.Euler(upperBodyEuler);}),
             (() => {})
         );
-        reactiveState.setOnGetNextState(() => {
-            return reactiveState;
-        });
+        
         this.upperBodyStateManager = new StateManager(reactiveState);
     }
 
@@ -61,7 +59,7 @@ public class PlayerCharacterModelHelper {
         State reactiveState = new State(
             (() => {}),
             (() => {
-                if (this.movementDirection.x == 0.0f && this.movementDirection.z == 0.0f) {
+                if (this.movementDirection == Vector3.zero) {
                     this.animator.SetInteger("walkDirection", 0);
                     this.swivelHelper.manageSwivel(this.heading, this.lowerBodyRotation);
                     this.lowerBodyRotation += Time.deltaTime * this.swivelHelper.getSwivelAmountWithoutDeltaTime();
@@ -88,9 +86,7 @@ public class PlayerCharacterModelHelper {
         }),
             (() => {})
         );
-        reactiveState.setOnGetNextState(() => {
-            return reactiveState;
-        });
+        
         this.lowerBodyStateManager = new StateManager(reactiveState);
     }
 

@@ -10,7 +10,7 @@ public class StateManager {
     }
     public void doUpdate() {
         State nextState = this.currentState.getNextState();
-        if (nextState != this.currentState) {
+        if (nextState != this.currentState && nextState.canTransitionInto()) {
             this.currentState.exit();
             this.currentState = nextState;
             this.currentState.enter();
