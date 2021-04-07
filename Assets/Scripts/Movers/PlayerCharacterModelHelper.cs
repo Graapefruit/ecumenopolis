@@ -196,4 +196,12 @@ public class PlayerCharacterModelHelper {
             setLayerWeight(this.heldItem.heldAnimationLayerName, ANIMATION_LAYER_ON);
         }
     }
+
+    public void startReload() {
+        this.animator.SetBool("reloading", true);
+    }
+
+    public void stopReload() {
+        this.animator.SetBool("reloading", false);
+    }
 }

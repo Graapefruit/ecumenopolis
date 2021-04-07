@@ -98,13 +98,17 @@ public class PlayerInventory : Inventory {
         return item;
     }
 
-    public void reloadHeldWeapon() {
+    public int getAmmoForHeldAndSpendAmmo(int amount) {
+        int amountUsed = 0;
         Item heldItem = this.getHeld();
         if (heldItem && heldItem is Gun) {
             Pair ammoLocation = this.findAmmo();
             if (ammoLocation != null) {
                 Ammo ammo = this.inventory[ammoLocation.x, ammoLocation.y] as Ammo;
-                ammo.restoreAmmo((heldItem as Gun));
+                // TODO: Iteratively get all ammo until no more or full
+                amountUsed = Mathf.Min(amount, ammo.currentStackSize);
+                ammo.currentStackSize = ammo.currentStackSize - amountUsed;
+
                 if (ammo.currentStackSize > 0) {
                     this.hud.updateStackSize(ammoLocation, ammo);
                 } else {
@@ -112,6 +116,7 @@ public class PlayerInventory : Inventory {
                 }
             }
         }
+        return amountUsed;
     }
 
     private Pair findAmmo() {

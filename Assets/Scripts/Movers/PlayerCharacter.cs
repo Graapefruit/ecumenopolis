@@ -221,7 +221,14 @@ public class PlayerCharacter : Mover, Shooter {
 
     public void reload() {
         // TODO: this.modelHelper.beginReload();
-        this.inventory.reloadHeldWeapon();
+        Item held = this.inventory.getHeld();
+        if (held != null && held is Gun) {
+            Gun heldGun = this.inventory.getHeld() as Gun;
+            if (!heldGun.isReloading()) {
+                this.modelHelper.startReload();
+                heldGun.startReload(this.modelHelper.stopReload, this.inventory.getAmmoForHeldAndSpendAmmo);
+            }
+        }
     }
 
     public Pickup getFirstPickupInRange() {

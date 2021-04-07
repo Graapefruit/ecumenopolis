@@ -7,6 +7,7 @@ using UnityEngine;
 public class Gun : Item {
     private const int GUN_IGNORE_LAYER = ~(1 << 8);
     public int damage;
+    public float reloadTime;
     public float fireCooldown;
     public float range;
     public int maxAmmo;
@@ -15,6 +16,7 @@ public class Gun : Item {
     public float bloomRecoveryRate;
     public float minBloom;
     public float maxBloom;
+    private bool reloading;
     private float bloomPerShotRad;
     private float currentBloom;
     private float timeLastShot;
@@ -35,7 +37,7 @@ public class Gun : Item {
     }
 
     private bool gunIsReady() {
-        return Time.time - timeLastShot >= fireCooldown && ammoRemaining > 0;
+        return Time.time - timeLastShot >= fireCooldown && ammoRemaining > 0 && !this.reloading;
     }
 
     public void refillAmmo(int amount) {
@@ -46,10 +48,24 @@ public class Gun : Item {
         return this.ammoRemaining;
     }
 
-    public int reloadReturnRemaining(int amount) {
-        int amountUsed = Mathf.Min(amount, this.maxAmmo - this.ammoRemaining);
-        this.ammoRemaining += amountUsed;
-        return amount - amountUsed;
+    public bool isReloading() {
+        return this.reloading;
+    }
+
+    public void startReload(Action stopAnimationCallback, Func<int, int> getAndDecrementAmmoCallback) {
+        if (!reloading) {
+            CoroutineManager.doCoroutine(this.doReload(stopAnimationCallback, getAndDecrementAmmoCallback));
+        }
+    }
+
+    private IEnumerator doReload(Action stopAnimationCallback, Func<int, int> getAndDecrementAmmoCallback) {
+        reloading = true;
+        yield return new WaitForSeconds(this.reloadTime);
+        Debug.Log("Done reloading!");
+        stopAnimationCallback();
+        int amountMissing = this.maxAmmo - this.ammoRemaining;
+        this.ammoRemaining += getAndDecrementAmmoCallback(amountMissing);
+        reloading = false;
     }
 
     protected void fireWeapon(Shooter shooter, Vector3 source, Vector3 direction) {

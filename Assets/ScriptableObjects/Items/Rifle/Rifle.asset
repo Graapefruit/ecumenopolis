@@ -18,7 +18,11 @@ MonoBehaviour:
   pickupTransform: {fileID: 11400000, guid: 89895e89551a958448733dbcae257af0, type: 2}
   holdTransform: {fileID: 11400000, guid: 7851b5620b693e740af926a1ea683321, type: 2}
   heldAnimationLayerName: UpperBodyRifle
+  stackable: 0
+  maxStackSize: 0
+  currentStackSize: 0
   damage: 7
+  reloadTime: 1
   fireCooldown: 0.125
   range: 14
   maxAmmo: 30
