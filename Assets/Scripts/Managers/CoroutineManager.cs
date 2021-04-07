@@ -17,7 +17,15 @@ public class CoroutineManager : MonoBehaviour {
         ch.doCoroutineHelper(coroutine);
     }
 
+    public static void stopCoroutine(IEnumerator coroutine) {
+        ch.stopCoroutineHelper(coroutine);
+    }
+
     private void doCoroutineHelper(IEnumerator coroutine) {
         StartCoroutine(coroutine);
+    }
+
+    private void stopCoroutineHelper(IEnumerator coroutine) {
+        StopCoroutine(coroutine);
     }
 }

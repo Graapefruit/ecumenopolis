@@ -217,6 +217,17 @@ public class PlayerCharacter : Mover, Shooter {
         this.currentStamina = Mathf.Max(MIN_STAMINA, Mathf.Min(MAX_STAMINA, newStamina));
     }
 
+    private void cancelReload() {
+        Item held = this.inventory.getHeld();
+        if (held != null && held is Gun) {
+            Gun heldGun = this.inventory.getHeld() as Gun;
+            if (heldGun.isReloading()) {
+                this.modelHelper.stopReload();
+                heldGun.cancelReload();
+            }
+        }
+    }
+
     // ================== PUBLIC METHODS ==================
 
     public void reload() {
@@ -263,6 +274,7 @@ public class PlayerCharacter : Mover, Shooter {
     }
 
     public void changeHeld(int index) {
+        this.cancelReload();
         this.inventory.switchHeld(index);
     }
 

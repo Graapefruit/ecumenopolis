@@ -146,7 +146,7 @@ public class PlayerCharacterModelHelper {
         // The bone for the lower body is the parent of all bones, so it should be updated first, so it's effects on the lower body can be overwritten
         this.lowerBodyStateManager.doUpdate();
         this.upperBodyStateManager.doUpdate();
-        Debug.Log(this.upperBodyStateManager.getCurrentStateName());
+        // Debug.Log(this.upperBodyStateManager.getCurrentStateName());
     }
 
     private void setLowerBodyRotation() {

@@ -16,11 +16,13 @@ public class Gun : Item {
     public float bloomRecoveryRate;
     public float minBloom;
     public float maxBloom;
-    private bool reloading;
     private float bloomPerShotRad;
     private float currentBloom;
     private float timeLastShot;
     private int ammoRemaining;
+    private bool reloading;
+
+    private IEnumerator reloadCoroutine;
 
     void OnEnable() {
         this.timeLastShot = 0.0f;
@@ -34,10 +36,6 @@ public class Gun : Item {
             this.fireWeapon(shooter, source, direction.normalized);
             this.ammoRemaining--;
         }
-    }
-
-    private bool gunIsReady() {
-        return Time.time - timeLastShot >= fireCooldown && ammoRemaining > 0 && !this.reloading;
     }
 
     public void refillAmmo(int amount) {
@@ -54,14 +52,25 @@ public class Gun : Item {
 
     public void startReload(Action stopAnimationCallback, Func<int, int> getAndDecrementAmmoCallback) {
         if (!reloading) {
-            CoroutineManager.doCoroutine(this.doReload(stopAnimationCallback, getAndDecrementAmmoCallback));
+            reloadCoroutine = this.doReload(stopAnimationCallback, getAndDecrementAmmoCallback);
+            CoroutineManager.doCoroutine(reloadCoroutine);
         }
+    }
+
+    public void cancelReload() {
+        if (reloading) {
+            CoroutineManager.stopCoroutine(this.reloadCoroutine);
+            reloading = false;
+        }
+    }
+
+    private bool gunIsReady() {
+        return Time.time - timeLastShot >= fireCooldown && ammoRemaining > 0 && !this.reloading;
     }
 
     private IEnumerator doReload(Action stopAnimationCallback, Func<int, int> getAndDecrementAmmoCallback) {
         reloading = true;
         yield return new WaitForSeconds(this.reloadTime);
-        Debug.Log("Done reloading!");
         stopAnimationCallback();
         int amountMissing = this.maxAmmo - this.ammoRemaining;
         this.ammoRemaining += getAndDecrementAmmoCallback(amountMissing);
