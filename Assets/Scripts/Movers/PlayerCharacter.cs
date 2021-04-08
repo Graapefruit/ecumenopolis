@@ -3,6 +3,9 @@ using System.Collections.Generic;
 using UnityEngine;
 
 public class PlayerCharacter : Mover, Shooter {
+    public Item startingItem;
+    public GameObject inventoryHudPrefab;
+    public GameObject inventoryHotbarHudPrefab;
     public const float MAX_STAMINA = 5.0f;
     public const float MIN_STAMINA = 0.0f;
     private const int PICKUP_LAYER = (1 << 11);
@@ -13,7 +16,6 @@ public class PlayerCharacter : Mover, Shooter {
     private const float STAMINA_RECOVERY_RATE_WALKING = 0.65f;
     private const float STAMINA_DRAIN_RATE_SPRINTING = -1.5f;
     private const float JUMP_STAMINA_COST = 1.5f;
-    public Item startingItem;
     public bool sprinting;
     public bool shooting;
     public Vector3 HorizontalDirection {
@@ -47,14 +49,15 @@ public class PlayerCharacter : Mover, Shooter {
         this.followTarget = this.transform.GetChild(2);
         this.characterController = this.GetComponent<CharacterController>();
         this.initializeStates();
-    }
-
-    // TODO: Start?
-    public void finishInitialization() {
-        this.inventory = new PlayerInventory();
-        this.modelHelper = new PlayerCharacterModelHelper(this.transform.GetChild(0).gameObject, this.animator);
+        InventoryHudPanel hud = Instantiate(inventoryHudPrefab, Vector3.zero, Quaternion.identity).GetComponent<InventoryHudPanel>();
+        HotbarHudPanel hotbarHud = Instantiate(inventoryHotbarHudPrefab, Vector3.zero, Quaternion.identity).GetComponent<HotbarHudPanel>();
+        this.inventory = new PlayerInventory(hud, hotbarHud);
         this.inventory.add(startingItem, 0, 0);
         this.inventory.assignMapping(0, 0, 0);
+        this.modelHelper = new PlayerCharacterModelHelper(this.transform.GetChild(0).gameObject, this.animator);
+    }
+
+    void Start() {
     }
 
     // Model updates must be called in LATE update to override changes from the animations themselves

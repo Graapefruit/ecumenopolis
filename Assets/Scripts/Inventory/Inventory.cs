@@ -8,13 +8,25 @@ public class Inventory {
     protected int inventorySizeY = 6;
     protected InventoryHudPanel hud;
 
-    public Inventory() {
+    public Inventory(InventoryHudPanel hud) {
         this.inventory = new Item[inventorySizeX, inventorySizeY];
-        this.initializeHud();
+        this.hud = hud;
+        initializeHud();
     }
 
     public InventoryHudPanel getHud() {
         return this.hud;
+    }
+
+    protected virtual void initializeHud() {
+        this.hud.initializeInventoryHud(this);
+        for (int x = 0; x < this.inventorySizeX; x++) {
+            for (int y = 0; y < this.inventorySizeY; y++) {
+                if (this.inventory[x, y] != null) {
+                    this.hud.add(this.inventory[x, y], x, y);
+                }
+            }
+        }
     }
 
     public void add(Item item, int x, int y) {
@@ -46,19 +58,5 @@ public class Inventory {
 
     public Pair getDimensions() {
         return new Pair(inventorySizeX, inventorySizeY);
-    }
-
-    // ----- Helpers -----
-
-    private void initializeHud() {
-        this.hud = HudManager.getNewInventoryHudInstance();
-        this.hud.initializeInventoryHud(this);
-        for (int x = 0; x < this.inventorySizeX; x++) {
-            for (int y = 0; y < this.inventorySizeY; y++) {
-                if (this.inventory[x, y] != null) {
-                    this.hud.add(this.inventory[x, y], x, y);
-                }
-            }
-        }
     }
 }

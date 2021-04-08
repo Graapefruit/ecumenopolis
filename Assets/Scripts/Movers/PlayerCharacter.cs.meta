@@ -5,6 +5,10 @@ MonoImporter:
   serializedVersion: 2
   defaultReferences:
   - startingItem: {fileID: 11400000, guid: 119bc1605ccfff547a3c4150950fbc90, type: 2}
+  - inventoryHudPrefab: {fileID: 6132104302995412394, guid: fcce14bc34075ba4491be2849f011769,
+      type: 3}
+  - inventoryHotbarHudPrefab: {fileID: 245006230004510192, guid: 5b42f5a7dabf8cf46886cb1e411f4156,
+      type: 3}
   executionOrder: 0
   icon: {instanceID: 0}
   userData: 

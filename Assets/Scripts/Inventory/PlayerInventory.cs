@@ -8,7 +8,8 @@ public class PlayerInventory : Inventory {
     private int currentlyHeld;
     private HotbarHudPanel hotbarHud;
 
-    public PlayerInventory() : base() {
+    public PlayerInventory(InventoryHudPanel hud, HotbarHudPanel hotbarHud) : base(hud) {
+        this.hotbarHud = hotbarHud;
         this.hotbarMappings = new Pair[10];
         this.inverseHotbarMappings = new int[this.inventorySizeX, this.inventorySizeY];
         for(int x = 0; x < this.inventorySizeX; x++) {
@@ -16,10 +17,10 @@ public class PlayerInventory : Inventory {
                 this.inverseHotbarMappings[x, y] = -1;
             }
         }
-        this.hotbarHud = HudManager.getNewHotbarHudInstance();
-        // TODO: Calling this causes the hotbar square to vanish off the screen. Likely has to with 
+        // TODO: Calling this causes the hotbar square to vanish off the screen. Likely has to with... ???
         // this.switchHeld(0);
     }
+
     public HotbarHudPanel getHotbarHud() {
         return this.hotbarHud;
     }

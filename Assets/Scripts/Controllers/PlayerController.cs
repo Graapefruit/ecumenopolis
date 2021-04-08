@@ -9,6 +9,7 @@ public class PlayerController : MonoBehaviour {
         InventoryOpen
     }
     public GameObject pcPrefab;
+    public GameObject playerHudPrefab;
     private PlayerCharacter playerCharacter;
     private PlayerHud hud;
     private ItemDragHelper itemDragHelper;
@@ -22,9 +23,8 @@ public class PlayerController : MonoBehaviour {
     }
 
     void Start() {
-        this.playerCharacter.finishInitialization();
         this.playerInventory = this.playerCharacter.getInventory();
-        this.hud = HudManager.getNewPlayerHudInstance();
+        this.hud = Instantiate(playerHudPrefab, Vector3.zero, Quaternion.identity).GetComponent<PlayerHud>();
         this.itemDragHelper = this.hud.transform.Find("DraggedItem").GetComponent<ItemDragHelper>();
         this.hud.assignPlayer(this.playerCharacter);
     }
@@ -61,22 +61,22 @@ public class PlayerController : MonoBehaviour {
     private void manageStateChanges() {
         switch (this.state) {
             case State.Normal:
+                Cursor.lockState = CursorLockMode.Locked;
                 if (Input.GetKeyDown(KeyCode.I)) {
                     this.hud.toggleInventory();
                     this.state = State.InventoryOpen;
                 }
-                Cursor.lockState = CursorLockMode.Locked;
                 break;
             case State.InventoryOpen:
+                Cursor.lockState = CursorLockMode.None;
                 if (Input.GetKeyDown(KeyCode.I)) {
                     this.hud.toggleInventory();
                     this.state = State.Normal;
                     this.itemDragHelper.gameObject.SetActive(false);
+                    if (this.itemDragHelper.hasItem()) {
+                        PickupManager.dropItem(this.playerCharacter.transform.position, this.itemDragHelper.releaseItem());
+                    }
                 }
-                if (this.itemDragHelper.hasItem()) {
-                    PickupManager.dropItem(this.playerCharacter.transform.position, this.itemDragHelper.releaseItem());
-                }
-                Cursor.lockState = CursorLockMode.None;
                 break;
         }
     }
