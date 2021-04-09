@@ -4,10 +4,10 @@ using UnityEngine;
 
 public class Game : MonoBehaviour
 {
-    public GameObject pmObject;
-    private PlayerCharacter player;
-    private PlayerController playerController;
-    public static Game game;
+    public GameObject playerCharacterPrefab;
+    public GameObject playerControllerPrefab;
+    private static Game game;
+    private PlayerManager playerManager;
     
     // Start is called before the first frame update
     void Awake()
@@ -17,15 +17,10 @@ public class Game : MonoBehaviour
             GameObject.Destroy(game);
         }
         game = this;
-        game.playerController = pmObject.GetComponent<PlayerController>();
-        game.player = game.playerController.getPlayer();
+        playerManager = new PlayerManager(playerCharacterPrefab, playerControllerPrefab);
     }
 
     public static PlayerCharacter getPlayer() {
-        if (game.player != null) {
-            return game.player.gameObject.GetComponent<PlayerCharacter>();
-        } else {
-            return null;
-        }
+        return game.playerManager.getPlayer();
     }
 }

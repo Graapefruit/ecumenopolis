@@ -8,7 +8,6 @@ public class PlayerController : MonoBehaviour {
         Normal,
         InventoryOpen
     }
-    public GameObject pcPrefab;
     public GameObject playerHudPrefab;
     private PlayerCharacter playerCharacter;
     private PlayerHud hud;
@@ -18,11 +17,10 @@ public class PlayerController : MonoBehaviour {
 
     void Awake() {
         this.state = State.Normal;
-        this.playerCharacter = ((GameObject) Instantiate(pcPrefab, new Vector3 (24.0f, 10.0f, 13.0f), Quaternion.identity)).GetComponent<PlayerCharacter>();
-        this.state = State.Normal;
     }
 
-    void Start() {
+    public void assignPlayer(PlayerCharacter pc) {
+        this.playerCharacter = pc;
         this.playerInventory = this.playerCharacter.getInventory();
         this.hud = Instantiate(playerHudPrefab, Vector3.zero, Quaternion.identity).GetComponent<PlayerHud>();
         this.itemDragHelper = this.hud.transform.Find("DraggedItem").GetComponent<ItemDragHelper>();
